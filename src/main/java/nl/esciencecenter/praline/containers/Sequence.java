@@ -39,6 +39,10 @@ public class Sequence {
         }
     }
 
+    public int [] getElements() {
+        return sequence;
+    }
+
     public void setElements(int [] elements) {
         sequence = elements;
     }

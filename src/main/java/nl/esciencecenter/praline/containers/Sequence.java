@@ -4,6 +4,10 @@ public class Sequence {
     private String id;
     private int [] sequence;
 
+    public Sequence(String id) {
+        this.id = id;
+    }
+
     public Sequence(String id, int length) {
         this.id = id;
         sequence = new int [length];

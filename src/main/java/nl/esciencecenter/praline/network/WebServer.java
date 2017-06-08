@@ -9,17 +9,16 @@ import java.util.HashMap;
 import static spark.Spark.*;
 
 public class WebServer {
-    private int nrThreads;
     ArrayList<Sequence> sequences;
     HashMap<String, ScoreMatrix> scores;
 
     public WebServer(int threads) {
-        nrThreads = threads;
-        threadPool(nrThreads);
+        threadPool(threads);
         init();
     }
 
     public void run() {
+        awaitInitialization();
         post("/send/:sequence", (request, response) -> {
             int statusCode = processSendSequence(request.params(":sequence"), request.body());
             response.status(statusCode);
@@ -36,7 +35,7 @@ public class WebServer {
             }
         });
         // Compress responses
-        after(((request, response) -> { response.header("Content-Encoding", "gzip"); }));
+        after(((request, response) -> response.header("Content-Encoding", "gzip")));
     }
 
     public void close() {

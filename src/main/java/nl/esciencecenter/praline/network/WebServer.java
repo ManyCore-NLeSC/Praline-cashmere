@@ -25,7 +25,7 @@ public class WebServer {
             return "Sequence " + request.params(":sequence") + " processed.";
         });
         get("/receive/:sequence1/:sequence2", (request, response) -> {
-            ScoreMatrix score = scores.get(request.params(":sequence1") + request.params(":sequence2"));
+            ScoreMatrix score = scores.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( score != null ) {
                 response.status(200);
                 return score;

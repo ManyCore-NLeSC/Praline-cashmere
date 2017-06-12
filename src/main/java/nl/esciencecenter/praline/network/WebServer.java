@@ -28,7 +28,7 @@ public class WebServer {
             ScoreMatrix score = scores.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( score != null ) {
                 response.status(200);
-                return score;
+                return score.toString();
             } else {
                 response.status(404);
                 return "";

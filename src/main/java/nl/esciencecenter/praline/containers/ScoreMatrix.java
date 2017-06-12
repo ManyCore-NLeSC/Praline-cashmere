@@ -48,4 +48,18 @@ public class ScoreMatrix {
             matrix[index] = value;
         }
     }
+
+    public int [] getMatrix() {
+        return matrix;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer stringMatrix = new StringBuffer();
+        for ( int item = 0; item < matrix.length; item++ ) {
+            stringMatrix.append(Integer.toString(matrix[item]));
+            stringMatrix.append(" ");
+        }
+        return stringMatrix.toString();
+    }
 }

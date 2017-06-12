@@ -55,8 +55,8 @@ public class ScoreMatrix {
 
     @Override
     public String toString() {
-        StringBuffer stringMatrix = new StringBuffer();
-        for ( int item = 0; item < matrix.length; item++ ) {
+        StringBuilder stringMatrix = new StringBuilder();
+        for ( int item : matrix ) {
             stringMatrix.append(Integer.toString(matrix[item]));
             stringMatrix.append(" ");
         }

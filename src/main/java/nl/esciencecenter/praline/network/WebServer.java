@@ -9,6 +9,7 @@ import java.util.HashMap;
 import static spark.Spark.*;
 
 public class WebServer {
+    private Object sequenceLock;
     private ArrayList<Sequence> sequences;
     private HashMap<String, ScoreMatrix> scores;
 
@@ -47,7 +48,8 @@ public class WebServer {
         stop();
     }
 
-    public void setSequences(ArrayList<Sequence> sequences) {
+    public void setSequences(ArrayList<Sequence> sequences, Object lock) {
+        sequenceLock = lock;
         this.sequences = sequences;
     }
 
@@ -66,7 +68,7 @@ public class WebServer {
             iterator++;
         }
         sequence.setElements(elements);
-        synchronized (this) {
+        synchronized ( sequenceLock ) {
             success = sequences.add(sequence);
         }
         if ( success ) {

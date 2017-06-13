@@ -65,8 +65,10 @@ public class WebServer {
             iterator++;
         }
         sequence.setElements(elements);
-        sequences.add(sequence);
-
-        return 201;
+        if ( sequences.add(sequence) ) {
+            return 201;
+        } else {
+            return 500;
+        }
     }
 }

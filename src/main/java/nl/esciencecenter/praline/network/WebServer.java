@@ -19,11 +19,13 @@ public class WebServer {
 
     public void run() {
         awaitInitialization();
+        // Receive a sequence
         post("/send/:sequence", (request, response) -> {
             int statusCode = processSendSequence(request.params(":sequence"), request.body());
             response.status(statusCode);
             return "Sequence " + request.params(":sequence") + " processed.";
         });
+        // Send a score
         get("/receive/:sequence1/:sequence2", (request, response) -> {
             ScoreMatrix score = scores.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( score != null ) {
@@ -34,6 +36,9 @@ public class WebServer {
                 return "";
             }
         });
+        // Default routes
+        get("/", ((request, response) -> halt(501)));
+        post("/", ((request, response) -> halt(501)));
         // Compress responses
         after(((request, response) -> response.header("Content-Encoding", "gzip")));
     }

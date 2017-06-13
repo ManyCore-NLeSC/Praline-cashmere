@@ -26,7 +26,7 @@ public class WebServerTest {
         scores = new HashMap<>();
         server = new WebServer(nrThreads);
 
-        server.setSequences(sequences);
+        server.setSequences(sequences, new Object());
         server.setScores(scores);
         server.run();
     }

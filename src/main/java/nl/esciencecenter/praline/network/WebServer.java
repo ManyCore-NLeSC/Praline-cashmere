@@ -56,6 +56,7 @@ public class WebServer {
     }
 
     private int processSendSequence(String id, String body) {
+        boolean success;
         int iterator = 0;
         int [] elements = new int [body.split(" ").length];
         Sequence sequence = new Sequence(id);
@@ -65,7 +66,10 @@ public class WebServer {
             iterator++;
         }
         sequence.setElements(elements);
-        if ( sequences.add(sequence) ) {
+        synchronized (this) {
+            success = sequences.add(sequence);
+        }
+        if ( success ) {
             return 201;
         } else {
             return 500;

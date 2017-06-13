@@ -51,16 +51,15 @@ public class WebServer {
     }
 
     private int processSendSequence(String id, String body) {
-        Sequence sequence;
-        ArrayList<Integer> numericSequence = new ArrayList<>();
+        int iterator = 0;
+        int [] elements = new int [body.split(" ").length];
+        Sequence sequence = new Sequence(id);
 
         for ( String item : body.split(" ") ) {
-            numericSequence.add(Integer.parseInt(item));
+            elements[iterator] = Integer.parseInt(item);
+            iterator++;
         }
-        sequence = new Sequence(id, numericSequence.size());
-        for ( int item = 0; item < numericSequence.size(); item++ ) {
-            sequence.setElement(item, numericSequence.get(item));
-        }
+        sequence.setElements(elements);
         sequences.add(sequence);
 
         return 201;

@@ -9,8 +9,8 @@ import java.util.HashMap;
 import static spark.Spark.*;
 
 public class WebServer {
-    ArrayList<Sequence> sequences;
-    HashMap<String, ScoreMatrix> scores;
+    private ArrayList<Sequence> sequences;
+    private HashMap<String, ScoreMatrix> scores;
 
     public WebServer(int threads) {
         threadPool(threads);

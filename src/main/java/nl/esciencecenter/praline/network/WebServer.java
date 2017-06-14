@@ -6,13 +6,16 @@ import nl.esciencecenter.praline.containers.Sequence;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static spark.Spark.*;
 
 public class WebServer {
-    private Object sequenceLock;
+    // Local data structures
     private HashSet<String> knownSequences;
-    private ArrayList<Sequence> sequencesQueue;
+    // Global data structures
+    private ReentrantLock sequenceLock;
+    private ArrayList<Sequence> sequences;
     private HashMap<String, ScoreMatrix> scores;
 
     public WebServer(int threads) {
@@ -55,9 +58,9 @@ public class WebServer {
         stop();
     }
 
-    public void setSequences(ArrayList<Sequence> sequencesQueue, Object lock) {
+    public void setSequences(ArrayList<Sequence> sequences, ReentrantLock lock) {
         sequenceLock = lock;
-        this.sequencesQueue = sequencesQueue;
+        this.sequences = sequences;
     }
 
     public void setScores(HashMap<String, ScoreMatrix> scores) {
@@ -75,8 +78,11 @@ public class WebServer {
             iterator++;
         }
         sequence.setElements(elements);
-        synchronized ( sequenceLock ) {
-            success = sequencesQueue.add(sequence);
+        sequenceLock.lock();
+        try {
+            success = sequences.add(sequence);
+        } finally {
+            sequenceLock.unlock();
         }
         if ( success ) {
             knownSequences.add(id);

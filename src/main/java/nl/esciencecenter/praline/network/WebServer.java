@@ -14,11 +14,12 @@ public class WebServer {
     // Local data structures
     private HashSet<String> knownSequences;
     // Global data structures
-    private ReentrantLock sequenceLock;
+    private final ReentrantLock sequenceLock;
     private ArrayList<Sequence> sequences;
     private HashMap<String, ScoreMatrix> scores;
 
-    public WebServer(int threads) {
+    public WebServer(int threads, ReentrantLock lock) {
+        sequenceLock = lock;
         knownSequences = new HashSet<>();
         threadPool(threads);
         init();
@@ -58,8 +59,7 @@ public class WebServer {
         stop();
     }
 
-    public void setSequences(ArrayList<Sequence> sequences, ReentrantLock lock) {
-        sequenceLock = lock;
+    public void setSequences(ArrayList<Sequence> sequences) {
         this.sequences = sequences;
     }
 
@@ -78,16 +78,13 @@ public class WebServer {
             iterator++;
         }
         sequence.setElements(elements);
-        sequenceLock.lock();
-        try {
+        synchronized ( sequenceLock ) {
             success = sequences.add(sequence);
-        } finally {
-            sequenceLock.unlock();
-        }
-        if ( success ) {
-            synchronized ( sequenceLock ) {
+            if (success) {
                 sequenceLock.notifyAll();
             }
+        }
+        if ( success ) {
             knownSequences.add(id);
             return 201;
         } else {

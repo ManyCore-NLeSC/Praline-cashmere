@@ -85,6 +85,9 @@ public class WebServer {
             sequenceLock.unlock();
         }
         if ( success ) {
+            synchronized ( sequenceLock ) {
+                sequenceLock.notifyAll();
+            }
             knownSequences.add(id);
             return 201;
         } else {

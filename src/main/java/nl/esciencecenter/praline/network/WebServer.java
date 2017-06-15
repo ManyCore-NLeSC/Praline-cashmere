@@ -45,7 +45,7 @@ public class WebServer {
                 return score.toString();
             } else {
                 response.status(404);
-                return "";
+                return "No score for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
             }
         });
         // Default routes

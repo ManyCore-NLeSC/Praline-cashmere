@@ -6,7 +6,7 @@ public class AlignmentMatrix {
     private final int MAX_SEQUENCES = 2;
     private String id;
     private ArrayList<Sequence> sequences;
-    private int [] matrix;
+    private float [] matrix;
 
     public AlignmentMatrix(String id) {
         this.id = id;
@@ -33,10 +33,10 @@ public class AlignmentMatrix {
         for ( Sequence sequence : sequences ) {
             size *= sequence.getLength();
         }
-        matrix = new int [size];
+        matrix = new float [size];
     }
 
-    public int getElement(int index) {
+    public float getElement(int index) {
         if ( (index >= 0) && (index < matrix.length) ) {
             return matrix[index];
         }
@@ -49,15 +49,15 @@ public class AlignmentMatrix {
         }
     }
 
-    public int [] getMatrix() {
+    public float [] getMatrix() {
         return matrix;
     }
 
     @Override
     public String toString() {
         StringBuilder stringMatrix = new StringBuilder();
-        for ( int item : matrix ) {
-            stringMatrix.append(Integer.toString(item));
+        for ( float item : matrix ) {
+            stringMatrix.append(Float.toString(item));
             stringMatrix.append(" ");
         }
         return stringMatrix.toString();

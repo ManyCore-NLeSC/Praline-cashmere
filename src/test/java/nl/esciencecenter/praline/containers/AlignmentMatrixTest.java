@@ -5,6 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AlignmentMatrixTest {
+    private final float epsilon = 0.001f;
     private final String sequenceOneName = "SequenceOne";
     private final int sequenceOneLength = 12;
     private final String sequenceTwoName = "SequenceTwo";
@@ -39,12 +40,12 @@ public class AlignmentMatrixTest {
         alignmentMatrix.addSequence(sequenceTwo);
         alignmentMatrix.allocateMatrix();
         alignmentMatrix.setElement((0 * sequenceTwoLength) + 2, 43);
-        assertEquals(43, alignmentMatrix.getElement((0 * sequenceTwoLength) + 2));
+        assertEquals(43, alignmentMatrix.getElement((0 * sequenceTwoLength) + 2), epsilon);
         alignmentMatrix.setElement((11 * sequenceTwoLength) + 0, 9);
-        assertEquals(9, alignmentMatrix.getElement((11 * sequenceTwoLength) + 0));
-        assertEquals(43, alignmentMatrix.getMatrix()[(0 * sequenceTwoLength) + 2]);
-        assertEquals(9, alignmentMatrix.getMatrix()[(11 * sequenceTwoLength) + 0]);
-        assertEquals(-1, alignmentMatrix.getElement((sequenceOneLength * sequenceTwoLength) + sequenceTwoLength));
+        assertEquals(9, alignmentMatrix.getElement((11 * sequenceTwoLength) + 0), epsilon);
+        assertEquals(43, alignmentMatrix.getMatrix()[(0 * sequenceTwoLength) + 2], epsilon);
+        assertEquals(9, alignmentMatrix.getMatrix()[(11 * sequenceTwoLength) + 0], epsilon);
+        assertEquals(-1, alignmentMatrix.getElement((sequenceOneLength * sequenceTwoLength) + sequenceTwoLength), epsilon);
         String alignmentMatrixString = alignmentMatrix.toString();
         assertEquals(43, Integer.parseInt(alignmentMatrixString.split(" ")[(0 * sequenceTwoLength) + 2]));
         assertEquals(9, Integer.parseInt(alignmentMatrixString.split(" ")[(11 * sequenceTwoLength) + 0]));

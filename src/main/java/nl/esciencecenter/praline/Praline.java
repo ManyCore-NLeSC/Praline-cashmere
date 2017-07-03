@@ -16,13 +16,13 @@ public class Praline {
     private static final ReentrantLock sequenceLock = new ReentrantLock();
     private volatile static ArrayList<Sequence> newSequences;
     private static ArrayList<Sequence> activeSequences;
-    // Scores
-    private static HashMap<String, AlignmentMatrix> scores;
+    // Alignments
+    private static HashMap<String, AlignmentMatrix> alignments;
 
     public static void main(String [] args) throws InterruptedException {
         newSequences = new ArrayList<>();
         activeSequences = new ArrayList<>();
-        scores = new HashMap<>();
+        alignments = new HashMap<>();
 
         // Command line arguments
         CommandLineArguments arguments = new CommandLineArguments();
@@ -31,7 +31,7 @@ public class Praline {
         // Initialize web server
         server = new WebServer(arguments.getNrServerThreads(), sequenceLock);
         server.setSequences(newSequences);
-        server.setScores(scores);
+        server.setScores(alignments);
         server.run();
 
         // Receive sequences from network
@@ -48,17 +48,17 @@ public class Praline {
             }
             System.out.println();
         }
-        // Send score matrices
+        // Send alignment matrices
         for ( Sequence sequenceOne : activeSequences ) {
             for ( Sequence sequenceTwo : activeSequences ) {
                 if ( sequenceOne.getId().equals(sequenceTwo.getId()) ) {
                     continue;
                 }
-                AlignmentMatrix score = new AlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
-                score.addSequence(sequenceOne);
-                score.addSequence(sequenceTwo);
-                score.allocateMatrix();
-                scores.put(score.getId(), score);
+                AlignmentMatrix alignment = new AlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
+                alignment.addSequence(sequenceOne);
+                alignment.addSequence(sequenceTwo);
+                alignment.allocateMatrix();
+                alignments.put(alignment.getId(), alignment);
             }
         }
         Thread.sleep(60000);

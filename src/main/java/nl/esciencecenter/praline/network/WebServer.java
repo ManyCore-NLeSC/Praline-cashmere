@@ -16,7 +16,7 @@ public class WebServer {
     // Global data structures
     private final ReentrantLock sequenceLock;
     private ArrayList<Sequence> sequences;
-    private HashMap<String, AlignmentMatrix> scores;
+    private HashMap<String, AlignmentMatrix> alignments;
 
     public WebServer(int threads, ReentrantLock lock) {
         sequenceLock = lock;
@@ -37,15 +37,15 @@ public class WebServer {
             response.status(statusCode);
             return "Sequence \"" + request.params(":sequence") + "\" processed.";
         });
-        // Send a score
+        // Send an alignment
         get("/receive/:sequence1/:sequence2", (request, response) -> {
-            AlignmentMatrix score = scores.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
-            if ( score != null ) {
+            AlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            if ( alignment != null ) {
                 response.status(200);
-                return score.toString();
+                return alignment.toString();
             } else {
                 response.status(404);
-                return "No score for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
+                return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
             }
         });
         // Default routes
@@ -63,8 +63,8 @@ public class WebServer {
         this.sequences = sequences;
     }
 
-    public void setScores(HashMap<String, AlignmentMatrix> scores) {
-        this.scores = scores;
+    public void setScores(HashMap<String, AlignmentMatrix> alignments) {
+        this.alignments = alignments;
     }
 
     private int processSendSequence(String id, String body) {

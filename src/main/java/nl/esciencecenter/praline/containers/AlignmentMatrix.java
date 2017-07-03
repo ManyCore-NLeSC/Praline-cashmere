@@ -40,10 +40,10 @@ public class AlignmentMatrix {
         if ( (index >= 0) && (index < matrix.length) ) {
             return matrix[index];
         }
-        return -1;
+        return -1.0f;
     }
 
-    public void setElement(int index, int value) {
+    public void setElement(int index, float value) {
         if ( (index >= 0) && (index < matrix.length) ) {
             matrix[index] = value;
         }

@@ -1,6 +1,6 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.containers.ScoreMatrix;
+import nl.esciencecenter.praline.containers.AlignmentMatrix;
 import nl.esciencecenter.praline.containers.Sequence;
 import org.junit.Test;
 
@@ -11,30 +11,31 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static org.junit.Assert.*;
 
 public class WebServerTest {
+    private final int nrThreads = 42;
+    private final float epsilon = 0.001f;
     private final String hostname = "http://localhost:4567";
     private WebServer server;
     private ArrayList<Sequence> sequences;
-    private HashMap<String, ScoreMatrix> scores;
-
-    public WebServerTest() {
-        final int nrThreads = 42;
-        sequences = new ArrayList<>();
-        scores = new HashMap<>();
-        server = new WebServer(nrThreads);
-
-        server.setSequences(sequences, new Object());
-        server.setScores(scores);
-        server.run();
-    }
+    private HashMap<String, AlignmentMatrix> alignments;
 
     @Test
     public void run() throws IOException {
         int statusCode;
         String temp;
+        ReentrantLock sequenceLock = new ReentrantLock();
+
+        sequences = new ArrayList<>();
+        alignments = new HashMap<>();
+        server = new WebServer(nrThreads, sequenceLock);
+
+        server.setSequences(sequences);
+        server.setScores(alignments);
+        server.run();
 
         // Create control sequence
         Sequence controlSequence = new Sequence("controlOne", 17);
@@ -61,8 +62,8 @@ public class WebServerTest {
             assertEquals(controlSequence.getElement(symbol), sequences.get(0).getElement(symbol));
         }
 
-        // Create control score matrix
-        ScoreMatrix controlScore = new ScoreMatrix("controlOne_controlTwo");
+        // Create control alignment matrix
+        AlignmentMatrix controlScore = new AlignmentMatrix("controlOne_controlTwo");
         controlScore.addSequence(controlSequence);
         controlScore.addSequence(new Sequence("controlTwo", 4));
         controlScore.allocateMatrix();
@@ -71,7 +72,7 @@ public class WebServerTest {
                 controlScore.setElement((symbolOne * controlScore.getSequence(1).getLength()) + symbolTwo, symbolTwo);
             }
         }
-        scores.put(controlScore.getId(), controlScore);
+        alignments.put(controlScore.getId(), controlScore);
         connection = new URL(hostname + "/receive/" + controlSequence.getId() + "/" + controlScore.getSequence(1).getId()).openConnection();
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -86,11 +87,11 @@ public class WebServerTest {
         int controlSymbol = 0;
         assertEquals(200, statusCode);
         for ( String symbol : responseBody.toString().split(" ")  ) {
-            assertEquals(controlScore.getElement(controlSymbol), Integer.parseInt(symbol));
+            assertEquals(controlScore.getElement(controlSymbol), Float.parseFloat(symbol), epsilon);
             controlSymbol++;
         }
 
-        // Not existing score matrix
+        // Not existing alignment matrix
         connection = new URL(hostname + "/receive/test/wrong").openConnection();
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         statusCode = ((HttpURLConnection) connection).getResponseCode();

@@ -2,13 +2,13 @@ package nl.esciencecenter.praline.containers;
 
 import java.util.ArrayList;
 
-public class ScoreMatrix {
+public class AlignmentMatrix {
     private final int MAX_SEQUENCES = 2;
     private String id;
     private ArrayList<Sequence> sequences;
     private int [] matrix;
 
-    public ScoreMatrix(String id) {
+    public AlignmentMatrix(String id) {
         this.id = id;
         sequences = new ArrayList<>();
     }

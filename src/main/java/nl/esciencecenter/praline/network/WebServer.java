@@ -1,6 +1,6 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.containers.ScoreMatrix;
+import nl.esciencecenter.praline.containers.AlignmentMatrix;
 import nl.esciencecenter.praline.containers.Sequence;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class WebServer {
     // Global data structures
     private final ReentrantLock sequenceLock;
     private ArrayList<Sequence> sequences;
-    private HashMap<String, ScoreMatrix> scores;
+    private HashMap<String, AlignmentMatrix> scores;
 
     public WebServer(int threads, ReentrantLock lock) {
         sequenceLock = lock;
@@ -39,7 +39,7 @@ public class WebServer {
         });
         // Send a score
         get("/receive/:sequence1/:sequence2", (request, response) -> {
-            ScoreMatrix score = scores.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            AlignmentMatrix score = scores.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( score != null ) {
                 response.status(200);
                 return score.toString();
@@ -63,7 +63,7 @@ public class WebServer {
         this.sequences = sequences;
     }
 
-    public void setScores(HashMap<String, ScoreMatrix> scores) {
+    public void setScores(HashMap<String, AlignmentMatrix> scores) {
         this.scores = scores;
     }
 

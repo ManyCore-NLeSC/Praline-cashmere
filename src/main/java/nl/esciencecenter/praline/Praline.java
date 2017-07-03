@@ -1,7 +1,7 @@
 package nl.esciencecenter.praline;
 
 import com.beust.jcommander.JCommander;
-import nl.esciencecenter.praline.containers.ScoreMatrix;
+import nl.esciencecenter.praline.containers.AlignmentMatrix;
 import nl.esciencecenter.praline.containers.Sequence;
 import nl.esciencecenter.praline.network.WebServer;
 
@@ -17,7 +17,7 @@ public class Praline {
     private volatile static ArrayList<Sequence> newSequences;
     private static ArrayList<Sequence> activeSequences;
     // Scores
-    private static HashMap<String, ScoreMatrix> scores;
+    private static HashMap<String, AlignmentMatrix> scores;
 
     public static void main(String [] args) throws InterruptedException {
         newSequences = new ArrayList<>();
@@ -38,7 +38,7 @@ public class Praline {
         while ( activeSequences.size() < arguments.getNrExpectedSequences() ) {
             synchronized ( sequenceLock ) {
                 sequenceLock.wait();
-                Praline.consumeSequence(newSequences.size() - 1);
+                activeSequences.add(newSequences.remove(newSequences.size() - 1));
             }
         }
         for ( Sequence sequence : activeSequences ) {
@@ -54,7 +54,7 @@ public class Praline {
                 if ( sequenceOne.getId().equals(sequenceTwo.getId()) ) {
                     continue;
                 }
-                ScoreMatrix score = new ScoreMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
+                AlignmentMatrix score = new AlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
                 score.addSequence(sequenceOne);
                 score.addSequence(sequenceTwo);
                 score.allocateMatrix();
@@ -66,11 +66,5 @@ public class Praline {
         // Clean up
         server.close();
         System.exit(0);
-    }
-
-    private static void consumeSequence(int sequenceIndex) {
-        synchronized ( sequenceLock ) {
-            activeSequences.add(newSequences.remove(sequenceIndex));
-        }
     }
 }

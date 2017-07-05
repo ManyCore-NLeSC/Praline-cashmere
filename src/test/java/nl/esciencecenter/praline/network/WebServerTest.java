@@ -69,7 +69,7 @@ public class WebServerTest {
         controlScore.allocateMatrix();
         for ( int symbolOne = 0; symbolOne < controlScore.getSequence(0).getLength(); symbolOne++ ) {
             for ( int symbolTwo = 0; symbolTwo < controlScore.getSequence(1).getLength(); symbolTwo++ ) {
-                controlScore.setElement((symbolOne * controlScore.getSequence(1).getLength()) + symbolTwo, symbolTwo);
+                controlScore.setScore((symbolOne * controlScore.getSequence(1).getLength()) + symbolTwo, symbolTwo);
             }
         }
         alignments.put(controlScore.getId(), controlScore);
@@ -87,7 +87,7 @@ public class WebServerTest {
         int controlSymbol = 0;
         assertEquals(200, statusCode);
         for ( String symbol : responseBody.toString().split(" ")  ) {
-            assertEquals(controlScore.getElement(controlSymbol), Float.parseFloat(symbol), epsilon);
+            assertEquals(controlScore.getScore(controlSymbol), Float.parseFloat(symbol), epsilon);
             controlSymbol++;
         }
 

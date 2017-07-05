@@ -1,8 +1,8 @@
 package nl.esciencecenter.praline;
 
 import com.beust.jcommander.JCommander;
-import nl.esciencecenter.praline.containers.AlignmentMatrix;
-import nl.esciencecenter.praline.containers.Sequence;
+import nl.esciencecenter.praline.data.AlignmentMatrix;
+import nl.esciencecenter.praline.data.Sequence;
 import nl.esciencecenter.praline.network.WebServer;
 
 import java.util.ArrayList;

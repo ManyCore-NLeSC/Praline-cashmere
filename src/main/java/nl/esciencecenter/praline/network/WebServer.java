@@ -1,7 +1,7 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.containers.AlignmentMatrix;
-import nl.esciencecenter.praline.containers.Sequence;
+import nl.esciencecenter.praline.data.AlignmentMatrix;
+import nl.esciencecenter.praline.data.Sequence;
 
 import java.util.ArrayList;
 import java.util.HashMap;

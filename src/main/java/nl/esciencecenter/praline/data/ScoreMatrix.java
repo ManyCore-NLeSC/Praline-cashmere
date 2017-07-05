@@ -1,4 +1,4 @@
-package nl.esciencecenter.praline.containers;
+package nl.esciencecenter.praline.data;
 
 public class ScoreMatrix {
     private String name;

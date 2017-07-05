@@ -12,6 +12,7 @@ public class AlphabetTest {
     @Test
     public void getName() {
         Alphabet alphabet = new Alphabet(nameOne);
+
         assertEquals(nameOne, alphabet.getName());
         assertNotEquals("", alphabet.getName());
     }
@@ -19,6 +20,7 @@ public class AlphabetTest {
     @Test
     public void getLength() {
         Alphabet alphabet = new Alphabet(nameOne, lengthOne);
+
         assertEquals(lengthOne, alphabet.getLength());
         assertNotEquals(lengthOne - 1, alphabet.getLength());
         alphabet.setLength(lengthTwo);

@@ -1,4 +1,4 @@
-package nl.esciencecenter.praline.containers;
+package nl.esciencecenter.praline.data;
 
 import java.util.ArrayList;
 
@@ -6,7 +6,8 @@ public class AlignmentMatrix {
     private final int MAX_SEQUENCES = 2;
     private String id;
     private ArrayList<Sequence> sequences;
-    private float [] matrix;
+    private float [] scores;
+    private Move [] pointers;
 
     public AlignmentMatrix(String id) {
         this.id = id;
@@ -31,32 +32,43 @@ public class AlignmentMatrix {
         int size = 1;
 
         for ( Sequence sequence : sequences ) {
-            size *= sequence.getLength();
+            size *= sequence.getLength() + 1;
         }
-        matrix = new float [size];
+        scores = new float [size];
+        pointers = new Move [size];
     }
 
-    public float getElement(int index) {
-        if ( (index >= 0) && (index < matrix.length) ) {
-            return matrix[index];
+    public float getScore(int index) {
+        if ( (index >= 0) && (index < scores.length) ) {
+            return scores[index];
         }
         return -1.0f;
     }
 
-    public void setElement(int index, float value) {
-        if ( (index >= 0) && (index < matrix.length) ) {
-            matrix[index] = value;
+    public Move getMove(int index) {
+        if ( (index >= 0) && (index < pointers.length) ) {
+            return pointers[index];
+        }
+        return Move.NIL;
+    }
+
+    public void setScore(int index, float value) {
+        if ( (index >= 0) && (index < scores.length) ) {
+            scores[index] = value;
         }
     }
 
-    public float [] getMatrix() {
-        return matrix;
+    public void setMove(int index, Move move) {
+        if ( (index >= 0) && ( index < pointers.length) ) {
+            pointers[index] = move;
+        }
     }
 
     @Override
     public String toString() {
         StringBuilder stringMatrix = new StringBuilder();
-        for ( float item : matrix ) {
+
+        for ( float item : scores ) {
             stringMatrix.append(Float.toString(item));
             stringMatrix.append(" ");
         }

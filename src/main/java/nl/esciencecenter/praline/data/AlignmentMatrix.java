@@ -45,6 +45,10 @@ public class AlignmentMatrix {
         return -1.0f;
     }
 
+    public float getScore() {
+        return scores[scores.length - 1];
+    }
+
     public Move getMove(int index) {
         if ( (index >= 0) && (index < pointers.length) ) {
             return pointers[index];

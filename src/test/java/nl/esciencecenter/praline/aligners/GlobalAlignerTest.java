@@ -42,5 +42,6 @@ public class GlobalAlignerTest {
         assertEquals(Move.TOP_LEFT, matrix.getMove((sequenceTwo.getLength() * (sequenceOne.getLength() + 1)) + sequenceOne.getLength()));
         assertEquals(-8.0f, matrix.getScore((2 * (sequenceOne.getLength() + 1)) + 7), epsilon);
         assertEquals(Move.LEFT, matrix.getMove((2 * (sequenceOne.getLength() + 1)) + 7));
+        assertEquals(0.0f, matrix.getScore(), epsilon);
     }
 }

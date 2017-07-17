@@ -1,8 +1,6 @@
 package nl.esciencecenter.praline.aligners;
 
-import nl.esciencecenter.praline.data.AlignmentMatrix;
-import nl.esciencecenter.praline.data.Move;
-import nl.esciencecenter.praline.data.Sequence;
+import nl.esciencecenter.praline.data.*;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -20,17 +18,20 @@ public class GlobalAlignerTest {
 
     @Test
     public void alignment() {
+        Alphabet alphabet = new Alphabet("Alphabet", 4);
         Sequence sequenceOne = new Sequence("SequenceOne");
         Sequence sequenceTwo = new Sequence("SequenceTwo");
         AlignmentMatrix matrix = new AlignmentMatrix("Test");
+        ScoreMatrix scores = new ScoreMatrix("Scores", alphabet);
         GlobalAligner aligner = new GlobalAligner();
 
         sequenceOne.setElements(new int [] {3, 2, 2, 2, 1, 0, 3, 2, 3});
         sequenceTwo.setElements(new int [] {3, 2, 3, 2, 0, 0, 1, 3});
+        scores.setMatrix(new float [] {1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f});
         matrix.addSequence(sequenceOne);
         matrix.addSequence(sequenceTwo);
         matrix.allocateMatrix();
-        aligner.computeAlignment(matrix);
+        aligner.computeAlignment(matrix, scores);
 
         assertEquals(0.0f, matrix.getScore(0), epsilon);
         assertEquals(Move.NIL, matrix.getMove(0));

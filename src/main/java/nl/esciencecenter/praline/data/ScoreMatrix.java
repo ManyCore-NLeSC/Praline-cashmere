@@ -32,6 +32,10 @@ public class ScoreMatrix {
         return matrix;
     }
 
+    public void setMatrix(float [] matrix) {
+        this.matrix = matrix;
+    }
+
     public float getScore(int i, int j) {
         return matrix[(i * alphabet.getLength()) + j];
     }

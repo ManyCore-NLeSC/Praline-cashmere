@@ -2,6 +2,7 @@ package nl.esciencecenter.praline.aligners;
 
 import nl.esciencecenter.praline.data.AlignmentMatrix;
 import nl.esciencecenter.praline.data.Move;
+import nl.esciencecenter.praline.data.ScoreMatrix;
 
 // Needleman–Wunsch algorithm
 public class GlobalAligner {
@@ -23,28 +24,19 @@ public class GlobalAligner {
         this.gapScore = gapScore;
     }
 
-    public void computeAlignment(AlignmentMatrix matrix) {
+    public void computeAlignment(AlignmentMatrix matrix, ScoreMatrix scores) {
         initialize(matrix);
         for ( int row = 1; row < matrix.getSequence(1).getLength() + 1; row++ ) {
             for ( int column = 1; column < matrix.getSequence(0).getLength() + 1; column++ ) {
-                float tempScore = 0.0f;
-                float bestScore = 0.0f;
-                Move bestMove = Move.NIL;
+                float bestScore = matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + column) + gapScore;
+                Move bestMove = Move.TOP;
 
-                if ( (matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength()) + 1) + column) + gapScore) > (matrix.getScore((row * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + gapScore) ) {
-                    bestScore = matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + column) + gapScore;
-                    bestMove = Move.TOP;
-                } else {
+                if ( (matrix.getScore((row * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + gapScore) > bestScore ) {
                     bestScore = matrix.getScore((row * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + gapScore;
                     bestMove = Move.LEFT;
                 }
-                if ( matrix.getSequence(0).getElement(column) == matrix.getSequence(1).getElement(row) ) {
-                    tempScore = matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + 1.0f;
-                } else {
-                    tempScore = matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) - 1.0f;
-                }
-                if ( tempScore  > bestScore ) {
-                    bestScore = tempScore;
+                if ( matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + scores.getScore(matrix.getSequence(0).getElement(column - 1), matrix.getSequence(1).getElement(row - 1)) > bestScore ) {
+                    bestScore = matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + scores.getScore(matrix.getSequence(0).getElement(column - 1), matrix.getSequence(1).getElement(row - 1));
                     bestMove = Move.TOP_LEFT;
                 }
                 matrix.setScore((row * (matrix.getSequence(0).getLength() + 1)) + column, bestScore);

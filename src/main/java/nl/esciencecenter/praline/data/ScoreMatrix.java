@@ -21,7 +21,7 @@ public class ScoreMatrix {
         this.alphabet = alphabet;
     }
 
-    public void setMatrix(float [] matrix) {
+    public void setScores(float [] matrix) {
         if ( matrix.length == (alphabet.getLength() * alphabet.getLength()) ) {
             this.matrix = matrix;
         }

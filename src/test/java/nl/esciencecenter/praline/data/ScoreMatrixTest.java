@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ScoreMatrixTest {
-    final float epsilon = 0.001f;
+    private final float epsilon = 0.001f;
     private String matrixName = "MatrixName";
     private String alphabetName = "AlphabetName";
     private int alphabetLength = 32;

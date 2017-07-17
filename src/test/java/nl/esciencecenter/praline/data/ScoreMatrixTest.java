@@ -19,8 +19,9 @@ public class ScoreMatrixTest {
     @Test
     public void getAlphabet() {
         Alphabet alphabet = new Alphabet(alphabetName, alphabetLength);
-        ScoreMatrix matrix = new ScoreMatrix(matrixName, alphabet);
+        ScoreMatrix matrix = new ScoreMatrix(matrixName);
 
+        matrix.setAlphabet(alphabet);
         assertEquals(alphabetName, matrix.getAlphabet().getName());
     }
 

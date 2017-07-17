@@ -28,7 +28,7 @@ public class AlignmentMatrix {
         }
     }
 
-    public void allocateMatrix() {
+    public void allocate() {
         int size = 1;
 
         for ( Sequence sequence : sequences ) {

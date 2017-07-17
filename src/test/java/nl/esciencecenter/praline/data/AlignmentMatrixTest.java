@@ -38,7 +38,7 @@ public class AlignmentMatrixTest {
 
         alignmentMatrix.addSequence(sequenceOne);
         alignmentMatrix.addSequence(sequenceTwo);
-        alignmentMatrix.allocateMatrix();
+        alignmentMatrix.allocate();
         alignmentMatrix.setScore((0 * sequenceTwoLength) + 2, 43.0f);
         assertEquals(43.0f, alignmentMatrix.getScore((0 * sequenceTwoLength) + 2), epsilon);
         alignmentMatrix.setScore((11 * sequenceTwoLength) + 0, 9.0f);

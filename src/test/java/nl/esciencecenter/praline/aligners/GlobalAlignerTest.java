@@ -31,7 +31,7 @@ public class GlobalAlignerTest {
         scores.setMatrix(new float [] {1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f});
         matrix.addSequence(sequenceOne);
         matrix.addSequence(sequenceTwo);
-        matrix.allocateMatrix();
+        matrix.allocate();
         aligner.computeAlignment(matrix, scores);
 
         assertEquals(0.0f, matrix.getScore(0), epsilon);

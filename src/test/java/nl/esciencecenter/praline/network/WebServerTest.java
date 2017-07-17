@@ -66,7 +66,7 @@ public class WebServerTest {
         AlignmentMatrix controlScore = new AlignmentMatrix("controlOne_controlTwo");
         controlScore.addSequence(controlSequence);
         controlScore.addSequence(new Sequence("controlTwo", 4));
-        controlScore.allocateMatrix();
+        controlScore.allocate();
         for ( int symbolOne = 0; symbolOne < controlScore.getSequence(0).getLength(); symbolOne++ ) {
             for ( int symbolTwo = 0; symbolTwo < controlScore.getSequence(1).getLength(); symbolTwo++ ) {
                 controlScore.setScore((symbolOne * controlScore.getSequence(1).getLength()) + symbolTwo, symbolTwo);

@@ -57,7 +57,7 @@ public class Praline {
                 AlignmentMatrix alignment = new AlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
                 alignment.addSequence(sequenceOne);
                 alignment.addSequence(sequenceTwo);
-                alignment.allocateMatrix();
+                alignment.allocate();
                 alignments.put(alignment.getId(), alignment);
             }
         }

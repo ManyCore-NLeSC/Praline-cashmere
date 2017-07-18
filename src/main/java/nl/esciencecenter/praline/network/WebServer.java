@@ -28,7 +28,7 @@ public class WebServer {
     public void run() {
         awaitInitialization();
         // Receive a sequence
-        post("/send/:sequence", (request, response) -> {
+        post("/send/sequence/:sequence", (request, response) -> {
             if ( knownSequences.contains(request.params(":sequence")) ) {
                 response.status(409);
                 return "Sequence \"" + request.params(":sequence") + "\" already exists.";
@@ -37,7 +37,9 @@ public class WebServer {
             response.status(statusCode);
             return "Sequence \"" + request.params(":sequence") + "\" processed.";
         });
-        // Send an alignment
+        // Receive an alphabet
+        // Receive a score matrix
+        // Send an alignment matrix
         get("/receive/:sequence1/:sequence2", (request, response) -> {
             AlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
@@ -48,6 +50,8 @@ public class WebServer {
                 return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
             }
         });
+        // Send an alignment score
+        // Send an alignment path
         // Default routes
         get("/", ((request, response) -> halt(501)));
         post("/", ((request, response) -> halt(501)));

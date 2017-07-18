@@ -12,16 +12,15 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Praline {
     // WebServer
     private static WebServer server;
+    // Locks
+    private static final HashMap<String, ReentrantLock> locks = new HashMap<>();
     // Sequences
-    private static final ReentrantLock sequenceLock = new ReentrantLock();
-    private volatile static ArrayList<Sequence> newSequences;
-    private static ArrayList<Sequence> activeSequences;
+    private volatile static HashMap<String, Sequence> sequences;
     // Alignments
-    private static HashMap<String, AlignmentMatrix> alignments;
+    private volatile static HashMap<String, AlignmentMatrix> alignments;
 
     public static void main(String [] args) throws InterruptedException {
-        newSequences = new ArrayList<>();
-        activeSequences = new ArrayList<>();
+        sequences = new HashMap<>();
         alignments = new HashMap<>();
 
         // Command line arguments
@@ -29,19 +28,22 @@ public class Praline {
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
         // Initialize web server
-        server = new WebServer(arguments.getNrServerThreads(), sequenceLock);
-        server.setSequences(newSequences);
-        server.setScores(alignments);
+        server = new WebServer(arguments.getNrServerThreads());
+        server.setSequencesContainer(sequences);
+        server.setAlignmentMatricesContainer(alignments);
         server.run();
 
+        // Locks
+        locks.put("sequence", new ReentrantLock());
+        locks.put("alphabet", new ReentrantLock());
+
         // Receive sequences from network
-        while ( activeSequences.size() < arguments.getNrExpectedSequences() ) {
-            synchronized ( sequenceLock ) {
-                sequenceLock.wait();
-                activeSequences.add(newSequences.remove(newSequences.size() - 1));
+        while ( sequences.size() < arguments.getNrExpectedSequences() ) {
+            synchronized ( locks.get("sequence") ) {
+                locks.get("sequence").wait();
             }
         }
-        for ( Sequence sequence : activeSequences ) {
+        for ( Sequence sequence : sequences.values() ) {
             System.out.print("Sequence \"" + sequence.getId() + "\": ");
             for ( Integer symbol : sequence.getElements() ) {
                 System.out.print(symbol + " ");
@@ -49,8 +51,8 @@ public class Praline {
             System.out.println();
         }
         // Send alignment matrices
-        for ( Sequence sequenceOne : activeSequences ) {
-            for ( Sequence sequenceTwo : activeSequences ) {
+        for ( Sequence sequenceOne : sequences.values() ) {
+            for ( Sequence sequenceTwo : sequences.values() ) {
                 if ( sequenceOne.getId().equals(sequenceTwo.getId()) ) {
                     continue;
                 }

@@ -40,7 +40,7 @@ public class WebServer {
         // Receive an alphabet
         // Receive a score matrix
         // Send an alignment matrix
-        get("/receive/:sequence1/:sequence2", (request, response) -> {
+        get("/receive/alignment_matrix/:sequence1/:sequence2", (request, response) -> {
             AlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
                 response.status(200);

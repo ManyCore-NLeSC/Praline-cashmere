@@ -1,13 +1,11 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.data.AlignmentMatrix;
+import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
 import nl.esciencecenter.praline.data.Alphabet;
 import nl.esciencecenter.praline.data.ScoreMatrix;
 import nl.esciencecenter.praline.data.Sequence;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static spark.Spark.*;
@@ -18,7 +16,7 @@ public class WebServer {
     private HashMap<String, Sequence> sequences;
     private HashMap<String, Alphabet> alphabets;
     private HashMap<String, ScoreMatrix> scores;
-    private HashMap<String, AlignmentMatrix> alignments;
+    private HashMap<String, GlobalAlignmentMatrix> alignments;
 
     public WebServer(int threads) {
         threadPool(threads);
@@ -45,7 +43,7 @@ public class WebServer {
         this.scores = scores;
     }
 
-    public void setAlignmentMatricesContainer(HashMap<String, AlignmentMatrix> alignments) {
+    public void setAlignmentMatricesContainer(HashMap<String, GlobalAlignmentMatrix> alignments) {
         this.alignments = alignments;
     }
 
@@ -83,7 +81,7 @@ public class WebServer {
         });
         // Send an alignment matrix
         get("/receive/alignment_matrix/:sequence1/:sequence2", (request, response) -> {
-            AlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            GlobalAlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
                 response.status(200);
                 return alignment.toString();
@@ -94,7 +92,7 @@ public class WebServer {
         });
         // Send an alignment score
         get("/receive/alignment_score/:sequence1/:sequence2", (request, response) -> {
-            AlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            GlobalAlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
                 response.status(200);
                 return alignment.getScore();

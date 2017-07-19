@@ -43,7 +43,7 @@ public class GlobalAlignmentMatrixTest {
         assertEquals(43.0f, globalAlignmentMatrix.getScore((0 * sequenceTwoLength) + 2), epsilon);
         globalAlignmentMatrix.setScore((11 * sequenceTwoLength) + 0, 9.0f);
         assertEquals(9.0f, globalAlignmentMatrix.getScore((11 * sequenceTwoLength) + 0), epsilon);
-        assertEquals(-1.0f, globalAlignmentMatrix.getScore(((sequenceOneLength + 1) * (sequenceTwoLength + 1)) + sequenceTwoLength + 1), epsilon);
+        assertEquals(Float.MIN_VALUE, globalAlignmentMatrix.getScore(((sequenceOneLength + 1) * (sequenceTwoLength + 1)) + sequenceTwoLength + 1), epsilon);
         String alignmentMatrixString = globalAlignmentMatrix.toString();
         assertEquals(43.0f, Float.parseFloat(alignmentMatrixString.split(" ")[(0 * sequenceTwoLength) + 2]), epsilon);
         assertEquals(9.0f, Float.parseFloat(alignmentMatrixString.split(" ")[(11 * sequenceTwoLength) + 0]), epsilon);

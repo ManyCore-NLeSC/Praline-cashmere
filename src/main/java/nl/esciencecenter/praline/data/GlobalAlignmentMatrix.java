@@ -2,14 +2,14 @@ package nl.esciencecenter.praline.data;
 
 import java.util.ArrayList;
 
-public class AlignmentMatrix {
+public class GlobalAlignmentMatrix {
     private final int MAX_SEQUENCES = 2;
     private String id;
     private ArrayList<Sequence> sequences;
     private float [] scores;
     private Move [] pointers;
 
-    public AlignmentMatrix(String id) {
+    public GlobalAlignmentMatrix(String id) {
         this.id = id;
         sequences = new ArrayList<>();
     }

@@ -1,11 +1,10 @@
 package nl.esciencecenter.praline;
 
 import com.beust.jcommander.JCommander;
-import nl.esciencecenter.praline.data.AlignmentMatrix;
+import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
 import nl.esciencecenter.praline.data.Sequence;
 import nl.esciencecenter.praline.network.WebServer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,7 +16,7 @@ public class Praline {
     // Sequences
     private volatile static HashMap<String, Sequence> sequences;
     // Alignments
-    private volatile static HashMap<String, AlignmentMatrix> alignments;
+    private volatile static HashMap<String, GlobalAlignmentMatrix> alignments;
 
     public static void main(String [] args) throws InterruptedException {
         sequences = new HashMap<>();
@@ -56,7 +55,7 @@ public class Praline {
                 if ( sequenceOne.getId().equals(sequenceTwo.getId()) ) {
                     continue;
                 }
-                AlignmentMatrix alignment = new AlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
+                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
                 alignment.addSequence(sequenceOne);
                 alignment.addSequence(sequenceTwo);
                 alignment.allocate();

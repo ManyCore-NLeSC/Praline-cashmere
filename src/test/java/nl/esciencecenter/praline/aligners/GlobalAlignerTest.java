@@ -21,7 +21,7 @@ public class GlobalAlignerTest {
         Alphabet alphabet = new Alphabet("Alphabet", 4);
         Sequence sequenceOne = new Sequence("SequenceOne");
         Sequence sequenceTwo = new Sequence("SequenceTwo");
-        AlignmentMatrix matrix = new AlignmentMatrix("Test");
+        GlobalAlignmentMatrix matrix = new GlobalAlignmentMatrix("Test");
         ScoreMatrix scores = new ScoreMatrix("Scores");
         GlobalAligner aligner = new GlobalAligner();
 

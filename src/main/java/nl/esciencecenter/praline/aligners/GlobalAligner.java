@@ -1,6 +1,6 @@
 package nl.esciencecenter.praline.aligners;
 
-import nl.esciencecenter.praline.data.AlignmentMatrix;
+import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
 import nl.esciencecenter.praline.data.Move;
 import nl.esciencecenter.praline.data.ScoreMatrix;
 
@@ -24,7 +24,7 @@ public class GlobalAligner {
         this.gapScore = gapScore;
     }
 
-    public void computeAlignment(AlignmentMatrix matrix, ScoreMatrix scores) {
+    public void computeAlignment(GlobalAlignmentMatrix matrix, ScoreMatrix scores) {
         initialize(matrix);
         for ( int row = 1; row < matrix.getSequence(1).getLength() + 1; row++ ) {
             for ( int column = 1; column < matrix.getSequence(0).getLength() + 1; column++ ) {
@@ -45,7 +45,7 @@ public class GlobalAligner {
         }
     }
 
-    private void initialize(AlignmentMatrix matrix) {
+    private void initialize(GlobalAlignmentMatrix matrix) {
         matrix.setScore(0, 0.0f);
         matrix.setMove(0, Move.NIL);
         for ( int item = 1; item < matrix.getSequence(0).getLength() + 1; item++ ) {

@@ -1,6 +1,6 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.data.AlignmentMatrix;
+import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
 import nl.esciencecenter.praline.data.Sequence;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ public class WebServerTest {
     private WebServer server;
     private HashMap<String, ReentrantLock> locks;
     private HashMap<String, Sequence> sequences;
-    private HashMap<String, AlignmentMatrix> alignments;
+    private HashMap<String, GlobalAlignmentMatrix> alignments;
 
     @Test
     public void run() throws IOException {
@@ -84,7 +84,7 @@ public class WebServerTest {
         }
 
         // Create control alignment matrix
-        AlignmentMatrix controlScore = new AlignmentMatrix("controlOne_controlTwo");
+        GlobalAlignmentMatrix controlScore = new GlobalAlignmentMatrix("controlOne_controlTwo");
         controlScore.addSequence(controlSequence);
         controlScore.addSequence(new Sequence("controlTwo", 4));
         controlScore.allocate();

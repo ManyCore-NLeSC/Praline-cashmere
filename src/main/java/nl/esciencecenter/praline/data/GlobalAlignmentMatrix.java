@@ -42,7 +42,7 @@ public class GlobalAlignmentMatrix {
         if ( (index >= 0) && (index < scores.length) ) {
             return scores[index];
         }
-        return -1.0f;
+        return Float.MIN_VALUE;
     }
 
     public float getScore() {
@@ -77,5 +77,25 @@ public class GlobalAlignmentMatrix {
             stringMatrix.append(" ");
         }
         return stringMatrix.toString();
+    }
+
+    public ArrayList<String> getAlignment() {
+        int row = sequences.get(1).getLength();
+        int column = sequences.get(0).getLength();
+        ArrayList<String> alignment = new ArrayList<>();
+
+        while ( getMove((row * (sequences.get(0).getLength() + 1)) + column) != Move.NIL ) {
+            Move move = getMove((row * (sequences.get(0).getLength() + 1)) + column);
+            alignment.add(String.valueOf(row) + " " + String.valueOf(column));
+            if ( move == Move.TOP ) {
+                row -= 1;
+            } else if ( move == Move.LEFT ) {
+                column -= 1;
+            } else {
+                row -= 1;
+                column -= 1;
+            }
+        }
+        return alignment;
     }
 }

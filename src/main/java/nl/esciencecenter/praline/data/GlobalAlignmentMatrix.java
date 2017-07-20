@@ -96,6 +96,7 @@ public class GlobalAlignmentMatrix {
                 column -= 1;
             }
         }
+        alignment.add(String.valueOf(row) + " " + String.valueOf(column));
         return alignment;
     }
 }

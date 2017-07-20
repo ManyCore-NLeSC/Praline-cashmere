@@ -31,11 +31,11 @@ public class GlobalAligner {
                 float bestScore = matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + column) + gapScore;
                 Move bestMove = Move.TOP;
 
-                if ( (matrix.getScore((row * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + gapScore) > bestScore ) {
+                if ( (matrix.getScore((row * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + gapScore) >= bestScore ) {
                     bestScore = matrix.getScore((row * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + gapScore;
                     bestMove = Move.LEFT;
                 }
-                if ( matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + scores.getScore(matrix.getSequence(0).getElement(column - 1), matrix.getSequence(1).getElement(row - 1)) > bestScore ) {
+                if ( matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + scores.getScore(matrix.getSequence(0).getElement(column - 1), matrix.getSequence(1).getElement(row - 1)) >= bestScore ) {
                     bestScore = matrix.getScore(((row - 1) * (matrix.getSequence(0).getLength() + 1)) + (column - 1)) + scores.getScore(matrix.getSequence(0).getElement(column - 1), matrix.getSequence(1).getElement(row - 1));
                     bestMove = Move.TOP_LEFT;
                 }

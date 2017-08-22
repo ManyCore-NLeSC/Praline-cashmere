@@ -66,8 +66,22 @@ public class WebServerTest {
         for ( int symbol = 0; symbol < controlSequence.getLength(); symbol++ ) {
             assertEquals(controlSequence.getElement(symbol), sequences.get("controlOne").getElement(symbol));
         }
+        // Try to send the same sequence again
+        connection = new URL(hostname + "/send/sequence/" + controlSequence.getId()).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
+        request = connection.getOutputStream();
+        request.write(sequenceString.toString().getBytes(StandardCharsets.UTF_8.name()));
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that the request was refused
+        assertEquals(409, statusCode);
         // Cleanup
         ((HttpURLConnection) connection).disconnect();
+    }
+
+    private void alphabets() throws IOException {
+
     }
 
     private void alignments() throws IOException {

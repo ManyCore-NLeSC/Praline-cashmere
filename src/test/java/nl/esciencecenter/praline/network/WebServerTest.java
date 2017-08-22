@@ -125,13 +125,6 @@ public class WebServerTest {
 
         // Create control sequence
         Sequence controlSequence = new Sequence("controlOne", 17);
-        StringBuilder sequenceString = new StringBuilder();
-        for ( int symbol = 0; symbol < controlSequence.getLength(); symbol++ ) {
-            controlSequence.setElement(symbol, symbol);
-            sequenceString.append(Integer.toString(symbol));
-            sequenceString.append(" ");
-        }
-
         // Create control alignment matrix
         GlobalAlignmentMatrix controlScore = new GlobalAlignmentMatrix("controlOne_controlTwo");
         controlScore.addSequence(controlSequence);

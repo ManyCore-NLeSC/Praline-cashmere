@@ -2,6 +2,7 @@ package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.Alphabet;
 import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
+import nl.esciencecenter.praline.data.ScoreMatrix;
 import nl.esciencecenter.praline.data.Sequence;
 import org.junit.Test;
 
@@ -23,6 +24,7 @@ public class WebServerTest {
     private HashMap<String, ReentrantLock> locks;
     private HashMap<String, Sequence> sequences;
     private HashMap<String, Alphabet> alphabets;
+    private HashMap<String, ScoreMatrix> scoreMatrices;
     private HashMap<String, GlobalAlignmentMatrix> alignments;
 
     @Test
@@ -31,12 +33,15 @@ public class WebServerTest {
         locks = new HashMap<>();
         locks.put("sequence", new ReentrantLock());
         locks.put("alphabet", new ReentrantLock());
+        locks.put("scorematrix", new ReentrantLock());
         sequences = new HashMap<>();
         alphabets = new HashMap<>();
+        scoreMatrices = new HashMap<>();
         alignments = new HashMap<>();
         server.setLocks(locks);
         server.setSequencesContainer(sequences);
         server.setAlphabetsContainer(alphabets);
+        server.setScoreMatricesContainer(scoreMatrices);
         server.setAlignmentMatricesContainer(alignments);
         server.run();
 
@@ -112,6 +117,52 @@ public class WebServerTest {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
         request = connection.getOutputStream();
         request.write(String.valueOf(controlAlphabet.getLength()).getBytes(StandardCharsets.UTF_8.name()));
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that the request was refused
+        assertEquals(409, statusCode);
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
+    }
+
+    private void scoreMatrices() throws IOException {
+        int statusCode;
+        Alphabet alphabet = new Alphabet("controlAlphabet", 46);
+
+        // Create control score matrix
+        ScoreMatrix controlScoreMatrix = new ScoreMatrix("controlScoreMatrix");
+        controlScoreMatrix.setAlphabet(alphabet);
+        float [] controlMatrix = new float [alphabet.getLength() * alphabet.getLength()];
+        StringBuilder controlMatrixString = new StringBuilder();
+        for ( int item = 0; item < controlMatrix.length; item++ ) {
+            controlMatrix[item] = item;
+            controlMatrixString.append(item);
+            controlMatrixString.append(".0 ");
+        }
+        controlScoreMatrix.setScores(controlMatrix);
+        // Send score matrix to server
+        URLConnection connection = new URL(hostname + "/send/score/" + alphabet.getName()).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
+        OutputStream request = connection.getOutputStream();
+        request.write(controlMatrixString.toString().getBytes(StandardCharsets.UTF_8.name()));
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that sent sequence match
+        assertEquals(201, statusCode);
+        for ( int row = 0; row < alphabet.getLength(); row++ ) {
+            for ( int column = 0; column < alphabet.getLength(); column++ ) {
+                assertEquals(controlScoreMatrix.getScore(row, column), scoreMatrices.get("controlScoreMatrix").getScore(row, column), epsilon);
+            }
+        }
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
+        // Try to send the same matrix again
+        connection = new URL(hostname + "/send/score/" + alphabet.getName()).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
+        request = connection.getOutputStream();
+        request.write(controlMatrixString.toString().getBytes(StandardCharsets.UTF_8.name()));
         statusCode = ((HttpURLConnection) connection).getResponseCode();
         // Check that the request was refused
         assertEquals(409, statusCode);

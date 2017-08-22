@@ -72,6 +72,8 @@ public class WebServerTest {
         for ( int symbol = 0; symbol < controlSequence.getLength(); symbol++ ) {
             assertEquals(controlSequence.getElement(symbol), sequences.get("controlOne").getElement(symbol));
         }
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
         // Try to send the same sequence again
         connection = new URL(hostname + "/send/sequence/" + controlSequence.getId()).openConnection();
         connection.setDoOutput(true);
@@ -101,6 +103,8 @@ public class WebServerTest {
         // Check that sent alphabet match
         assertEquals(201, statusCode);
         assertEquals(controlAlphabet.getLength(), alphabets.get("control").getLength());
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
         // Try to send the same alphabet again
         connection = new URL(hostname + "/send/alphabet/" + controlAlphabet.getName()).openConnection();
         connection.setDoOutput(true);
@@ -155,6 +159,8 @@ public class WebServerTest {
             assertEquals(controlScore.getScore(controlSymbol), Float.parseFloat(symbol), epsilon);
             controlSymbol++;
         }
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
         // Not existing alignment matrix
         connection = new URL(hostname + "/receive/test/wrong").openConnection();
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());

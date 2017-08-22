@@ -1,5 +1,6 @@
 package nl.esciencecenter.praline.network;
 
+import nl.esciencecenter.praline.data.Alphabet;
 import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
 import nl.esciencecenter.praline.data.Sequence;
 import org.junit.Test;
@@ -21,6 +22,7 @@ public class WebServerTest {
     private WebServer server;
     private HashMap<String, ReentrantLock> locks;
     private HashMap<String, Sequence> sequences;
+    private HashMap<String, Alphabet> alphabets;
     private HashMap<String, GlobalAlignmentMatrix> alignments;
 
     @Test
@@ -28,14 +30,18 @@ public class WebServerTest {
         server = new WebServer(nrThreads);
         locks = new HashMap<>();
         locks.put("sequence", new ReentrantLock());
+        locks.put("alphabet", new ReentrantLock());
         sequences = new HashMap<>();
+        alphabets = new HashMap<>();
         alignments = new HashMap<>();
         server.setLocks(locks);
         server.setSequencesContainer(sequences);
+        server.setAlphabetsContainer(alphabets);
         server.setAlignmentMatricesContainer(alignments);
         server.run();
 
         sequences();
+        alphabets();
         alignments();
 
         server.close();
@@ -81,7 +87,32 @@ public class WebServerTest {
     }
 
     private void alphabets() throws IOException {
+        int statusCode;
+        Alphabet controlAlphabet = new Alphabet("control", 14);
 
+        // Send alphabet to server
+        URLConnection connection = new URL(hostname + "/send/alphabet/" + controlAlphabet.getName()).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
+        OutputStream request = connection.getOutputStream();
+        request.write(String.valueOf(controlAlphabet.getLength()).getBytes(StandardCharsets.UTF_8.name()));
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that sent alphabet match
+        assertEquals(201, statusCode);
+        assertEquals(controlAlphabet.getLength(), alphabets.get("control").getLength());
+        // Try to send the same alphabet again
+        connection = new URL(hostname + "/send/alphabet/" + controlAlphabet.getName()).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
+        request = connection.getOutputStream();
+        request.write(String.valueOf(controlAlphabet.getLength()).getBytes(StandardCharsets.UTF_8.name()));
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that the request was refused
+        assertEquals(409, statusCode);
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
     }
 
     private void alignments() throws IOException {

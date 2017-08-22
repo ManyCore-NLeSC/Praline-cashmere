@@ -49,6 +49,7 @@ public class WebServerTest {
         alphabets();
         scoreMatrices();
         alignments();
+        defaults();
 
         server.close();
     }
@@ -239,5 +240,27 @@ public class WebServerTest {
         assertEquals(controlScore.getScore(), Float.parseFloat(responseBody.toString()), epsilon);
         // Cleanup
         ((HttpURLConnection) connection).disconnect();
+    }
+
+    private void defaults() throws IOException {
+        int statusCode;
+        String temp;
+
+        // Get
+        URLConnection connection = new URL(hostname + "/").openConnection();
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        ((HttpURLConnection) connection).disconnect();
+        assertEquals(501, statusCode);
+        // Post
+        connection = new URL(hostname + "/").openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
+        OutputStream request = connection.getOutputStream();
+        request.write("".getBytes(StandardCharsets.UTF_8.name()));
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        ((HttpURLConnection) connection).disconnect();
+        assertEquals(501, statusCode);
     }
 }

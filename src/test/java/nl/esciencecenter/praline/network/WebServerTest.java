@@ -47,6 +47,7 @@ public class WebServerTest {
 
         sequences();
         alphabets();
+        scoreMatrices();
         alignments();
 
         server.close();
@@ -139,12 +140,22 @@ public class WebServerTest {
             controlMatrixString.append(".0 ");
         }
         controlScoreMatrix.setScores(controlMatrix);
-        // Send score matrix to server
-        URLConnection connection = new URL(hostname + "/send/score/" + alphabet.getName()).openConnection();
+        // Send alphabet to server
+        URLConnection connection = new URL(hostname + "/send/alphabet/" + alphabet.getName()).openConnection();
         connection.setDoOutput(true);
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
         OutputStream request = connection.getOutputStream();
+        request.write(String.valueOf(alphabet.getLength()).getBytes(StandardCharsets.UTF_8.name()));
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        assertEquals(201, statusCode);
+        ((HttpURLConnection) connection).disconnect();
+        // Send score matrix to server
+        connection = new URL(hostname + "/send/score/" + alphabet.getName() + "/" + controlScoreMatrix.getName()).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
+        request = connection.getOutputStream();
         request.write(controlMatrixString.toString().getBytes(StandardCharsets.UTF_8.name()));
         statusCode = ((HttpURLConnection) connection).getResponseCode();
         // Check that sent sequence match
@@ -157,7 +168,7 @@ public class WebServerTest {
         // Cleanup
         ((HttpURLConnection) connection).disconnect();
         // Try to send the same matrix again
-        connection = new URL(hostname + "/send/score/" + alphabet.getName()).openConnection();
+        connection = new URL(hostname + "/send/score/" + alphabet.getName() + "/" + controlScoreMatrix.getName()).openConnection();
         connection.setDoOutput(true);
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());

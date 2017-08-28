@@ -34,7 +34,6 @@ public class LocalAlignmentMatrix extends  AlignmentMatrix{
                 column -= 1;
             }
         }
-        alignment.add(String.valueOf(row) + " " + String.valueOf(column));
 
         return alignment;
     }

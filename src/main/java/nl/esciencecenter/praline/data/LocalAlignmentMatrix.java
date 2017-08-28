@@ -18,7 +18,7 @@ public class LocalAlignmentMatrix extends  AlignmentMatrix{
     }
 
     public ArrayList<String> getAlignment() {
-        int row = maxScoreIndex / (getSequence(1).getLength() + 1);
+        int row = maxScoreIndex / (getSequence(0).getLength() + 1);
         int column = maxScoreIndex % (getSequence(0).getLength() + 1);
         ArrayList<String> alignment = new ArrayList<>();
 

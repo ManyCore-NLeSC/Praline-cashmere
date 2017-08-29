@@ -1,9 +1,6 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
-import nl.esciencecenter.praline.data.Alphabet;
-import nl.esciencecenter.praline.data.ScoreMatrix;
-import nl.esciencecenter.praline.data.Sequence;
+import nl.esciencecenter.praline.data.*;
 
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -16,7 +13,8 @@ public class WebServer {
     private HashMap<String, Sequence> sequences;
     private HashMap<String, Alphabet> alphabets;
     private HashMap<String, ScoreMatrix> scores;
-    private HashMap<String, GlobalAlignmentMatrix> alignments;
+    private HashMap<String, GlobalAlignmentMatrix> globalAlignments;
+    private HashMap<String, LocalAlignmentMatrix> localAlignments;
 
     public WebServer(int threads) {
         threadPool(threads);
@@ -43,8 +41,12 @@ public class WebServer {
         this.scores = scores;
     }
 
-    public void setAlignmentMatricesContainer(HashMap<String, GlobalAlignmentMatrix> alignments) {
-        this.alignments = alignments;
+    public void setGlobalAlignmentMatricesContainer(HashMap<String, GlobalAlignmentMatrix> globalAlignments) {
+        this.globalAlignments = globalAlignments;
+    }
+
+    public void setLocalAlignmentMatricesContaines(HashMap<String, LocalAlignmentMatrix> localAlignments) {
+        this.localAlignments = localAlignments;
     }
 
     public void run() {
@@ -79,9 +81,9 @@ public class WebServer {
             response.status(statusCode);
             return "Score matrix \"" + request.params(":scorematrix") + "\" processed.";
         });
-        // Send an alignment matrix
+        // Send a global alignment matrix
         get("/receive/alignment_matrix/global/:sequence1/:sequence2", (request, response) -> {
-            GlobalAlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            GlobalAlignmentMatrix alignment = globalAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
                 response.status(200);
                 return alignment.toString();
@@ -90,9 +92,9 @@ public class WebServer {
                 return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
             }
         });
-        // Send an alignment score
+        // Send a global alignment score
         get("/receive/alignment_score/global/:sequence1/:sequence2", (request, response) -> {
-            GlobalAlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            GlobalAlignmentMatrix alignment = globalAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
                 response.status(200);
                 return alignment.getScore();
@@ -101,7 +103,50 @@ public class WebServer {
                 return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
             }
         });
-        // Send an alignment path
+        // Send a global alignment path
+        get("/receive/alignment_path/global/:sequence1/:sequence2", (request, response) -> {
+           GlobalAlignmentMatrix alignment = globalAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            if ( alignment != null ) {
+                response.status(200);
+                return alignment.getAlignment().toString();
+            } else {
+                response.status(404);
+                return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
+            }
+        });
+        // Send a local alignment matrix
+        get("/receive/alignment_matrix/local/:sequence1/:sequence2", (request, response) -> {
+            LocalAlignmentMatrix alignment = localAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            if ( alignment != null ) {
+                response.status(200);
+                return alignment.toString();
+            } else {
+                response.status(404);
+                return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
+            }
+        });
+        // Send a local alignment score
+        get("/receive/alignment_score/local/:sequence1/:sequence2", (request, response) -> {
+            LocalAlignmentMatrix alignment = localAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            if ( alignment != null ) {
+                response.status(200);
+                return alignment.getScore();
+            } else {
+                response.status(404);
+                return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
+            }
+        });
+        // Send a local alignment path
+        get("/receive/alignment_path/local/:sequence1/:sequence2", (request, response) -> {
+            LocalAlignmentMatrix alignment = localAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
+            if ( alignment != null ) {
+                response.status(200);
+                return alignment.getAlignment().toString();
+            } else {
+                response.status(404);
+                return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
+            }
+        });
         // Default routes
         get("/", ((request, response) -> halt(501)));
         post("/", ((request, response) -> halt(501)));

@@ -244,7 +244,6 @@ public class WebServerTest {
 
     private void defaults() throws IOException {
         int statusCode;
-        String temp;
 
         // Get
         URLConnection connection = new URL(hostname + "/").openConnection();

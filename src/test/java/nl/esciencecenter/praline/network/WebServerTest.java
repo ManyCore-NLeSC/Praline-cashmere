@@ -218,13 +218,6 @@ public class WebServerTest {
         }
         // Cleanup
         ((HttpURLConnection) connection).disconnect();
-        // Not existing alignment matrix
-        connection = new URL(hostname + "/receive/test/wrong").openConnection();
-        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
-        statusCode = ((HttpURLConnection) connection).getResponseCode();
-        assertEquals(404, statusCode);
-        // Cleanup
-        ((HttpURLConnection) connection).disconnect();
         // Receive the global alignment score from the server
         connection = new URL(hostname + "/receive/alignment_score/global/" + controlSequence.getId() + "/" + controlScore.getSequence(1).getId()).openConnection();
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
@@ -251,6 +244,11 @@ public class WebServerTest {
         statusCode = ((HttpURLConnection) connection).getResponseCode();
         ((HttpURLConnection) connection).disconnect();
         assertEquals(501, statusCode);
+        connection = new URL(hostname + "/receive/test/wrong").openConnection();
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        assertEquals(404, statusCode);
+        ((HttpURLConnection) connection).disconnect();
         // Post
         connection = new URL(hostname + "/").openConnection();
         connection.setDoOutput(true);

@@ -80,7 +80,7 @@ public class WebServer {
             return "Score matrix \"" + request.params(":scorematrix") + "\" processed.";
         });
         // Send an alignment matrix
-        get("/receive/alignment_matrix/:sequence1/:sequence2", (request, response) -> {
+        get("/receive/alignment_matrix/global/:sequence1/:sequence2", (request, response) -> {
             GlobalAlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
                 response.status(200);
@@ -91,7 +91,7 @@ public class WebServer {
             }
         });
         // Send an alignment score
-        get("/receive/alignment_score/:sequence1/:sequence2", (request, response) -> {
+        get("/receive/alignment_score/global/:sequence1/:sequence2", (request, response) -> {
             GlobalAlignmentMatrix alignment = alignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
             if ( alignment != null ) {
                 response.status(200);

@@ -1,9 +1,6 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.data.Alphabet;
-import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
-import nl.esciencecenter.praline.data.ScoreMatrix;
-import nl.esciencecenter.praline.data.Sequence;
+import nl.esciencecenter.praline.data.*;
 import org.junit.Test;
 
 import java.io.*;
@@ -25,7 +22,8 @@ public class WebServerTest {
     private HashMap<String, Sequence> sequences;
     private HashMap<String, Alphabet> alphabets;
     private HashMap<String, ScoreMatrix> scoreMatrices;
-    private HashMap<String, GlobalAlignmentMatrix> alignments;
+    private HashMap<String, GlobalAlignmentMatrix> globalAlignments;
+    private HashMap<String, LocalAlignmentMatrix> localAlignments;
 
     @Test
     public void run() throws IOException {
@@ -37,12 +35,14 @@ public class WebServerTest {
         sequences = new HashMap<>();
         alphabets = new HashMap<>();
         scoreMatrices = new HashMap<>();
-        alignments = new HashMap<>();
+        globalAlignments = new HashMap<>();
+        localAlignments = new HashMap<>();
         server.setLocks(locks);
         server.setSequencesContainer(sequences);
         server.setAlphabetsContainer(alphabets);
         server.setScoreMatricesContainer(scoreMatrices);
-        server.setAlignmentMatricesContainer(alignments);
+        server.setGlobalAlignmentMatricesContainer(globalAlignments);
+        server.setLocalAlignmentMatricesContaines(localAlignments);
         server.run();
 
         sequences();
@@ -131,8 +131,8 @@ public class WebServerTest {
         Alphabet alphabet = new Alphabet("controlAlphabet", 46);
 
         // Create control score matrix
-        ScoreMatrix controlScoreMatrix = new ScoreMatrix("controlScoreMatrix");
-        controlScoreMatrix.setAlphabet(alphabet);
+        ScoreMatrix globalAlignmentMatrixMatrix = new ScoreMatrix("globalAlignmentMatrixMatrix");
+        globalAlignmentMatrixMatrix.setAlphabet(alphabet);
         float [] controlMatrix = new float [alphabet.getLength() * alphabet.getLength()];
         StringBuilder controlMatrixString = new StringBuilder();
         for ( int item = 0; item < controlMatrix.length; item++ ) {
@@ -140,7 +140,7 @@ public class WebServerTest {
             controlMatrixString.append(item);
             controlMatrixString.append(".0 ");
         }
-        controlScoreMatrix.setScores(controlMatrix);
+        globalAlignmentMatrixMatrix.setScores(controlMatrix);
         // Send alphabet to server
         URLConnection connection = new URL(hostname + "/send/alphabet/" + alphabet.getName()).openConnection();
         connection.setDoOutput(true);
@@ -152,7 +152,7 @@ public class WebServerTest {
         assertEquals(201, statusCode);
         ((HttpURLConnection) connection).disconnect();
         // Send score matrix to server
-        connection = new URL(hostname + "/send/score/" + alphabet.getName() + "/" + controlScoreMatrix.getName()).openConnection();
+        connection = new URL(hostname + "/send/score/" + alphabet.getName() + "/" + globalAlignmentMatrixMatrix.getName()).openConnection();
         connection.setDoOutput(true);
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
@@ -163,13 +163,13 @@ public class WebServerTest {
         assertEquals(201, statusCode);
         for ( int row = 0; row < alphabet.getLength(); row++ ) {
             for ( int column = 0; column < alphabet.getLength(); column++ ) {
-                assertEquals(controlScoreMatrix.getScore(row, column), scoreMatrices.get("controlScoreMatrix").getScore(row, column), epsilon);
+                assertEquals(globalAlignmentMatrixMatrix.getScore(row, column), scoreMatrices.get("globalAlignmentMatrixMatrix").getScore(row, column), epsilon);
             }
         }
         // Cleanup
         ((HttpURLConnection) connection).disconnect();
         // Try to send the same matrix again
-        connection = new URL(hostname + "/send/score/" + alphabet.getName() + "/" + controlScoreMatrix.getName()).openConnection();
+        connection = new URL(hostname + "/send/score/" + alphabet.getName() + "/" + globalAlignmentMatrixMatrix.getName()).openConnection();
         connection.setDoOutput(true);
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + StandardCharsets.UTF_8.name());
@@ -187,20 +187,27 @@ public class WebServerTest {
         String temp;
 
         // Create control sequence
-        Sequence controlSequence = new Sequence("controlOne", 17);
+        Sequence controlSequenceOne = new Sequence("controlOne", 17);
+        Sequence controlSequenceTwo = new Sequence("controlTwo", 4);
         // Create control alignment matrix
-        GlobalAlignmentMatrix controlScore = new GlobalAlignmentMatrix("controlOne_controlTwo");
-        controlScore.addSequence(controlSequence);
-        controlScore.addSequence(new Sequence("controlTwo", 4));
-        controlScore.allocate();
-        for ( int symbolOne = 0; symbolOne < controlScore.getSequence(0).getLength(); symbolOne++ ) {
-            for ( int symbolTwo = 0; symbolTwo < controlScore.getSequence(1).getLength(); symbolTwo++ ) {
-                controlScore.setScore((symbolOne * controlScore.getSequence(1).getLength()) + symbolTwo, symbolTwo);
+        GlobalAlignmentMatrix globalAlignmentMatrix = new GlobalAlignmentMatrix("controlOne_controlTwo");
+        LocalAlignmentMatrix localAlignmentMatrix = new LocalAlignmentMatrix("controlOne_controlTwo");
+        globalAlignmentMatrix.addSequence(controlSequenceOne);
+        localAlignmentMatrix.addSequence(controlSequenceOne);
+        globalAlignmentMatrix.addSequence(controlSequenceTwo);
+        localAlignmentMatrix.addSequence(controlSequenceTwo);
+        globalAlignmentMatrix.allocate();
+        localAlignmentMatrix.allocate();
+        for ( int symbolOne = 0; symbolOne < globalAlignmentMatrix.getSequence(0).getLength(); symbolOne++ ) {
+            for ( int symbolTwo = 0; symbolTwo < globalAlignmentMatrix.getSequence(1).getLength(); symbolTwo++ ) {
+                globalAlignmentMatrix.setScore((symbolOne * controlSequenceTwo.getLength()) + symbolTwo, symbolTwo);
+                localAlignmentMatrix.setScore((symbolOne * controlSequenceTwo.getLength()) + symbolTwo, symbolTwo);
             }
         }
-        alignments.put(controlScore.getId(), controlScore);
-        // Receive alignment matrix from server
-        URLConnection connection = new URL(hostname + "/receive/alignment_matrix/global/" + controlSequence.getId() + "/" + controlScore.getSequence(1).getId()).openConnection();
+        globalAlignments.put(globalAlignmentMatrix.getId(), globalAlignmentMatrix);
+        localAlignments.put(localAlignmentMatrix.getId(), localAlignmentMatrix);
+        // Receive global alignment matrix from server
+        URLConnection connection = new URL(hostname + "/receive/alignment_matrix/global/" + controlSequenceOne.getId() + "/" + controlSequenceTwo.getId()).openConnection();
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder responseBody = new StringBuilder();
@@ -213,13 +220,13 @@ public class WebServerTest {
         int controlSymbol = 0;
         assertEquals(200, statusCode);
         for ( String symbol : responseBody.toString().split(" ")  ) {
-            assertEquals(controlScore.getScore(controlSymbol), Float.parseFloat(symbol), epsilon);
+            assertEquals(globalAlignmentMatrix.getScore(controlSymbol), Float.parseFloat(symbol), epsilon);
             controlSymbol++;
         }
         // Cleanup
         ((HttpURLConnection) connection).disconnect();
         // Receive the global alignment score from the server
-        connection = new URL(hostname + "/receive/alignment_score/global/" + controlSequence.getId() + "/" + controlScore.getSequence(1).getId()).openConnection();
+        connection = new URL(hostname + "/receive/alignment_score/global/" + controlSequenceOne.getId() + "/" + controlSequenceTwo.getId()).openConnection();
         connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
         response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         responseBody = new StringBuilder();
@@ -230,7 +237,69 @@ public class WebServerTest {
         statusCode = ((HttpURLConnection) connection).getResponseCode();
         // Check that received alignment score match
         assertEquals(200, statusCode);
-        assertEquals(controlScore.getScore(), Float.parseFloat(responseBody.toString()), epsilon);
+        assertEquals(globalAlignmentMatrix.getScore(), Float.parseFloat(responseBody.toString()), epsilon);
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
+        // Receive the global alignment path
+        connection = new URL(hostname + "/receive/alignment_path/global/" + controlSequenceOne.getId() + "/" + controlSequenceTwo.getId()).openConnection();
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        responseBody = new StringBuilder();
+        while ( (temp = response.readLine()) != null ) {
+            responseBody.append(temp);
+        }
+        response.close();
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that received alignment path match
+        assertEquals(200, statusCode);
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
+        // Receive local alignment matrix from server
+        connection = new URL(hostname + "/receive/alignment_matrix/local/" + controlSequenceOne.getId() + "/" + controlSequenceTwo.getId()).openConnection();
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        responseBody = new StringBuilder();
+        while ( (temp = response.readLine()) != null ) {
+            responseBody.append(temp);
+        }
+        response.close();
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that received matrix match
+        controlSymbol = 0;
+        assertEquals(200, statusCode);
+        for ( String symbol : responseBody.toString().split(" ")  ) {
+            assertEquals(globalAlignmentMatrix.getScore(controlSymbol), Float.parseFloat(symbol), epsilon);
+            controlSymbol++;
+        }
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
+        // Receive the local alignment score from the server
+        connection = new URL(hostname + "/receive/alignment_score/local/" + controlSequenceOne.getId() + "/" + controlSequenceTwo.getId()).openConnection();
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        responseBody = new StringBuilder();
+        while ( (temp = response.readLine()) != null ) {
+            responseBody.append(temp);
+        }
+        response.close();
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that received alignment score match
+        assertEquals(200, statusCode);
+        assertEquals(globalAlignmentMatrix.getScore(), Float.parseFloat(responseBody.toString()), epsilon);
+        // Cleanup
+        ((HttpURLConnection) connection).disconnect();
+        // Receive the global alignment path
+        connection = new URL(hostname + "/receive/alignment_path/local/" + controlSequenceOne.getId() + "/" + controlSequenceTwo.getId()).openConnection();
+        connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
+        response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        responseBody = new StringBuilder();
+        while ( (temp = response.readLine()) != null ) {
+            responseBody.append(temp);
+        }
+        response.close();
+        statusCode = ((HttpURLConnection) connection).getResponseCode();
+        // Check that received alignment path match
+        assertEquals(200, statusCode);
         // Cleanup
         ((HttpURLConnection) connection).disconnect();
     }

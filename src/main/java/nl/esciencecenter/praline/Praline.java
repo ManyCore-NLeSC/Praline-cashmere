@@ -29,7 +29,7 @@ public class Praline {
         // Initialize web server
         server = new WebServer(arguments.getNrServerThreads());
         server.setSequencesContainer(sequences);
-        server.setAlignmentMatricesContainer(alignments);
+        server.setGlobalAlignmentMatricesContainer(alignments);
         server.run();
 
         // Locks

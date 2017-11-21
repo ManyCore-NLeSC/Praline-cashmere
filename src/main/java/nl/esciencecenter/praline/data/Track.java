@@ -17,4 +17,8 @@ public class Track {
     public void setAlphabet(Alphabet alphabet) {
         this.alphabet = alphabet;
     }
+
+    public int getLength() {
+        return -1;
+    }
 }

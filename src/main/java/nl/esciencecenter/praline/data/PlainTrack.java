@@ -36,4 +36,9 @@ public class PlainTrack extends Track {
     public void setValue(int index, int value) {
         values[index] = value;
     }
+
+    @Override
+    public int getLength() {
+        return values.length;
+    }
 }

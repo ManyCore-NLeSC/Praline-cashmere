@@ -28,8 +28,8 @@ public class GlobalAlignmentMatrixTest {
 
         globalAlignmentMatrix.addSequence(sequenceOne);
         globalAlignmentMatrix.addSequence(sequenceTwo);
-        assertEquals(sequenceOne.getId(), globalAlignmentMatrix.getSequence(0).getId());
-        assertEquals(sequenceTwo.getId(), globalAlignmentMatrix.getSequence(1).getId());
+        assertEquals(sequenceOne.getName(), globalAlignmentMatrix.getSequence(0).getName());
+        assertEquals(sequenceTwo.getName(), globalAlignmentMatrix.getSequence(1).getName());
     }
 
     @Test

@@ -43,7 +43,7 @@ public class Praline {
             }
         }
         for ( Sequence sequence : sequences.values() ) {
-            System.out.print("Sequence \"" + sequence.getId() + "\": ");
+            System.out.print("Sequence \"" + sequence.getName() + "\": ");
             for ( Integer symbol : sequence.getElements() ) {
                 System.out.print(symbol + " ");
             }
@@ -52,10 +52,10 @@ public class Praline {
         // Send alignment matrices
         for ( Sequence sequenceOne : sequences.values() ) {
             for ( Sequence sequenceTwo : sequences.values() ) {
-                if ( sequenceOne.getId().equals(sequenceTwo.getId()) ) {
+                if ( sequenceOne.getName().equals(sequenceTwo.getName()) ) {
                     continue;
                 }
-                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
+                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getName() + "_" + sequenceTwo.getName());
                 alignment.addSequence(sequenceOne);
                 alignment.addSequence(sequenceTwo);
                 alignment.allocate();

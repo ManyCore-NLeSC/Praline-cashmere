@@ -13,8 +13,8 @@ public class SequenceTest {
     public void getId() {
         Sequence sequence = new Sequence(name);
 
-        assertEquals(name, sequence.getId());
-        assertNotEquals("", sequence.getId());
+        assertEquals(name, sequence.getName());
+        assertNotEquals("", sequence.getName());
     }
 
     @Test

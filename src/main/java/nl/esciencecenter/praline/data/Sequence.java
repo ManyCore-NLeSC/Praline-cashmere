@@ -1,49 +1,48 @@
 package nl.esciencecenter.praline.data;
 
+import java.util.ArrayList;
+
 public class Sequence {
-    private String id;
-    private int [] sequence;
+    private String name;
+    private int length;
+    private ArrayList<Track> tracks;
 
-    public Sequence(String id) {
-        this.id = id;
+    public Sequence(String name) {
+        this.name = name;
     }
 
-    public Sequence(String id, int length) {
-        this.id = id;
-        sequence = new int [length];
+    public Sequence(String name, int length) {
+        this.name = name;
+        this.length = length;
     }
 
-    public Sequence(String id, int [] sequence) {
-        this.id = id;
-        this.sequence = sequence;
+    public Sequence(String name, int length, ArrayList<Track> tracks) {
+        this.name = name;
+        this.length = length;
+        this.tracks = tracks;
     }
 
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     public int getLength() {
-        return sequence.length;
+        return length;
     }
 
-    public int getElement(int index) {
-        if ( (index >= 0) && (index < sequence.length) ) {
-            return sequence[index];
+    public ArrayList<Track> getTracks() {
+        return tracks;
+    }
+
+    public void addTrack(Track track) {
+        if ( track.getLength() == length ) {
+            tracks.add(track);
+        } else {
+            // TODO: throw exception
         }
-        return -1;
     }
 
-    public void setElement(int index, int value) {
-        if ( (index >= 0) && (index < sequence.length) ) {
-            sequence[index] = value;
-        }
-    }
-
-    public int [] getElements() {
-        return sequence;
-    }
-
-    public void setElements(int [] elements) {
-        sequence = elements;
+    public int getNrTracks() {
+        return tracks.size();
     }
 }

@@ -55,10 +55,7 @@ public class Praline {
                 if ( sequenceOne.getId().equals(sequenceTwo.getId()) ) {
                     continue;
                 }
-                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId());
-                alignment.addSequence(sequenceOne);
-                alignment.addSequence(sequenceTwo);
-                alignment.allocate();
+                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId(),sequenceOne,sequenceTwo);
                 alignments.put(alignment.getId(), alignment);
             }
         }

@@ -190,18 +190,12 @@ public class WebServerTest {
         Sequence controlSequenceOne = new Sequence("controlOne", 17);
         Sequence controlSequenceTwo = new Sequence("controlTwo", 4);
         // Create control alignment matrix
-        GlobalAlignmentMatrix globalAlignmentMatrix = new GlobalAlignmentMatrix("controlOne_controlTwo");
-        LocalAlignmentMatrix localAlignmentMatrix = new LocalAlignmentMatrix("controlOne_controlTwo");
-        globalAlignmentMatrix.addSequence(controlSequenceOne);
-        localAlignmentMatrix.addSequence(controlSequenceOne);
-        globalAlignmentMatrix.addSequence(controlSequenceTwo);
-        localAlignmentMatrix.addSequence(controlSequenceTwo);
-        globalAlignmentMatrix.allocate();
-        localAlignmentMatrix.allocate();
-        for ( int symbolOne = 0; symbolOne < globalAlignmentMatrix.getSequence(0).getLength(); symbolOne++ ) {
-            for ( int symbolTwo = 0; symbolTwo < globalAlignmentMatrix.getSequence(1).getLength(); symbolTwo++ ) {
-                globalAlignmentMatrix.setScore((symbolOne * controlSequenceTwo.getLength()) + symbolTwo, symbolTwo);
-                localAlignmentMatrix.setScore((symbolOne * controlSequenceTwo.getLength()) + symbolTwo, symbolTwo);
+        GlobalAlignmentMatrix globalAlignmentMatrix = new GlobalAlignmentMatrix("controlOne_controlTwo", controlSequenceOne,controlSequenceTwo);
+        LocalAlignmentMatrix localAlignmentMatrix = new LocalAlignmentMatrix("controlOne_controlTwo", controlSequenceOne,controlSequenceTwo);
+        for ( int symbolOne = 0; symbolOne < globalAlignmentMatrix.getSeqA().getLength(); symbolOne++ ) {
+            for ( int symbolTwo = 0; symbolTwo < globalAlignmentMatrix.getSeqB().getLength(); symbolTwo++ ) {
+                globalAlignmentMatrix.setScore(symbolOne  ,symbolTwo, symbolTwo);
+                localAlignmentMatrix.setScore(symbolOne, symbolTwo, symbolTwo);
             }
         }
         globalAlignments.put(globalAlignmentMatrix.getId(), globalAlignmentMatrix);
@@ -220,7 +214,7 @@ public class WebServerTest {
         int controlSymbol = 0;
         assertEquals(200, statusCode);
         for ( String symbol : responseBody.toString().split(" ")  ) {
-            assertEquals(globalAlignmentMatrix.getScore(controlSymbol), Float.parseFloat(symbol), epsilon);
+            assertEquals(globalAlignmentMatrix.getScore(controlSymbol,0), Float.parseFloat(symbol), epsilon);
             controlSymbol++;
         }
         // Cleanup
@@ -268,7 +262,7 @@ public class WebServerTest {
         controlSymbol = 0;
         assertEquals(200, statusCode);
         for ( String symbol : responseBody.toString().split(" ")  ) {
-            assertEquals(globalAlignmentMatrix.getScore(controlSymbol), Float.parseFloat(symbol), epsilon);
+            assertEquals(globalAlignmentMatrix.getScore(controlSymbol,0), Float.parseFloat(symbol), epsilon);
             controlSymbol++;
         }
         // Cleanup

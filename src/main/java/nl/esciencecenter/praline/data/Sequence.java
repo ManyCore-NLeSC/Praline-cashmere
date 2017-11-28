@@ -30,7 +30,7 @@ public class Sequence {
         if ( (index >= 0) && (index < sequence.length) ) {
             return sequence[index];
         }
-        return -1;
+        throw new Error("Out of bounds!" + index);
     }
 
     public void setElement(int index, int value) {

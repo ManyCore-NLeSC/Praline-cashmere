@@ -23,6 +23,6 @@ public class Alphabet {
     }
 
     public void setLength(int length) {
-        length = length;
+        this.length = length;
     }
 }

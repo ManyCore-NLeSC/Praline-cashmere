@@ -4,32 +4,17 @@ import java.util.ArrayList;
 
 public class GlobalAlignmentMatrix extends AlignmentMatrix {
 
-    public GlobalAlignmentMatrix(String id) {
-        super(id);
+    public GlobalAlignmentMatrix(String id, Sequence seqA, Sequence seqB) {
+        super(id,seqA,seqB);
     }
 
     public float getScore() {
-        return scores[scores.length - 1];
+        return getScore(getSeqA().getLength(), getSeqB().getLength());
     }
 
-    public ArrayList<String> getAlignment() {
-        int row = getSequence(1).getLength();
-        int column = getSequence(0).getLength();
-        ArrayList<String> alignment = new ArrayList<>();
 
-        while ( getMove((row * (getSequence(0).getLength() + 1)) + column) != Move.NIL ) {
-            Move move = getMove((row * (getSequence(0).getLength() + 1)) + column);
-            alignment.add(String.valueOf(row) + " " + String.valueOf(column));
-            if ( move == Move.TOP ) {
-                row -= 1;
-            } else if ( move == Move.LEFT ) {
-                column -= 1;
-            } else {
-                row -= 1;
-                column -= 1;
-            }
-        }
-        alignment.add(String.valueOf(row) + " " + String.valueOf(column));
-        return alignment;
+    public ArrayList<String> getAlignment( ) {
+        return getAlignment(getSeqA().getLength(),getSeqB().getLength());
     }
+
 }

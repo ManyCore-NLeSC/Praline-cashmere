@@ -3,38 +3,36 @@ package nl.esciencecenter.praline.data;
 import java.util.ArrayList;
 
 public class LocalAlignmentMatrix extends  AlignmentMatrix{
-    private int maxScoreIndex;
+    private int maxScoreIndexCol;
+    private int maxScoreIndexRow;
+    private float bestScore;
 
-    public LocalAlignmentMatrix(String id) {
-        super(id);
+    public LocalAlignmentMatrix(String id, Sequence seqA, Sequence seqB) {
+        super(id,seqA,seqB);
+        bestScore = Float.MIN_VALUE;
+        maxScoreIndexRow = maxScoreIndexCol = 0;
     }
 
     public float getScore() {
-        return getScore(maxScoreIndex);
+        return getScore(maxScoreIndexCol, maxScoreIndexRow);
     }
 
-    public void setMaxScoreItem(int index) {
-        maxScoreIndex = index;
-    }
-
-    public ArrayList<String> getAlignment() {
-        int row = maxScoreIndex / (getSequence(0).getLength() + 1);
-        int column = maxScoreIndex % (getSequence(0).getLength() + 1);
-        ArrayList<String> alignment = new ArrayList<>();
-
-        while ( getMove((row * (getSequence(0).getLength() + 1)) + column) != Move.NIL ) {
-            Move move = getMove((row * (getSequence(0).getLength() + 1)) + column);
-            alignment.add(String.valueOf(row) + " " + String.valueOf(column));
-            if ( move == Move.TOP ) {
-                row -= 1;
-            } else if ( move == Move.LEFT ) {
-                column -= 1;
-            } else {
-                row -= 1;
-                column -= 1;
+    public void setScore(int col, int row, float value) {
+        if(isInside(col,row)){
+            if(value > bestScore ){
+                maxScoreIndexCol = col;
+                maxScoreIndexRow = row;
+                bestScore = value;
             }
+            super.setScore(col,row,value);
         }
-
-        return alignment;
     }
+
+    public ArrayList<String> getAlignment(){
+        return getAlignment(maxScoreIndexCol,maxScoreIndexRow);
+    }
+
+
+
+
 }

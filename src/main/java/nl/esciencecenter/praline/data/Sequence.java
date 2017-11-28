@@ -47,6 +47,13 @@ public class Sequence {
         return tracks;
     }
 
+    public Track getTrack(int i){
+        if(i >= 0 && i < tracks.size()){
+            return tracks.get(i);
+        }
+        throw new Error("No such track!");
+    }
+
     public void addTrack(Track track) {
         if ( track.getLength() == length ) {
             tracks.add(track);

@@ -13,8 +13,8 @@ public class LocalAligner extends Aligner {
         super(gapScore);
     }
 
-    protected ScoreResult computeScore(int column, int row, AlignmentMatrix matrix, ScoreMatrix scores){
-       ScoreResult best = super.computeScore(column,row,matrix,scores);
+    protected ScoreResult computeScore(int column, int row, AlignmentMatrix matrix, PositionCost cost){
+       ScoreResult best = super.computeScore(column,row,matrix,cost);
        if(best.score <= 0){
            return new ScoreResult(0,Move.NIL);
        } else {

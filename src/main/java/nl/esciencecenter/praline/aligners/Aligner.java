@@ -21,12 +21,12 @@ abstract class Aligner {
         this.gapScore = gapScore;
     }
 
-    public void computeAlignment(AlignmentMatrix matrix, ScoreMatrix scores) {
+    public void computeAlignment(AlignmentMatrix matrix, PositionCost positionCost) {
         matrix.allocate();
         initMatrix(matrix);
         for ( int row = 1; row < matrix.getSeqB().getLength() + 1; row++ ) {
             for ( int column = 1; column < matrix.getSeqA().getLength() + 1; column++ ) {
-                ScoreResult res = computeScore(column, row, matrix,scores);
+                ScoreResult res = computeScore(column, row, matrix,positionCost);
 
                 matrix.setScore(column,row, res.score);
                 matrix.setMove(column, row, res.move);
@@ -34,14 +34,14 @@ abstract class Aligner {
         }
     }
 
-    protected ScoreResult computeScore(int column, int row, AlignmentMatrix matrix,ScoreMatrix scores){
+    protected ScoreResult computeScore(int column, int row, AlignmentMatrix matrix,PositionCost positionCost){
         ScoreResult best = new ScoreResult(matrix.getScore(column, row -1) + getGapScore(), Move.TOP);
         float gap2 = matrix.getScore(column-1, row) + getGapScore();
         if ( gap2 >= best.score) {
             best = new ScoreResult(gap2,Move.LEFT);
         }
         float align = matrix.getScore(column -1, row -1) +
-                scores.getScore(matrix.getSeqA().getElement(column-1), matrix.getSeqB().getElement(row-1));
+                positionCost.cost(column,row);
 
         if (  align >= best.score ) {
             best = new ScoreResult(align,Move.TOP_LEFT);

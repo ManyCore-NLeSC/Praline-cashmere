@@ -155,20 +155,22 @@ public class WebServer {
     }
 
     private int processSendSequence(String id, String body) {
-        int iterator = 0;
-        int [] elements = new int [body.split(" ").length];
-        Sequence sequence = new Sequence(id);
+//        int iterator = 0;
+//        int [] elements = new int [body.split(" ").length];
+//        Sequence sequence = new Sequence(id);
+//
+//        for ( String item : body.split(" ") ) {
+//            elements[iterator] = Integer.parseInt(item);
+//            iterator++;
+//        }
+//        sequence.setElements(elements);
+//        synchronized ( locks.get("sequence") ) {
+//            sequences.put(id, sequence);
+//            locks.get("sequence").notifyAll();
+//        }
+        //return 201;
+        return 401;
 
-        for ( String item : body.split(" ") ) {
-            elements[iterator] = Integer.parseInt(item);
-            iterator++;
-        }
-        sequence.setElements(elements);
-        synchronized ( locks.get("sequence") ) {
-            sequences.put(id, sequence);
-            locks.get("sequence").notifyAll();
-        }
-        return 201;
     }
 
     private int processSendAlphabet(String id, int length) {

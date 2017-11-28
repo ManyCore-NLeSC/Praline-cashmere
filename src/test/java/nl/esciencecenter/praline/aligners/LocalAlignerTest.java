@@ -1,9 +1,6 @@
 package nl.esciencecenter.praline.aligners;
 
-import nl.esciencecenter.praline.data.Alphabet;
-import nl.esciencecenter.praline.data.LocalAlignmentMatrix;
-import nl.esciencecenter.praline.data.ScoreMatrix;
-import nl.esciencecenter.praline.data.Sequence;
+import nl.esciencecenter.praline.data.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -23,8 +20,8 @@ public class LocalAlignerTest {
         ArrayList<String> alignment;
         LocalAligner aligner = new LocalAligner(-2.0f);
 
-        sequenceOne.setElements(new int [] {3, 2, 2, 2, 1, 0, 3, 2, 3});
-        sequenceTwo.setElements(new int [] {3, 2, 3, 2, 0, 0, 1, 3});
+        sequenceOne.addTrack(new Track(alphabet,new int [] {3, 2, 2, 2, 1, 0, 3, 2, 3}));
+        sequenceTwo.addTrack(new Track(alphabet,new int [] {3, 2, 3, 2, 0, 0, 1, 3}));
         scores.setAlphabet(alphabet);
         scores.setScores(new float [] {1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f});
 //        matrix.addSequence(sequenceOne);

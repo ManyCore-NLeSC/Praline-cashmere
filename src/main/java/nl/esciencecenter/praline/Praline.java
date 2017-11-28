@@ -42,20 +42,21 @@ public class Praline {
                 locks.get("sequence").wait();
             }
         }
-        for ( Sequence sequence : sequences.values() ) {
-            System.out.print("Sequence \"" + sequence.getId() + "\": ");
-            for ( Integer symbol : sequence.getElements() ) {
-                System.out.print(symbol + " ");
-            }
-            System.out.println();
-        }
+//        for ( Sequence sequence : sequences.values() ) {
+//            System.out.print("Sequence \"" + sequence.getName() + "\": ");
+//            for ( Integer symbol : sequence.get() ) {
+//                System.out.print(symbol + " ");
+//            }
+//            System.out.println();
+//        }
         // Send alignment matrices
         for ( Sequence sequenceOne : sequences.values() ) {
             for ( Sequence sequenceTwo : sequences.values() ) {
-                if ( sequenceOne.getId().equals(sequenceTwo.getId()) ) {
+                if ( sequenceOne.getName().equals(sequenceTwo.getName()) ) {
                     continue;
                 }
-                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getId() + "_" + sequenceTwo.getId(),sequenceOne,sequenceTwo);
+                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getName() + "_" + sequenceTwo.getName(),sequenceOne,sequenceTwo);
+                alignment.allocate();
                 alignments.put(alignment.getId(), alignment);
             }
         }

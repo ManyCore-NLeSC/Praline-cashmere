@@ -21,9 +21,13 @@ public class GlobalAlignmentMatrixTest {
 
     @Test
     public void sequence() {
+
+
+        Sequence sequenceOne = new Sequence(sequenceOneName);
+        Sequence sequenceTwo = new Sequence(sequenceTwoName);
         GlobalAlignmentMatrix globalAlignmentMatrix = new GlobalAlignmentMatrix(sequenceOneName + "_" + sequenceTwoName, sequenceOne, sequenceTwo);
-        assertEquals(sequenceOne.getId(), globalAlignmentMatrix.getSeqA().getId());
-        assertEquals(sequenceTwo.getId(), globalAlignmentMatrix.getSeqB().getId());
+        assertEquals(sequenceOne.getName(), globalAlignmentMatrix.getSeqA().getName());
+        assertEquals(sequenceTwo.getName(), globalAlignmentMatrix.getSeqB().getName());
     }
 
     @Test

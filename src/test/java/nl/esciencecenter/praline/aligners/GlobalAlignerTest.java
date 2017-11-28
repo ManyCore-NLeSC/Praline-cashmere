@@ -21,8 +21,11 @@ public class GlobalAlignerTest {
     @Test
     public void alignment() {
         Alphabet alphabet = new Alphabet("Alphabet", 4);
-        Sequence sequenceOne = new Sequence("SequenceOne",new int [] {3, 2, 2, 2, 1, 0, 3, 2, 3});
-        Sequence sequenceTwo = new Sequence("SequenceTwo",new int [] {3, 2, 3, 2, 0, 0, 1, 3});
+        Sequence sequenceOne = new Sequence("SequenceOne");
+        sequenceOne.addTrack(new Track(alphabet,new int [] {3, 2, 2, 2, 1, 0, 3, 2, 3}));
+
+        Sequence sequenceTwo = new Sequence("SequenceTwo");
+        sequenceTwo.addTrack(new Track(alphabet, new int [] {3, 2, 3, 2, 0, 0, 1, 3}));
         GlobalAlignmentMatrix matrix = new GlobalAlignmentMatrix("Test",sequenceOne,sequenceTwo);
         ScoreMatrix scores = new ScoreMatrix("Scores");
         ArrayList<String> alignment;

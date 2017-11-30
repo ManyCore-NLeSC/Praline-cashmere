@@ -8,12 +8,13 @@ public class Sequence {
     private ArrayList<Track> tracks;
 
     public Sequence(String name) {
-        this.name = name;
+        this(name,0);
     }
 
     public Sequence(String name, int length) {
         this.name = name;
         this.length = length;
+        this.tracks = new ArrayList<>();
     }
 
     public Sequence(String name, int length, ArrayList<Track> tracks) {
@@ -55,8 +56,9 @@ public class Sequence {
     }
 
     public void addTrack(Track track) {
-        if ( track.getLength() == length ) {
+        if ( tracks.size() == 0 || track.getLength() == length ) {
             tracks.add(track);
+            length = track.getLength();
         } else {
             throw new Error("Track not of correct length!");
         }

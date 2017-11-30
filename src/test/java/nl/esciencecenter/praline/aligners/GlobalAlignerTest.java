@@ -31,10 +31,12 @@ public class GlobalAlignerTest {
         ArrayList<String> alignment;
         GlobalAligner aligner = new GlobalAligner(-2.0f);
 
-        scores.setAlphabet(alphabet);
-        scores.setScores(new float [] {1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f});
+        scores.setAlphabetA(alphabet);
+        scores.setAlphabetB(alphabet);
+        Matrix m = new Matrix(new float [] {1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f},
+                                alphabet.getLength(), alphabet.getLength());
 
-        aligner.computeAlignment(matrix, scores);
+        aligner.computeAlignment(matrix, new PositionCost(sequenceOne, sequenceTwo, m));
 
         alignment = matrix.getAlignment();
 

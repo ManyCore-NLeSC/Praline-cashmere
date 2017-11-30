@@ -22,8 +22,10 @@ public class ScoreMatrixTest {
         Alphabet alphabet = new Alphabet(alphabetName, alphabetLength);
         ScoreMatrix matrix = new ScoreMatrix(matrixName);
 
-        matrix.setAlphabet(alphabet);
-        assertEquals(alphabetName, matrix.getAlphabet().getName());
+        matrix.setAlphabetA(alphabet);
+        matrix.setAlphabetB(alphabet);
+        assertEquals(alphabetName, matrix.getAlphabetA().getName());
+        assertEquals(alphabetName, matrix.getAlphabetB().getName());
     }
 
     @Test
@@ -32,8 +34,11 @@ public class ScoreMatrixTest {
         ScoreMatrix matrix = new ScoreMatrix(matrixName);
         float [] scores = new float [alphabetLength * alphabetLength];
 
-        matrix.setAlphabet(alphabet);
-        matrix.setScores(scores);
+        matrix.setAlphabetA(alphabet);
+        matrix.setAlphabetB(alphabet);
+        Matrix m = new Matrix(alphabetLength,alphabetLength);
+        m.setMatrix(scores);
+        matrix.setScores(m);
         scores[0] = 1.0f;
         scores[12] = -3.0f;
         scores[932] = 92.3f;

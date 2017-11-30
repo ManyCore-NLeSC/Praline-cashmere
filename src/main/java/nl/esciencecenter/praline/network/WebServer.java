@@ -72,15 +72,15 @@ public class WebServer {
             return "Alphabet \"" + request.params(":alphabet") + "\" processed.";
         });
         // Receive a score matrix
-        post("/send/score/:alphabet/:scorematrix", (request, response) -> {
-            if ( scores.containsKey(request.params(":scorematrix")) ) {
-                response.status(409);
-                return "Score matrix \"" + request.params(":scorematrix") + "\" already exists.";
-            }
-            int statusCode = processSendScoreMatrix(request.params(":alphabet"), request.params(":scorematrix"), request.body());
-            response.status(statusCode);
-            return "Score matrix \"" + request.params(":scorematrix") + "\" processed.";
-        });
+//        post("/send/score/:alphabet/:scorematrix", (request, response) -> {
+//            if ( scores.containsKey(request.params(":scorematrix")) ) {
+//                response.status(409);
+//                return "Score matrix \"" + request.params(":scorematrix") + "\" already exists.";
+//            }
+//            int statusCode = processSendScoreMatrix(request.params(":alphabet"), request.params(":scorematrix"), request.body());
+//            response.status(statusCode);
+//            return "Score matrix \"" + request.params(":scorematrix") + "\" processed.";
+//        });
         // Send a global alignment matrix
         get("/receive/alignment_matrix/global/:sequence1/:sequence2", (request, response) -> {
             GlobalAlignmentMatrix alignment = globalAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
@@ -182,22 +182,22 @@ public class WebServer {
         }
         return 201;
     }
-
-    private int processSendScoreMatrix(String alphabetId, String scoreMatrixId, String body) {
-        int iterator = 0;
-        float [] elements = new float [body.split(" ").length];
-        ScoreMatrix score = new ScoreMatrix(scoreMatrixId);
-
-        score.setAlphabet(alphabets.get(alphabetId));
-        for ( String item : body.split(" ") ) {
-            elements[iterator] = Float.parseFloat(item);
-            iterator++;
-        }
-        score.setScores(elements);
-        synchronized ( locks.get("scorematrix") ) {
-            scores.put(scoreMatrixId, score);
-            locks.get("scorematrix").notifyAll();
-        }
-        return 201;
-    }
+//
+//    private int processSendScoreMatrix(String alphabetId, String scoreMatrixId, String body) {
+//        int iterator = 0;
+//        float [] elements = new float [body.split(" ").length];
+//        ScoreMatrix score = new ScoreMatrix(scoreMatrixId);
+//
+//        score.setAlphabet(alphabets.get(alphabetId));
+//        for ( String item : body.split(" ") ) {
+//            elements[iterator] = Float.parseFloat(item);
+//            iterator++;
+//        }
+//        score.setScores(elements);
+//        synchronized ( locks.get("scorematrix") ) {
+//            scores.put(scoreMatrixId, score);
+//            locks.get("scorematrix").notifyAll();
+//        }
+//        return 201;
+//    }
 }

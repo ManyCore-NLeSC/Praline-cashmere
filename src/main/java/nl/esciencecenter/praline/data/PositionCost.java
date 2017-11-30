@@ -8,8 +8,6 @@ public class PositionCost  {
     final Sequence b;
     final Matrix[] pairs;
 
-
-
     public PositionCost(Sequence a, Sequence b, Matrix ... pairs) {
         if(a.getNrTracks() != b.getNrTracks()){
             throw new Error("Number of tracks not equal");

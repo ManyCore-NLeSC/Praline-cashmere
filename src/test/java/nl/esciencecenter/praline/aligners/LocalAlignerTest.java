@@ -22,12 +22,15 @@ public class LocalAlignerTest {
 
         sequenceOne.addTrack(new Track(alphabet,new int [] {3, 2, 2, 2, 1, 0, 3, 2, 3}));
         sequenceTwo.addTrack(new Track(alphabet,new int [] {3, 2, 3, 2, 0, 0, 1, 3}));
-        scores.setAlphabet(alphabet);
-        scores.setScores(new float [] {1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f});
+        scores.setAlphabetA(alphabet);
+        scores.setAlphabetB(alphabet);
+        Matrix m = new Matrix(new float [] {1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f},
+                                alphabet.getLength(),alphabet.getLength());
+        //scores.setScores(m);
 //        matrix.addSequence(sequenceOne);
 //        matrix.addSequence(sequenceTwo);
         matrix.allocate();
-        aligner.computeAlignment(matrix, scores);
+        aligner.computeAlignment(matrix, new PositionCost(sequenceOne,sequenceTwo, m));
         alignment = matrix.getAlignment();
 //
 //        assertEquals(0.0f, matrix.getScore(0), epsilon);

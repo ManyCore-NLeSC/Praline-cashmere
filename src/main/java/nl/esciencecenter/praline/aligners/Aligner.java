@@ -2,6 +2,9 @@ package nl.esciencecenter.praline.aligners;
 
 import nl.esciencecenter.praline.data.*;
 
+import java.util.List;
+import java.util.Queue;
+
 abstract class Aligner {
     private float gapScore;
 
@@ -41,7 +44,7 @@ abstract class Aligner {
             best = new ScoreResult(gap2,Move.LEFT);
         }
         float align = matrix.getScore(column -1, row -1) +
-                positionCost.cost(column,row);
+                positionCost.cost(column-1,row-1);
 
         if (  align >= best.score ) {
             best = new ScoreResult(align,Move.TOP_LEFT);

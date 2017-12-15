@@ -43,6 +43,12 @@ public class TestAlign {
                 case GAPB : ar += a.charAt(i); br+= "-" ; i++; break;
             }
         }
+        if(i < a.length()){
+            ar += a.substring(i);
+        }
+        if(j < b.length()){
+            br += b.substring(j);
+        }
         System.out.println(ar);
         System.out.println(br);
 

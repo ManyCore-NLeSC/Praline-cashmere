@@ -4,6 +4,17 @@ public class Matrix2DI {
     final int[] data;
     public final int nrRows, nrCols;
 
+    public Matrix2DI(int[][] init){
+        this.nrRows = init.length;
+        this.nrCols = init[0].length;
+        data = new int[nrRows * nrCols];
+        for(int row = 0 ; row < nrRows; row++){
+            for(int col = 0 ; col < nrCols ; col++){
+                set(row,col,init[row][col]);
+            }
+        }
+    }
+
     public Matrix2DI(int nrRows, int nrCols){
         data = new int[nrRows * nrCols];
         this.nrRows = nrRows;

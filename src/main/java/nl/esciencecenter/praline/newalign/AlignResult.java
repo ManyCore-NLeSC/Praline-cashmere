@@ -1,4 +1,6 @@
-package nl.esciencecenter.praline.aligners;
+package nl.esciencecenter.praline.newalign;
+
+import nl.esciencecenter.praline.aligners.AlignStep;
 
 import java.util.List;
 

@@ -1,5 +1,6 @@
-package nl.esciencecenter.praline.aligners;
+package nl.esciencecenter.praline.newalign;
 
+import nl.esciencecenter.praline.aligners.AlignStep;
 import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Matrix2DI;
 import nl.esciencecenter.praline.data.Move;
@@ -21,11 +22,11 @@ public class ReferenceO3Aligner implements IAlign{
         traceback.set(0,0,Move.NIL.ordinal());
         for(int row = 1 ; row < sizeB + 1 ; row++){
             cost.set(row,0, gapCostA.getGapCost(row));
-            traceback.set(row,0, Move.TOP.ordinal());
+            traceback.set(row,0, Move.LEFT.ordinal());
         }
         for(int col = 1 ; col < sizeA + 1 ; col++){
             cost.set(0,col, gapCostB.getGapCost(col));
-            traceback.set(0,col, Move.LEFT.ordinal());
+            traceback.set(0,col, Move.TOP.ordinal());
         }
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
@@ -63,25 +64,18 @@ public class ReferenceO3Aligner implements IAlign{
             }
 
         }
-
-//        for(int i = 0 ; i < sizeB + 1 ; i++){
-//            for(int j = 0 ; j < sizeA + 1; j++){
-//                System.out.printf("%.1f ",cost.get(i,j));
-//            }
-//            System.out.println();
-//        }
-
-        List<AlignStep> align = getTraceback(traceback, sizeA, sizeB);
-        return new AlignResult(cost.get(sizeA,sizeB),align);
+        //List<AlignStep> align = getTraceback(traceback, sizeA + 1, sizeB + 1);
+        return new AlignResult(cost.get(sizeB,sizeA),null);
     }
 
-    private List<AlignStep> getTraceback(Matrix2DI traceback, int rowstart, int colstart) {
+    static List<AlignStep> getTraceback(Matrix2DI traceback, int rowstart, int colstart) {
         Stack<Move> trace = new Stack<>();
         int rowi = rowstart;
         int coli = colstart;
         Move got;
 
         while((got = Move.values()[traceback.get(rowi,coli)]) != Move.NIL){
+
             trace.push(got);
             switch (got){
                 case TOP: rowi--; break;
@@ -93,7 +87,7 @@ public class ReferenceO3Aligner implements IAlign{
 
     }
 
-    private List<AlignStep> moveToAlignSteps(Stack<Move> trace) {
+    static List<AlignStep> moveToAlignSteps(Stack<Move> trace) {
         LinkedList<AlignStep> res = new LinkedList<>();
         while(!trace.isEmpty()){
 

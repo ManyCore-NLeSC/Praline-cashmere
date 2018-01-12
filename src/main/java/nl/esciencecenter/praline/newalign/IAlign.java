@@ -1,4 +1,4 @@
-package nl.esciencecenter.praline.aligners;
+package nl.esciencecenter.praline.newalign;
 
 import nl.esciencecenter.praline.data.PositionCost;
 

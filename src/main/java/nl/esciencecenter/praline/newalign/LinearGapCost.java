@@ -1,6 +1,8 @@
-package nl.esciencecenter.praline.aligners;
+package nl.esciencecenter.praline.newalign;
 
-public class LinearGapCost implements IGapCost{
+import nl.esciencecenter.praline.newalign.IGapCost;
+
+public class LinearGapCost implements IGapCost {
 
     final float cost;
 

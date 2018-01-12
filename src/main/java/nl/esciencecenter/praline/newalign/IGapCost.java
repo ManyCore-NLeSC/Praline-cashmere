@@ -1,4 +1,4 @@
-package nl.esciencecenter.praline.aligners;
+package nl.esciencecenter.praline.newalign;
 
 public interface IGapCost {
 

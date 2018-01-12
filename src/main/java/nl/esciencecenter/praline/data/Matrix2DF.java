@@ -4,6 +4,18 @@ public class Matrix2DF {
     final float[] data;
     public final int nrRows, nrCols;
 
+    public Matrix2DF(float[][] init){
+        this.nrRows = init.length;
+        this.nrCols = init[0].length;
+        data = new float[nrRows * nrCols];
+        for(int row = 0 ; row < nrRows; row++){
+            for(int col = 0 ; col < nrCols ; col++){
+                set(row,col,init[row][col]);
+            }
+        }
+    }
+
+
     public Matrix2DF(int nrRows, int nrCols){
         data = new float[nrRows * nrCols];
         this.nrRows = nrRows;

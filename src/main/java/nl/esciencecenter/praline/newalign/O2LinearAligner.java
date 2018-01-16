@@ -7,7 +7,8 @@ import nl.esciencecenter.praline.data.Move;
 
 import java.util.List;
 
-public class O2LinearAligner implements IAlign{
+public class O2LinearAligner{
+    /*
     @Override
     public AlignResult align(int sizeA, int sizeB, IGapCost gapCostAg, IGapCost gapCostBg, IPositionCost posCosts) {
         float gapCostA = ((LinearGapCost)  gapCostAg).cost;
@@ -55,4 +56,5 @@ public class O2LinearAligner implements IAlign{
         List<AlignStep> align = ReferenceO3Aligner.getTraceback(traceback, sizeB, sizeA);
         return new AlignResult(cost.get(sizeB,sizeA),align);
     }
+    */
 }

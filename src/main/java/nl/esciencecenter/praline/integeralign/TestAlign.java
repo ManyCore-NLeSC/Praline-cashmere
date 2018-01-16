@@ -1,14 +1,8 @@
-package nl.esciencecenter.praline.newalign;
+package nl.esciencecenter.praline.integeralign;
 
 import nl.esciencecenter.praline.aligners.AlignStep;
-import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Matrix2DI;
-import nl.esciencecenter.praline.data.PositionCost;
-import nl.esciencecenter.praline.newalign.AlignResult;
-import nl.esciencecenter.praline.newalign.IPositionCost;
-import nl.esciencecenter.praline.newalign.ReferenceO3Aligner;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -17,8 +11,8 @@ public class TestAlign {
 
     static final int TEST_ALPHABET_SIZE = 3;
 
-    static float getAlignScore(List<AlignStep> align, int sizeA, int sizeB, IGapCost gapCostA, IGapCost gapCostB, IPositionCost costs) {
-        float score = 0;
+    static int getAlignScore(List<AlignStep> align, int sizeA, int sizeB, IGapCost gapCostA, IGapCost gapCostB, IPositionCost costs) {
+        int score = 0;
         int indexA = 0;
         int indexB = 0;
         int curGapA = 0;
@@ -58,17 +52,21 @@ public class TestAlign {
     }
 
     static void test(){
-        int[] a = new int[]{1,0,1};
-        int[] b = new int[]{2,1,2,2};
+        int[] a = new int[]{2};
+        int[] b = new int[]{2,2,2,0};
 
-        AlignResult res = new NewO2Affine().align(a.length,b.length,new AffineGapCost(-1f, -0.5f),
-                new AffineGapCost(-0.7f,-0.5f), testPositionCost(a,b));
+        AlignResult res = new AffineAlign().align(a.length,b.length,new AffineGapCost(-2, -1),
+                new AffineGapCost(-3,-2), testPositionCost(a,b));
         System.out.println();
         System.out.println();
-         new ReferenceO3Aligner().align(a.length,b.length,new AffineGapCost(-1f, -0.5f),
-                new AffineGapCost(-0.7f,-0.5f), testPositionCost(a,b));
-        //printAlign("2","11", res.align);
-        System.out.printf("%f\n",res.score);
+        new ReferenceO3Aligner().align(a.length,b.length,new AffineGapCost(-2, -1),
+                new AffineGapCost(-3,-2), testPositionCost(a,b));
+        for(AlignStep x : res.align){
+            System.out.println(x.name());
+        }
+        printAlign("2","2220", res.align);
+        System.out.printf("%d %d \n",res.score, getAlignScore(res.align,a.length,b.length,new AffineGapCost(-2, -1),
+                new AffineGapCost(-3,-2), testPositionCost(a,b) ));
 
     }
 
@@ -86,26 +84,25 @@ public class TestAlign {
             //System.out.println("custom done");
             end = System.currentTimeMillis();
             long durAlign = end - start;
-            //float score = getAlignScore(res.align,stringA.length,stringB.length,gapCostA,gapCostB, testPositionCost(stringA,stringB));
+            //int score = getAlignScore(res.align,stringA.length,stringB.length,gapCostA,gapCostB, testPositionCost(stringA,stringB));
             if(Math.abs(res.score - oracleRes.score) > 0.4){
-                System.out.printf("Wrong score reported: %f actual %f \n A: \n", res.score, oracleRes.score);
+                System.out.printf("Wrong score reported: %d actual %d \n A: \n", res.score, oracleRes.score);
                 System.out.println(Arrays.toString(stringA));
                 System.out.printf(" \n B: \n");
                 System.out.println(Arrays.toString(stringB));
                 return false;
             }
-            /*if (Math.abs(res.score - score) > 0.4) {
-                System.out.printf("Wrong answer reported: %f actual %f \n A: \n", res.score, score);
-                System.out.println(Arrays.toString(stringA));
-                System.out.printf(" \n B: \n");
-                System.out.println(Arrays.toString(stringB));
-                return false;
-            }*/
+//            if (Math.abs(res.score - score) > 0.4) {
+//                System.out.printf("Wrong answer reported: %d actual %d (size) %d \n A: \n", res.score, score, res.align.size());
+//                System.out.println(Arrays.toString(stringA));
+//                System.out.printf(" \n B: \n");
+//                System.out.println(Arrays.toString(stringB));
+//                return false;
+//            }
 
             if(measure){
                 System.out.printf("Took %d ms, reference took %d ms\n", durAlign, durOracle);
             }
-
         } catch (Exception e){
             System.out.printf("Wrong answer on: \n A: \n");
             System.out.println(Arrays.toString(stringA));
@@ -131,20 +128,20 @@ public class TestAlign {
     }
 
 
-    static final Matrix2DF testScoreMatrix = new Matrix2DF(new float[][] {
-            new float[] {5, 0, -1 },
-            new float[] {0 , 3, -2},
-            new float[] {-1, -2, 1} });
+    static final Matrix2DI testScoreMatrix = new Matrix2DI(new int[][] {
+            new int[] {10, 0, -2 },
+            new int[] {0 , 6, -4},
+            new int[] {-2, -4, 2} });
 
     static IPositionCost testPositionCost(int[] a, int[] b){
         return makeCost(testScoreMatrix,a,b);
     }
 
-    static IPositionCost makeCost(Matrix2DF scoreMatrix, int[] a, int[] b){
+    static IPositionCost makeCost(Matrix2DI scoreMatrix, int[] a, int[] b){
         return new IPositionCost(){
 
             @Override
-            public double cost(int posA, int posB) {
+            public int cost(int posA, int posB) {
                 return scoreMatrix.get(a[posA], b[posB]);
             }
         };
@@ -155,40 +152,42 @@ public class TestAlign {
         return new IPositionCost(){
 
             @Override
-            public double cost(int posA, int posB) {
+            public int cost(int posA, int posB) {
                 return a.charAt(posA) == b.charAt(posB) ? 1 : -1;
             }
         };
 
     }
-
-    static AlignResult stringAlign(String a, String b){
-        IAlign align = new FastLinearSpaceAligner(5,2);
-        AlignResult r = align.align(a.length(),b.length(), new LinearGapCost(-1), new LinearGapCost(-1), makeCost(a,b));
-        AlignResult refRes = new ReferenceO3Aligner().align(a.length(),b.length(), new LinearGapCost(-1), new LinearGapCost(-1), makeCost(a,b));
-        float checkedScore = getAlignScore(r.align, a.length(),b.length(), new LinearGapCost(-1), new LinearGapCost(-1), makeCost(a,b) );
-
-        boolean good = checkedScore == r.score;
-        if (good) {
-            System.out.println("Good!");
-        } else {
-            System.out.printf("Not good, result score %f checked %f", r.score, checkedScore);
-        }
-        boolean good2 = refRes.score == r.score;
-        if (good2) {
-            System.out.println("Good!");
-        } else {
-            System.out.printf("Not good, result score %f reference %f", r.score, refRes.score );
-        }
-        return r;
-    }
+//
+//    static AlignResult stringAlign(String a, String b){
+//        IAlign align = new FastLinearSpaceAligner(5,2);
+//        AlignResult r = align.align(a.length(),b.length(), new LinearGapCost(-1), new LinearGapCost(-1), makeCost(a,b));
+//        AlignResult refRes = new ReferenceO3Aligner().align(a.length(),b.length(), new LinearGapCost(-1), new LinearGapCost(-1), makeCost(a,b));
+//        float checkedScore = getAlignScore(r.align, a.length(),b.length(), new LinearGapCost(-1), new LinearGapCost(-1), makeCost(a,b) );
+//
+//        boolean good = checkedScore == r.score;
+//        if (good) {
+//            System.out.println("Good!");
+//        } else {
+//            System.out.printf("Not good, result score %f checked %f", r.score, checkedScore);
+//        }
+//        boolean good2 = refRes.score == r.score;
+//        if (good2) {
+//            System.out.println("Good!");
+//        } else {
+//            System.out.printf("Not good, result score %f reference %f", r.score, refRes.score );
+//        }
+//        return r;
+//    }
 
     public static void main(String[] argv){
         //testAligner(new ReferenceO3Aligner(), new ReferenceO3Aligner(), new LinearGapCost(-1), new LinearGapCost(-1.1f), 4,100, 10000);
-       // IAlign aling = new FastLinearSpaceAligner(100,100);
-        testAligner(new ReferenceO3Aligner(), new NewO2Affine(), new AffineGapCost(-1f, -0.5f), new AffineGapCost(-0.7f,-0.5f), 1,6, 1000000);
-        //test();
-//        testAligner(new ReferenceO3Aligner(), new LinearLinearSpaceAligner(), new LinearGapCost(-1), new LinearGapCost(-1.1f),3, 50,30000);
+        // IAlign aling = new FastLinearSpaceAligner(100,100);
+//       testAligner(new ReferenceO3Aligner(), new AffineAlign(), new AffineGapCost(-2, -1),
+               //new AffineGapCost(-3,-2), 1,4000, 1000000);
+       // test();
+        //testAligner(new LinearAligner(), new AffineAlign(), new LinearGapCost(-1), new LinearGapCost(-2),3, 5000,30000);
+        testAlign(new LinearAligner(), new AffineAlign(), new LinearGapCost(-1), new LinearGapCost(-2), 10000,10000,true );
 //        System.out.println("DONE!");
 //
 //        String a = "GCATGCU";

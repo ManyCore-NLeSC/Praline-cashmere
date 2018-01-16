@@ -1,4 +1,4 @@
-package nl.esciencecenter.praline.aligners;
+package nl.esciencecenter.praline.newalign;
 
 public class Coordinate {
     final public int x;

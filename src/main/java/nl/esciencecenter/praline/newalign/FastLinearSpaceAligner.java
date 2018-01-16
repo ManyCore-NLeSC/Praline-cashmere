@@ -1,7 +1,6 @@
 package nl.esciencecenter.praline.newalign;
 
 import nl.esciencecenter.praline.aligners.AlignStep;
-import nl.esciencecenter.praline.aligners.Coordinate;
 import nl.esciencecenter.praline.data.Matrix2DI;
 
 import java.util.LinkedList;
@@ -22,11 +21,11 @@ public class FastLinearSpaceAligner implements  IAlign {
 
     @Override
     public AlignResult align(int sizeA, int sizeB, IGapCost gapCostAg, IGapCost gapCostBg, IPositionCost posCosts) {
-        float gapCostA = ((LinearGapCost)  gapCostAg).cost;
-        float gapCostB = ((LinearGapCost)  gapCostBg).cost;
+        double gapCostA = ((LinearGapCost)  gapCostAg).cost;
+        double gapCostB = ((LinearGapCost)  gapCostBg).cost;
         LinkedList<Coordinate> alignCoords = new LinkedList<>();
         alignCoords.add(new Coordinate(0,0));
-        float score = constructAlign(0,sizeA,0,sizeB, gapCostA, gapCostB, posCosts, alignCoords);
+        double score = constructAlign(0,sizeA,0,sizeB, gapCostA, gapCostB, posCosts, alignCoords);
         alignCoords.add(new Coordinate(sizeB, sizeA));
 
         return new AlignResult(score, coordsToSteps(alignCoords.iterator()));
@@ -46,7 +45,7 @@ public class FastLinearSpaceAligner implements  IAlign {
 
 
     // does not add begin/end
-    float constructAlign(int startA,  int endA, int startB, int endB, float gapCostA, float gapCostB,
+    double constructAlign(int startA,  int endA, int startB, int endB, double gapCostA, double gapCostB,
                          IPositionCost posCosts, LinkedList<Coordinate> alignCoords) {
         //System.out.printf("constructAlgign(%d, %d , %d, %d)\n", startA, endA, startB, endB);
         if(endA - startA + 1 <= borderBase || endB - startB <= borderBase ){
@@ -76,21 +75,21 @@ public class FastLinearSpaceAligner implements  IAlign {
 
 
     static class ViaRes {
-        final float score;
+        final double score;
         final int[] vias;
 
-        ViaRes(float score, int[] vias) {
+        ViaRes(double score, int[] vias) {
             this.score = score;
             this.vias = vias;
         }
     }
 
-    ViaRes viaRow(int startA, int endA, int startB, int endB, int[] vias,  float gapCostA, float gapCostB, IPositionCost posCosts){
+    ViaRes viaRow(int startA, int endA, int startB, int endB, int[] vias,  double gapCostA, double gapCostB, IPositionCost posCosts){
         //System.out.printf("viaRow(%d, %d, %d, %d) %d\n", startA, endA, startB, endB, vias.length);
         int aDiff = endA - startA + 1;
         int bDiff = endB - startB + 1;
-        float[] prevRow = new float[aDiff];
-        float[] curRow  = new float[aDiff];
+        double[] prevRow = new double[aDiff];
+        double[] curRow  = new double[aDiff];
         for(int col = 0 ; col < aDiff ; col++){
             prevRow[col] = gapCostB * col;
         }
@@ -110,12 +109,12 @@ public class FastLinearSpaceAligner implements  IAlign {
             }
 
             for(int col = 1; col < aDiff; col++){
-                float gapA = prevRow[col] + gapCostA;
-                float gapB = curRow[col-1] + gapCostB;
+                double gapA = prevRow[col] + gapCostA;
+                double gapB = curRow[col-1] + gapCostB;
 
-                float match = prevRow[col - 1]
+                double match = prevRow[col - 1]
                         + posCosts.cost(col + startA - 1, row-1);
-                float score = match;
+                double score = match;
                 AlignStep choice = AlignStep.ALIGN;
                 if(gapA > score){ score = gapA;  choice = AlignStep.GAPA; }
                 if(gapB > score){ score = gapB; choice = AlignStep.GAPB;  }
@@ -139,7 +138,7 @@ public class FastLinearSpaceAligner implements  IAlign {
                         break;
                 }
             }
-            float[] tmp = prevRow;
+            double[] tmp = prevRow;
             prevRow = curRow;
             curRow = tmp;
             Matrix2DI tmpM = viaColPrev;

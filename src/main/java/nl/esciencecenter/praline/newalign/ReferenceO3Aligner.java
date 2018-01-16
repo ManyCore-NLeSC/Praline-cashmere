@@ -22,29 +22,29 @@ public class ReferenceO3Aligner implements IAlign{
         traceback.set(0,0,Move.NIL.ordinal());
         for(int row = 1 ; row < sizeB + 1 ; row++){
             cost.set(row,0, gapCostA.getGapCost(row));
-            traceback.set(row,0, Move.LEFT.ordinal());
+            traceback.set(row,0, Move.TOP.ordinal());
         }
         for(int col = 1 ; col < sizeA + 1 ; col++){
             cost.set(0,col, gapCostB.getGapCost(col));
-            traceback.set(0,col, Move.TOP.ordinal());
+            traceback.set(0,col, Move.LEFT.ordinal());
         }
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
-                float gapA = Float.NEGATIVE_INFINITY;
+                double gapA = Double.NEGATIVE_INFINITY;
                 for(int gap = 1 ; gap <= row ; gap++){
-                    float c = cost.get(row - gap,col) + gapCostA.getGapCost(gap);
+                    double c = cost.get(row - gap,col) + gapCostA.getGapCost(gap);
                     if(c > gapA) gapA = c;
                 }
-                float gapB = Float.NEGATIVE_INFINITY;
+                double gapB = Double.NEGATIVE_INFINITY;
                 for(int gap = 1 ; gap <= col ; gap++){
-                    float c = cost.get(row,col-gap) + gapCostB.getGapCost(gap);
+                    double c = cost.get(row,col-gap) + gapCostB.getGapCost(gap);
                     if(c > gapB) gapB = c;
                 }
 
-                float match = cost.get(row-1,col - 1)
+                double match = cost.get(row-1,col - 1)
                         + posCosts.cost(col - 1, row-1);
 
-                float score = match;
+                double score = match;
 
                 Move move = Move.TOP_LEFT;
 
@@ -59,13 +59,21 @@ public class ReferenceO3Aligner implements IAlign{
                 }
 
                 cost.set(row,col,score);
+
                 traceback.set(row,col,move.ordinal());
 
             }
 
+
         }
-        //List<AlignStep> align = getTraceback(traceback, sizeA + 1, sizeB + 1);
-        return new AlignResult(cost.get(sizeB,sizeA),null);
+//        for(int i = 0 ; i < sizeB + 1 ; i++){
+//            for(int j = 0; j < sizeA + 1 ; j++){
+//                System.out.printf("%f ", cost.get(i,j));
+//            }
+//            System.out.println();
+//        }
+        List<AlignStep> align = getTraceback(traceback, sizeB , sizeA);
+        return new AlignResult(cost.get(sizeB,sizeA),align);
     }
 
     static List<AlignStep> getTraceback(Matrix2DI traceback, int rowstart, int colstart) {

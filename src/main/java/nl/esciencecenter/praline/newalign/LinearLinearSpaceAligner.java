@@ -1,7 +1,6 @@
 package nl.esciencecenter.praline.newalign;
 
 import nl.esciencecenter.praline.aligners.AlignStep;
-import nl.esciencecenter.praline.aligners.Coordinate;
 import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Matrix2DI;
 import nl.esciencecenter.praline.data.Move;
@@ -19,7 +18,7 @@ public class LinearLinearSpaceAligner implements  IAlign {
 
         LinkedList<Coordinate> alignCoords = new LinkedList<>();
         alignCoords.add(new Coordinate(0,0));
-        float score = constructAlign(0, sizeA ,0, sizeB, gapCostA,gapCostB,posCosts, alignCoords);
+        double score = constructAlign(0, sizeA ,0, sizeB, gapCostA,gapCostB,posCosts, alignCoords);
         alignCoords.add(new Coordinate(sizeB, sizeA));
 
         return new AlignResult(score, coordsToSteps(alignCoords.iterator()));
@@ -53,7 +52,7 @@ public class LinearLinearSpaceAligner implements  IAlign {
     static int BORDER_BASE = 16000;
 
     // does not add begin/end
-    float constructAlign(int startA,  int endA, int startB, int endB, float gapCostA, float gapCostB,
+    double constructAlign(int startA,  int endA, int startB, int endB, float gapCostA, float gapCostB,
                                 IPositionCost posCosts, LinkedList<Coordinate> alignCoords) {
         if(endA - startA + 1 <= BORDER_BASE || endB - startB <= BORDER_BASE ){
             return baseCase(startA,endA, startB, endB, gapCostA, gapCostB, posCosts,alignCoords);
@@ -68,7 +67,7 @@ public class LinearLinearSpaceAligner implements  IAlign {
 
     }
 
-    static float baseCase(int startA,  int endA, int startB, int endB, float gapCostA, float gapCostB,
+    static double baseCase(int startA,  int endA, int startB, int endB, double gapCostA, double gapCostB,
                   IPositionCost posCosts, LinkedList<Coordinate> alignCoords){
         int diffA = endA - startA + 1;
         int diffB = endB - startB + 1;
@@ -86,13 +85,13 @@ public class LinearLinearSpaceAligner implements  IAlign {
         }
         for(int row = 1; row < diffB; row++){
             for(int col = 1 ; col < diffA; col++){
-                float gapA = cost.get(row - 1,col) + gapCostA;
-                float gapB = cost.get(row,col-1) + gapCostB;
+                double gapA = cost.get(row - 1,col) + gapCostA;
+                double gapB = cost.get(row,col-1) + gapCostB;
 
-                float match = cost.get(row-1,col - 1)
+                double match = cost.get(row-1,col - 1)
                         + posCosts.cost(startA + col - 1, startB + row-1);
 
-                float score = match;
+                double score = match;
 
                 Move move = Move.TOP_LEFT;
 
@@ -150,10 +149,10 @@ public class LinearLinearSpaceAligner implements  IAlign {
 
 
     static class ViaRes {
-        final float score;
+        final double score;
         final int via;
 
-        ViaRes(float score, int via) {
+        ViaRes(double score, int via) {
             this.score = score;
             this.via = via;
         }
@@ -161,8 +160,8 @@ public class LinearLinearSpaceAligner implements  IAlign {
 
     ViaRes viaRow(int startA,  int endA, int startB, int trackRow, int endB, float gapCostA, float gapCostB, IPositionCost posCosts){
         int aDiff = endA - startA + 1;
-        float[] prevRow = new float[aDiff];
-        float[] curRow  = new float[aDiff];
+        double[] prevRow = new double[aDiff];
+        double[] curRow  = new double[aDiff];
         for(int col = 0 ; col < aDiff ; col++){
             prevRow[col] = gapCostB * col;
         }
@@ -171,19 +170,19 @@ public class LinearLinearSpaceAligner implements  IAlign {
         for(int row = startB + 1; row <= trackRow; row++){
             curRow[0] = prevRow[0] + gapCostA;
             for(int col = 1; col < aDiff; col++){
-                float gapA = prevRow[col] + gapCostA;
-                float gapB = curRow[col-1] + gapCostB;
+                double gapA = prevRow[col] + gapCostA;
+                double gapB = curRow[col-1] + gapCostB;
 
-                float match = prevRow[col - 1]
+                double match = prevRow[col - 1]
                         + posCosts.cost(col + startA - 1, row-1);
-                float score = match;
+                double score = match;
 
                 if(gapA > score){ score = gapA;  }
                 if(gapB > score){ score = gapB; }
 
                 curRow[col] =score;
             }
-            float[] tmp = prevRow;
+            double[] tmp = prevRow;
             prevRow = curRow;
             curRow = tmp;
         }
@@ -197,19 +196,19 @@ public class LinearLinearSpaceAligner implements  IAlign {
             curRow[0] = prevRow[0] + gapCostA;
             viaCol[0] = viaColPrev[0];
             for(int col = 1; col < aDiff; col++){
-                float gapA = prevRow[col] + gapCostA;
-                float gapB = curRow[col-1] + gapCostB;
+                double gapA = prevRow[col] + gapCostA;
+                double gapB = curRow[col-1] + gapCostB;
 
-                float match = prevRow[col - 1]
+                double match = prevRow[col - 1]
                         + posCosts.cost(col + startA - 1, row-1);
-                float score = match;
+                double score = match;
                 int via = viaColPrev[col - 1];
                 if(gapA > score){ score = gapA; via = viaColPrev[col]; }
                 if(gapB > score){ score = gapB; via = viaCol[col - 1]; }
                 viaCol[col] = via;
                 curRow[col] =score;
             }
-            float[] tmp = prevRow;
+            double[] tmp = prevRow;
             prevRow = curRow;
             curRow = tmp;
             int[] viaTmp = viaColPrev;
@@ -223,8 +222,8 @@ public class LinearLinearSpaceAligner implements  IAlign {
 
 
     static double getScoreLinear(int sizeA, int sizeB, float gapCostA, float gapCostB, IPositionCost posCosts){
-        float[] prevRow = new float[sizeA+1];
-        float[] curRow  = new float[sizeA+1];
+        double[] prevRow = new double[sizeA+1];
+        double[] curRow  = new double[sizeA+1];
         for(int col = 0 ; col < sizeA + 1 ; col++){
             prevRow[col] = gapCostB * col;
         }
@@ -232,20 +231,20 @@ public class LinearLinearSpaceAligner implements  IAlign {
         for(int row = 1 ; row <sizeB + 1; row++){
             curRow[0] = prevRow[0] + gapCostA;
             for(int col = 1; col < sizeA + 1; col++){
-                float gapA = prevRow[col] + gapCostA;
-                float gapB = curRow[col-1] + gapCostB;
+                double gapA = prevRow[col] + gapCostA;
+                double gapB = curRow[col-1] + gapCostB;
 
-                float match = prevRow[col - 1]
+                double match = prevRow[col - 1]
                         + posCosts.cost(col - 1, row-1);
 
-                float score = match;
+                double score = match;
 
                 if(gapA > score){ score = gapA; }
                 if(gapB > score){ score = gapB; }
 
                 curRow[col] =score;
             }
-            float[] tmp = prevRow;
+            double[] tmp = prevRow;
             prevRow = curRow;
             curRow = tmp;
         }

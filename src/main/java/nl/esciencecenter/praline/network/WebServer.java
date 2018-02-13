@@ -226,20 +226,19 @@ public class WebServer {
     }
 
     // Register data structures
-    private int processRegisterProfile(String id, int tracks) {
-        synchronized ( locks.get("profiles") ) {
-            profiles.put(id, new Matrix2DF [tracks]);
-            locks.get("profiles").notifyAll();
+    private int processRegister(String name, int size, ReentrantLock lock, HashMap<String, Matrix2DF []> data) {
+        synchronized ( lock ) {
+            data.put(name, new Matrix2DF [size]);
+            lock.notifyAll();
         }
         return 201;
     }
+    private int processRegisterProfile(String id, int tracks) {
+        return processRegister(id, tracks, locks.get("profiles"), profiles);
+    }
 
     private int processRegisterCostMatrix(String id, int length) {
-        synchronized ( locks.get("scores") ) {
-            profiles.put(id, new Matrix2DF [length]);
-            locks.get("scores").notifyAll();
-        }
-        return 201;
+        return processRegister(id, length, locks.get("scores"), scores);
     }
 
     // Receive data structures

@@ -16,11 +16,11 @@ public class ReferenceO3Aligner implements IAlign {
 
     @Override
     public AlignResult align(int sizeA, int sizeB, IGapCost gapCostA, IGapCost gapCostB, IPositionCost posCosts,AlignmentMode mode) {
-        Matrix2DI cost = new Matrix2DI(sizeB+1,sizeA+1);
+        Matrix2DF cost = new Matrix2DF(sizeB+1,sizeA+1);
         Matrix2DI traceback = new Matrix2DI(sizeB+1, sizeA+1);
         int bestRow = 0;
         int bestCol = 0;
-        int bestScore = 0;
+        float bestScore = 0;
         cost.set(0,0,0);
         traceback.set(0,0, Move.NIL.ordinal());
         for(int row = 1 ; row < sizeB + 1 ; row++){
@@ -33,30 +33,30 @@ public class ReferenceO3Aligner implements IAlign {
         }
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
-                int gapA = Integer.MIN_VALUE;
+                float gapA = Integer.MIN_VALUE;
                 for(int gap = 1 ; gap <= row ; gap++){
-                    int c = cost.get(row - gap,col) + gapCostA.getGapCost(gap);
+                    float c = cost.get(row - gap,col) + gapCostA.getGapCost(gap);
                     if(c > gapA) gapA = c;
                 }
-                int gapB = Integer.MIN_VALUE;
+                float gapB = Integer.MIN_VALUE;
                 for(int gap = 1 ; gap <= col ; gap++){
-                    int c = cost.get(row,col-gap) + gapCostB.getGapCost(gap);
+                    float c = cost.get(row,col-gap) + gapCostB.getGapCost(gap);
                     if(c > gapB) gapB = c;
                 }
 
-                int match = cost.get(row-1,col - 1)
+                float match = cost.get(row-1,col - 1)
                         + posCosts.cost(col - 1, row-1);
 
-                int score = match;
+                float score = match;
 
                 Move move = Move.TOP_LEFT;
 
-                if(gapA > score){
+                if(gapA >= score){
                     score = gapA;
                     move = Move.TOP;
                 }
 
-                if(gapB > score){
+                if(gapB >= score){
                     score = gapB;
                     move = Move.LEFT;
                 }
@@ -78,8 +78,26 @@ public class ReferenceO3Aligner implements IAlign {
 
 
         }
+
+//        for(int i = 0 ; i < sizeB + 1; i++){
+//            for(int j = 0 ; j < sizeA + 1 ; j++){
+//                System.out.printf("%4d ", cost.get(i,j));
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+//
+//
+//        for(int i = 0 ; i < sizeB + 1; i++){
+//            for(int j = 0 ; j < sizeA + 1 ; j++){
+//                System.out.printf("%8s ", Move.values()[traceback.get(i,j)]);
+//            }
+//            System.out.println();
+//        }
+
+//        System.out.println();
         Alignment align;
-        int endScore;
+        float endScore;
         switch (mode) {
             case LOCAL:
                 align = getTraceback(traceback, bestRow, bestCol);
@@ -117,7 +135,6 @@ public class ReferenceO3Aligner implements IAlign {
         Move got;
 
         while((got = Move.values()[traceback.get(rowi,coli)]) != Move.NIL) {
-
             trace.push(got);
             switch (got) {
                 case TOP:
@@ -140,13 +157,16 @@ public class ReferenceO3Aligner implements IAlign {
     static List<AlignStep> moveToAlignSteps(Stack<Move> trace) {
         LinkedList<AlignStep> res = new LinkedList<>();
         while(!trace.isEmpty()){
-
+            AlignStep ns;
             switch(trace.pop()){
-                case TOP_LEFT: res.add(AlignStep.ALIGN); break;
-                case TOP: res.add(AlignStep.GAPA); break;
-                case LEFT: res.add(AlignStep.GAPB); break;
+                case TOP_LEFT: ns = AlignStep.ALIGN; break;
+                case TOP: ns = AlignStep.GAPA; break;
+                case LEFT: default: ns = AlignStep.GAPB; break;
             }
+//            System.out.println(ns);
+            res.add(ns);
         }
+
         return res;
     }
 }

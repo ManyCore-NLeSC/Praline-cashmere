@@ -17,7 +17,7 @@ public class MotifPositionCost implements IPositionCost{
     }
 
     @Override
-    public int cost(int posA, int posB) {
+    public float cost(int posA, int posB) {
         int cost = 0;
         for(int track = 0; track < a.nrRows; track++){
             cost+=alignCosts[track].get(a.get(track,posA), b.get(track,posB));

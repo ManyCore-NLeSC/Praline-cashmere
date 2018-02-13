@@ -3,6 +3,7 @@ package nl.esciencecenter.praline.integeralign;
 
 import nl.esciencecenter.praline.aligners.AlignStep;
 import nl.esciencecenter.praline.aligners.Alignment;
+import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Matrix2DI;
 import nl.esciencecenter.praline.newalign.Coordinate;
 
@@ -13,7 +14,7 @@ public class AffineAlign implements IAlign {
 
     static final int GAPA_MASK=1, GAPB_MASK =2, ALIGN_MASK =4;
 
-    static int max3(int a,int b, int c){
+    static float max3(float a,float b, float c){
         return Math.max(a,Math.max(b,c));
     }
 
@@ -33,7 +34,7 @@ public class AffineAlign implements IAlign {
         } else {
             gapCostB = ((AffineGapCost)  gapCostBg);
         }
-        Matrix2DI cost = new Matrix2DI(sizeB+1,sizeA+1);
+        Matrix2DF cost = new Matrix2DF(sizeB+1,sizeA+1);
         Matrix2DI traceback = new Matrix2DI(sizeB +1, sizeA + 1);
         cost.set(0,0,0);
         traceback.set(0,0,0);
@@ -47,24 +48,24 @@ public class AffineAlign implements IAlign {
         }
         int bestRow = 0;
         int bestCol = 0;
-        int bestScore = 0;
+        float bestScore = 0;
 
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
                 int traceA = traceback.get(row-1,col);
 
                 boolean gapAStarted = (traceA & GAPA_MASK) == GAPA_MASK;
-                int gapA = cost.get(row - 1,col) +
+                float gapA = cost.get(row - 1,col) +
                         (gapAStarted ? gapCostA.extend : gapCostA.start);
                 int traceB = traceback.get(row,col-1);
-                boolean gapBStarted =  (traceA & GAPB_MASK) == GAPB_MASK;
-                int gapB =  cost.get(row ,col - 1) +
+                boolean gapBStarted =  (traceB & GAPB_MASK) == GAPB_MASK;
+                float gapB =  cost.get(row ,col - 1) +
                         (gapBStarted ? gapCostB.extend : gapCostB.start);
 
 
-                int match =  cost.get(row-1,col - 1) +
+                float match =  cost.get(row-1,col - 1) +
                         posCosts.cost(col - 1, row-1);
-                int score = max3(gapA,gapB,match);
+                float score = max3(gapA,gapB,match);
                 int trace;
                 if(mode == AlignmentMode.LOCAL && score <= 0){
                     trace = 0;
@@ -94,9 +95,27 @@ public class AffineAlign implements IAlign {
             }
 
         }
+//        for(int i = 0 ; i < sizeB + 1; i++){
+//            for(int j = 0 ; j < sizeA + 1 ; j++){
+//                System.out.printf("%4d ", cost.get(i,j));
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+//
+//        System.out.println("traceback\n");
+//
+//        for(int i = 0 ; i < sizeB + 1; i++){
+//            for(int j = 0 ; j < sizeA + 1 ; j++){
+//                System.out.printf("%4d ", traceback.get(i,j));
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+
 
         Alignment align;
-        int endScore;
+        float endScore;
         switch (mode) {
             case LOCAL:
                 align = getTraceback(traceback, bestRow, bestCol);
@@ -133,7 +152,7 @@ public class AffineAlign implements IAlign {
         int coli = colstart;
         AlignStep lastStep = AlignStep.NIL;
         int trace;
-        while((trace = traceback.get(rowi,coli)) == 0){
+        while((trace = traceback.get(rowi,coli)) != 0){
             AlignStep newStep;
             if(trace == ALIGN_MASK){
                 newStep = AlignStep.ALIGN;
@@ -154,7 +173,7 @@ public class AffineAlign implements IAlign {
                 }
             }
 
-
+//            System.out.println(newStep);
             res.push(newStep);
             lastStep = newStep;
 

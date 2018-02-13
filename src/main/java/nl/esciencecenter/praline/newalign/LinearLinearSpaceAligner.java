@@ -67,7 +67,7 @@ public class LinearLinearSpaceAligner implements  IAlign {
 
     }
 
-    static double baseCase(int startA,  int endA, int startB, int endB, double gapCostA, double gapCostB,
+    static double baseCase(int startA,  int endA, int startB, int endB, float gapCostA, float gapCostB,
                   IPositionCost posCosts, LinkedList<Coordinate> alignCoords){
         int diffA = endA - startA + 1;
         int diffB = endB - startB + 1;
@@ -85,13 +85,13 @@ public class LinearLinearSpaceAligner implements  IAlign {
         }
         for(int row = 1; row < diffB; row++){
             for(int col = 1 ; col < diffA; col++){
-                double gapA = cost.get(row - 1,col) + gapCostA;
-                double gapB = cost.get(row,col-1) + gapCostB;
+                float gapA = cost.get(row - 1,col) + gapCostA;
+                float gapB = cost.get(row,col-1) + gapCostB;
 
-                double match = cost.get(row-1,col - 1)
+                float match = cost.get(row-1,col - 1)
                         + posCosts.cost(startA + col - 1, startB + row-1);
 
-                double score = match;
+                float score = match;
 
                 Move move = Move.TOP_LEFT;
 

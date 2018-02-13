@@ -8,10 +8,10 @@ import nl.esciencecenter.praline.aligners.Alignment;
 import java.util.List;
 
 public class AlignResult {
-    public final int score;
+    public final float score;
     public final Alignment align;
 
-    public AlignResult(int score, Alignment align) {
+    public AlignResult(float score, Alignment align) {
         this.score = score;
         this.align = align;
     }

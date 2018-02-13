@@ -2,6 +2,7 @@ package nl.esciencecenter.praline.integeralign;
 
 import nl.esciencecenter.praline.aligners.AlignStep;
 import nl.esciencecenter.praline.aligners.Alignment;
+import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Matrix2DI;
 import nl.esciencecenter.praline.data.Move;
 
@@ -13,13 +14,13 @@ public class LinearAligner implements IAlign{
     public AlignResult align(int sizeA, int sizeB, IGapCost gapCostAg, IGapCost gapCostBg, IPositionCost posCosts, AlignmentMode mode) {
         int gapCostA = ((LinearGapCost)  gapCostAg).cost;
         int gapCostB = ((LinearGapCost)  gapCostBg).cost;
-        Matrix2DI cost = new Matrix2DI(sizeB+1,sizeA+1);
+        Matrix2DF cost = new Matrix2DF(sizeB+1,sizeA+1);
         Matrix2DI traceback = new Matrix2DI(sizeB+1, sizeA+1);
         cost.set(0,0,0);
         traceback.set(0,0, Move.NIL.ordinal());
         int bestRow = 0;
         int bestCol = 0;
-        int bestScore = 0;
+        float bestScore = 0;
         for(int row = 1 ; row < sizeB + 1 ; row++){
             cost.set(row,0,gapCostA * row);
             traceback.set(row,0, Move.TOP.ordinal());
@@ -30,13 +31,13 @@ public class LinearAligner implements IAlign{
         }
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
-                int gapA = cost.get(row - 1,col) + gapCostA;
-                int gapB = cost.get(row,col-1) + gapCostB;
+                float gapA = cost.get(row - 1,col) + gapCostA;
+                float gapB = cost.get(row,col-1) + gapCostB;
 
-                int match = cost.get(row-1,col - 1)
+                float match = cost.get(row-1,col - 1)
                         + posCosts.cost(col - 1, row-1);
 
-                int score = match;
+                float score = match;
 
                 Move move = Move.TOP_LEFT;
 
@@ -49,6 +50,7 @@ public class LinearAligner implements IAlign{
                     score = gapB;
                     move = Move.LEFT;
                 }
+
                 if(mode == AlignmentMode.LOCAL && score <= 0){
                     move = Move.NIL;
                     score = 0;
@@ -67,7 +69,7 @@ public class LinearAligner implements IAlign{
 
         }
         Alignment align;
-        int endScore;
+        float endScore;
         switch (mode) {
             case LOCAL:
                 align = getTraceback(traceback, bestRow, bestCol);

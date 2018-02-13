@@ -8,7 +8,8 @@ import java.util.LinkedList;
 import static nl.esciencecenter.praline.newalign.LinearLinearSpaceAligner.baseCase;
 import static nl.esciencecenter.praline.newalign.LinearLinearSpaceAligner.coordsToSteps;
 
-public class FastLinearSpaceAligner implements  IAlign {
+public class FastLinearSpaceAligner  {
+    /*
 
     final int borderBase ;
     final int nrTrackRows;
@@ -156,4 +157,5 @@ public class FastLinearSpaceAligner implements  IAlign {
 
         return new ViaRes(prevRow[aDiff-1],viaRes);
     }
+    */
 }

@@ -1,16 +1,16 @@
 package nl.esciencecenter.praline.newalign;
 
 public class AffineGapCost implements IGapCost{
-    final double start;
-    final double extend;
+    final float start;
+    final float extend;
 
-    public AffineGapCost(double start, double extend) {
+    public AffineGapCost(float start, float extend) {
         this.start = start;
         this.extend = extend;
     }
 
     @Override
-    public double getGapCost(int gapSize) {
+    public float getGapCost(int gapSize) {
         if (gapSize == 0) {
             return 0;
         } else {

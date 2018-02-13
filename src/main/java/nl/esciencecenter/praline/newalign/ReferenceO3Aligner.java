@@ -30,21 +30,21 @@ public class ReferenceO3Aligner implements IAlign{
         }
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
-                double gapA = Double.NEGATIVE_INFINITY;
+                float gapA = Float.NEGATIVE_INFINITY;
                 for(int gap = 1 ; gap <= row ; gap++){
-                    double c = cost.get(row - gap,col) + gapCostA.getGapCost(gap);
+                    float c = cost.get(row - gap,col) + gapCostA.getGapCost(gap);
                     if(c > gapA) gapA = c;
                 }
-                double gapB = Double.NEGATIVE_INFINITY;
+                float gapB = Float.NEGATIVE_INFINITY;
                 for(int gap = 1 ; gap <= col ; gap++){
-                    double c = cost.get(row,col-gap) + gapCostB.getGapCost(gap);
+                    float c = cost.get(row,col-gap) + gapCostB.getGapCost(gap);
                     if(c > gapB) gapB = c;
                 }
 
-                double match = cost.get(row-1,col - 1)
+                float match = cost.get(row-1,col - 1)
                         + posCosts.cost(col - 1, row-1);
 
-                double score = match;
+                float score = match;
 
                 Move move = Move.TOP_LEFT;
 

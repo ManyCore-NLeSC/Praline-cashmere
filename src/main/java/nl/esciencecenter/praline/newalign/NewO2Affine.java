@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class NewO2Affine implements IAlign {
-
+public class NewO2Affine {
+/*
     @Override
     public AlignResult align(int sizeA, int sizeB, IGapCost gapCostAg, IGapCost gapCostBg, IPositionCost posCosts) {
         AffineGapCost gapCostA = ((AffineGapCost)  gapCostAg);
@@ -40,15 +40,15 @@ public class NewO2Affine implements IAlign {
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
                 //AffineMove gapAPrev = AffineMove.values()[traceback.get(row-1,col)];
-                double gapA = cost.get(row - 1,col) +
+                float gapA = cost.get(row - 1,col) +
                         (gapAStarted.get(row-1,col) == 1 ? gapCostA.extend : gapCostA.start);
 
 
-                double gapB =  cost.get(row ,col - 1) +
+                float gapB =  cost.get(row ,col - 1) +
                         (gapBStarted.get(row,col - 1) == 1 ? gapCostB.extend : gapCostB.start);
 
 
-                double match = cost.get(row-1,col - 1)
+                float match = cost.get(row-1,col - 1)
                         + posCosts.cost(col - 1, row-1);
 
                 double score = Math.max(match, Math.max(gapA,gapB));
@@ -126,4 +126,5 @@ public class NewO2Affine implements IAlign {
 //        }
 //        return res;
 //    }
+*/
 }

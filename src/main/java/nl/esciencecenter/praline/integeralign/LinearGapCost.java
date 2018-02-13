@@ -10,7 +10,7 @@ public class LinearGapCost implements IGapCost {
     }
 
     @Override
-    public int getGapCost(int gapSize) {
+    public float getGapCost(int gapSize) {
         return gapSize * cost;
     }
 }

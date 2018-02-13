@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class TestAlign {
-
+/*
     static final int TEST_ALPHABET_SIZE = 3;
 
     static float getAlignScore(List<AlignStep> align, int sizeA, int sizeB, IGapCost gapCostA, IGapCost gapCostB, IPositionCost costs) {
@@ -101,7 +101,7 @@ public class TestAlign {
                 System.out.println(Arrays.toString(stringB));
                 return false;
             }*/
-
+/*
             if(measure){
                 System.out.printf("Took %d ms, reference took %d ms\n", durAlign, durOracle);
             }
@@ -200,7 +200,7 @@ public class TestAlign {
 //        printAlign(a,b, res.align);
 
     }
-
+/*
     static void printAlign(String a, String b, List<AlignStep> res){
         String ar= "", br = "";
         int i = 0, j = 0;
@@ -221,4 +221,5 @@ public class TestAlign {
         System.out.println(br);
 
     }
+    */
 }

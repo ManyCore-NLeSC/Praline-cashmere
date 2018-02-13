@@ -12,7 +12,8 @@ public class WebServer {
     private HashMap<String, ReentrantLock> locks;
     private HashMap<String, Sequence> sequences;
     private HashMap<String, Alphabet> alphabets;
-    private HashMap<String, ScoreMatrix> scores;
+    private HashMap<String, Matrix2DF []> scores;
+    private HashMap<String, Matrix2DF []> profiles;
     private HashMap<String, GlobalAlignmentMatrix> globalAlignments;
     private HashMap<String, LocalAlignmentMatrix> localAlignments;
 
@@ -37,8 +38,12 @@ public class WebServer {
         this.alphabets = alphabets;
     }
 
-    public void setScoreMatricesContainer(HashMap<String, ScoreMatrix> scores) {
+    public void setScoreMatricesContainer(HashMap<String, Matrix2DF []> scores) {
         this.scores = scores;
+    }
+
+    public void setProfiles(HashMap<String, Matrix2DF []> profiles) {
+        this.profiles = profiles;
     }
 
     public void setGlobalAlignmentMatricesContainer(HashMap<String, GlobalAlignmentMatrix> globalAlignments) {
@@ -71,16 +76,52 @@ public class WebServer {
             response.status(statusCode);
             return "Alphabet \"" + request.params(":alphabet") + "\" processed.";
         });
-        // Receive a score matrix
-//        post("/send/score/:alphabet/:scorematrix", (request, response) -> {
-//            if ( scores.containsKey(request.params(":scorematrix")) ) {
-//                response.status(409);
-//                return "Score matrix \"" + request.params(":scorematrix") + "\" already exists.";
-//            }
-//            int statusCode = processSendScoreMatrix(request.params(":alphabet"), request.params(":scorematrix"), request.body());
-//            response.status(statusCode);
-//            return "Score matrix \"" + request.params(":scorematrix") + "\" processed.";
-//        });
+        // Register a profile
+        post("/register/profile/:profile_name", ((request, response) -> {
+            if ( profiles.containsKey(request.params(":profile_name")) ) {
+                response.status(409);
+                return "Profile \"" + request.params(":profile_name") + "\" already registered.";
+            }
+            int statusCode = processRegisterProfile(request.params(":profile_name"),
+                    Integer.parseInt(request.body()));
+            response.status(statusCode);
+            return "Profile \"" + request.params(":profile_name") + "\" registered.";
+        }));
+        // Add a track to a profile
+        post("/send/track/:profile_name/:track_position/:track_length", ((request, response) -> {
+            if ( !profiles.containsKey(request.params(":profile_name")) ) {
+                response.status(404);
+                return "Profile \"" + request.params(":profile_name") + "\" does not exist.";
+            }
+            int statusCode = processSendTrack(request.params(":profile_name"),
+                    Integer.parseInt(request.params(":track_position")),
+                    Integer.parseInt(request.params(":track_length")), request.body());
+            response.status(statusCode);
+            return "Added track to profile \"" + request.params(":profile_name") + "\".";
+        }));
+        // Register the cost matrix
+        post("/register/cost_matrix/:matrix_name", ((request, response) -> {
+            if ( profiles.containsKey(request.params(":matrix_name")) ) {
+                response.status(409);
+                return "Cost Matrix \"" + request.params(":matrix_name") + "\" already registered.";
+            }
+            int statusCode = processRegisterCostMatrix(request.params(":profile_name"),
+                    Integer.parseInt(request.body()));
+            response.status(statusCode);
+            return "Cost Matrix \"" + request.params(":profile_name") + "\" registered.";
+        }));
+        // Add a score to the cost matrix
+        post("/send/cost_matrix/:matrix_name/:score_position/:score_length", (request, response) -> {
+            if ( !scores.containsKey(request.params(":matrix_name")) ) {
+               response.status(404);
+                return "Cost Matrix \"" + request.params(":matrix_name") + "\" does not exist.";
+            }
+            int statusCode = processSendCostMatrix(request.params(":matrix_name"),
+                    Integer.parseInt(request.params(":score_position")),
+                    Integer.parseInt(request.params(":score_length")), request.body());
+            response.status(statusCode);
+            return "Added score to Cost Matrix \"" + request.params(":matrix_name") + "\".";
+        });
         // Send a global alignment matrix
         get("/receive/alignment_matrix/global/:sequence1/:sequence2", (request, response) -> {
             GlobalAlignmentMatrix alignment = globalAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));
@@ -182,22 +223,45 @@ public class WebServer {
         }
         return 201;
     }
-//
-//    private int processSendScoreMatrix(String alphabetId, String scoreMatrixId, String body) {
-//        int iterator = 0;
-//        float [] elements = new float [body.split(" ").length];
-//        ScoreMatrix score = new ScoreMatrix(scoreMatrixId);
-//
-//        score.setAlphabet(alphabets.get(alphabetId));
-//        for ( String item : body.split(" ") ) {
-//            elements[iterator] = Float.parseFloat(item);
-//            iterator++;
-//        }
-//        score.setScores(elements);
-//        synchronized ( locks.get("scorematrix") ) {
-//            scores.put(scoreMatrixId, score);
-//            locks.get("scorematrix").notifyAll();
-//        }
-//        return 201;
-//    }
+
+    // Register data structures
+    private int processRegisterProfile(String id, int length) {
+        synchronized ( locks.get("profiles") ) {
+            profiles.put(id, new Matrix2DF [length]);
+            locks.get("profiles").notifyAll();
+        }
+        return 201;
+    }
+
+    private int processRegisterCostMatrix(String id, int length) {
+        synchronized ( locks.get("scores") ) {
+            profiles.put(id, new Matrix2DF [length]);
+            locks.get("scores").notifyAll();
+        }
+        return 201;
+    }
+
+    // Receive data structures
+    private int processSend(String name, int position, int length, String values, ReentrantLock lock,
+                            HashMap<String, Matrix2DF []> data) {
+        String [] items = values.split(" ");
+        float [][] initializationMatrix = new float [items.length / length][length];
+
+        for ( int item = 0; item < items.length; item++ ) {
+            initializationMatrix[item / length][item % length] = Float.parseFloat(items[item]);
+        }
+        synchronized ( lock ) {
+            data.get(name)[position] = new Matrix2DF(initializationMatrix);
+            lock.notifyAll();
+        }
+        return 201;
+    }
+
+    private int processSendTrack(String profileID, int trackPosition, int trackLength, String track) {
+        return processSend(profileID, trackPosition, trackLength, track, locks.get("profiles"), profiles);
+    }
+
+    private int processSendCostMatrix(String matrixID, int scorePosition, int scoreLength, String score) {
+        return processSend(matrixID, scorePosition, scoreLength, score, locks.get("scores"), scores);
+    }
 }

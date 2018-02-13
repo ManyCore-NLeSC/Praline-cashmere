@@ -6,10 +6,9 @@ public class EasyInterface {
 
     AlignResult computeAlignment(Matrix2DF[] profileA, Matrix2DF[] profileB,
                                  Matrix2DF[] costMatrix,
-                                 float costStartGapA, float costExtendGapA, float costStartGapB, float costExtendGapB, AlignmentMode mode){
-        IGapCost gapA = new AffineGapCost(costStartGapA, costExtendGapA);
-        IGapCost gapB = new AffineGapCost(costStartGapB, costExtendGapB);
+                                 float costStartGap, float costExtendGap, AlignmentMode mode){
+        IGapCost gapA = new AffineGapCost(costStartGap, costExtendGap);
         IPositionCost posCost = new MotifProfilePositionCost(profileA,profileB,costMatrix);
-        return new AffineAlign().align(profileA.length, profileB.length, gapA, gapB, posCost, mode);
+        return new AffineAlign().align(profileA.length, profileB.length, gapA, gapA, posCost, mode);
     }
 }

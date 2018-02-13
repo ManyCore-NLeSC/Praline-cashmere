@@ -143,7 +143,7 @@ public class WebServer {
                 return "The cost matrix does not exist.";
             }
             EasyInterface aligner = new EasyInterface();
-            if ( request.params(":mode").compareTo("GLOBAL") == 0) {
+            if ( request.params(":mode").compareTo("global") == 0) {
                 alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
@@ -151,7 +151,7 @@ public class WebServer {
                                 Float.parseFloat(request.params(":start_gap")),
                                 Float.parseFloat(request.params(":extend_gap")),
                                 AlignmentMode.GLOBAL));
-            } else if ( request.params(":mode").compareTo("LOCAL") == 0 ) {
+            } else if ( request.params(":mode").compareTo("local") == 0 ) {
                 alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
@@ -159,7 +159,7 @@ public class WebServer {
                                 Float.parseFloat(request.params(":start_gap")),
                                 Float.parseFloat(request.params(":extend_gap")),
                                 AlignmentMode.LOCAL));
-            } else if ( request.params(":mode").compareTo("SEMIGLOBAL") == 0 ) {
+            } else if ( request.params(":mode").compareTo("semiglobal") == 0 ) {
                 alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),

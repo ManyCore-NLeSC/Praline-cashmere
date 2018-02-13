@@ -1,6 +1,9 @@
 package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.*;
+import nl.esciencecenter.praline.integeralign.AlignResultSteps;
+import nl.esciencecenter.praline.integeralign.AlignmentMode;
+import nl.esciencecenter.praline.integeralign.EasyInterface;
 
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,6 +17,7 @@ public class WebServer {
     private HashMap<String, Alphabet> alphabets;
     private HashMap<String, Matrix2DF []> scores;
     private HashMap<String, Matrix2DF []> profiles;
+    private HashMap<String, AlignResultSteps> alignments;
     private HashMap<String, GlobalAlignmentMatrix> globalAlignments;
     private HashMap<String, LocalAlignmentMatrix> localAlignments;
 
@@ -44,6 +48,10 @@ public class WebServer {
 
     public void setProfiles(HashMap<String, Matrix2DF []> profiles) {
         this.profiles = profiles;
+    }
+
+    public void setAlignments(HashMap<String, AlignResultSteps> alignments) {
+        this.alignments = alignments;
     }
 
     public void setGlobalAlignmentMatricesContainer(HashMap<String, GlobalAlignmentMatrix> globalAlignments) {
@@ -122,6 +130,49 @@ public class WebServer {
                     Integer.parseInt(request.params(":score_size")), request.body());
             response.status(statusCode);
             return "Added score to Cost Matrix \"" + request.params(":matrix_name") + "\".";
+        });
+        // Request an alignment
+        get("/align/:profile_one/:profile_two/:cost_matrix/:start_gap/:extend_gap/:mode", (request, response) -> {
+            if ( !profiles.containsKey(request.params(":profile_one"))
+                    || !profiles.containsKey(request.params(":profile_two")) ) {
+                response.status(404);
+                return "The profiles do not exist.";
+            }
+            if ( !scores.containsKey(request.params(":cost_matrix")) ) {
+                response.status(404);
+                return "The cost matrix does not exist.";
+            }
+            EasyInterface aligner = new EasyInterface();
+            if ( request.params(":mode").compareTo("GLOBAL") == 0) {
+                alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
+                        aligner.computeAlignment(profiles.get(request.params(":profile_one")),
+                                profiles.get(request.params(":profile_two")),
+                                scores.get(request.params(":cost_matrix")),
+                                Float.parseFloat(request.params(":start_gap")),
+                                Float.parseFloat(request.params(":extend_gap")),
+                                AlignmentMode.GLOBAL));
+            } else if ( request.params(":mode").compareTo("LOCAL") == 0 ) {
+                alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
+                        aligner.computeAlignment(profiles.get(request.params(":profile_one")),
+                                profiles.get(request.params(":profile_two")),
+                                scores.get(request.params(":cost_matrix")),
+                                Float.parseFloat(request.params(":start_gap")),
+                                Float.parseFloat(request.params(":extend_gap")),
+                                AlignmentMode.LOCAL));
+            } else if ( request.params(":mode").compareTo("SEMIGLOBAL") == 0 ) {
+                alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
+                        aligner.computeAlignment(profiles.get(request.params(":profile_one")),
+                                profiles.get(request.params(":profile_two")),
+                                scores.get(request.params(":cost_matrix")),
+                                Float.parseFloat(request.params(":start_gap")),
+                                Float.parseFloat(request.params(":extend_gap")),
+                                AlignmentMode.SEMIGLOBAL));
+            } else {
+                response.status(405);
+                return "Alignment mode \"" + request.params(":mode") + "\" not supported.";
+            }
+            response.status(200);
+            return "Alignment processed.";
         });
         // Send a global alignment matrix
         get("/receive/alignment_matrix/global/:sequence1/:sequence2", (request, response) -> {

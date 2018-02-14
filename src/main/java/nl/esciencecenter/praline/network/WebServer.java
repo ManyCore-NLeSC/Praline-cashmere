@@ -85,13 +85,13 @@ public class WebServer {
             return "Alphabet \"" + request.params(":alphabet") + "\" processed.";
         });
         // Register a profile
-        post("/register/profile/:profile_name", ((request, response) -> {
+        get("/register/profile/:profile_name/:tracks_number", ((request, response) -> {
             if ( profiles.containsKey(request.params(":profile_name")) ) {
                 response.status(409);
                 return "Profile \"" + request.params(":profile_name") + "\" already registered.";
             }
             int statusCode = processRegisterProfile(request.params(":profile_name"),
-                    Integer.parseInt(request.body()));
+                    Integer.parseInt(request.params(":tracks_number")));
             response.status(statusCode);
             return "Profile \"" + request.params(":profile_name") + "\" registered.";
         }));
@@ -109,13 +109,13 @@ public class WebServer {
             return "Added track to profile \"" + request.params(":profile_name") + "\".";
         }));
         // Register the cost matrix
-        post("/register/cost_matrix/:matrix_name", ((request, response) -> {
+        get("/register/cost_matrix/:matrix_name/:scores_number", ((request, response) -> {
             if ( profiles.containsKey(request.params(":matrix_name")) ) {
                 response.status(409);
                 return "Cost Matrix \"" + request.params(":matrix_name") + "\" already registered.";
             }
             int statusCode = processRegisterCostMatrix(request.params(":profile_name"),
-                    Integer.parseInt(request.body()));
+                    Integer.parseInt(request.params(":scores_number")));
             response.status(statusCode);
             return "Cost Matrix \"" + request.params(":matrix_name") + "\" registered.";
         }));
@@ -284,6 +284,7 @@ public class WebServer {
         }
         return 201;
     }
+
     private int processRegisterProfile(String id, int tracks) {
         return processRegister(id, tracks, locks.get("profiles"), profiles);
     }

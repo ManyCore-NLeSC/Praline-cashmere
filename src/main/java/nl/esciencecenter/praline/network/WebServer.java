@@ -58,7 +58,7 @@ public class WebServer {
         this.globalAlignments = globalAlignments;
     }
 
-    public void setLocalAlignmentMatricesContaines(HashMap<String, LocalAlignmentMatrix> localAlignments) {
+    public void setLocalAlignmentMatricesContainer(HashMap<String, LocalAlignmentMatrix> localAlignments) {
         this.localAlignments = localAlignments;
     }
 

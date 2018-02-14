@@ -277,24 +277,24 @@ public class WebServer {
     }
 
     // Register data structures
-    private int processRegister(String name, int size, ReentrantLock lock, HashMap<String, Matrix2DF []> data) {
-        synchronized ( lock ) {
+    private int processRegister(String name, int size, String lockName, HashMap<String, Matrix2DF []> data) {
+        synchronized ( locks.get(lockName) ) {
             data.put(name, new Matrix2DF [size]);
-            lock.notifyAll();
+            locks.get(lockName).notifyAll();
         }
         return 201;
     }
 
     private int processRegisterProfile(String id, int tracks) {
-        return processRegister(id, tracks, locks.get("profiles"), profiles);
+        return processRegister(id, tracks, "profiles", profiles);
     }
 
     private int processRegisterCostMatrix(String id, int length) {
-        return processRegister(id, length, locks.get("scores"), scores);
+        return processRegister(id, length, "scores", scores);
     }
 
     // Receive data structures
-    private int processSend(String name, int position, int rows, int columns, String values, ReentrantLock lock,
+    private int processSend(String name, int position, int rows, int columns, String values, String lockName,
                             HashMap<String, Matrix2DF []> data) {
         String [] items = values.split(" ");
         float [][] initializationMatrix = new float [rows][columns];
@@ -304,18 +304,18 @@ public class WebServer {
                 initializationMatrix[row][column] = Float.parseFloat(items[(row * columns) + column]);
             }
         }
-        synchronized ( lock ) {
+        synchronized ( locks.get(lockName) ) {
             data.get(name)[position] = new Matrix2DF(initializationMatrix);
-            lock.notifyAll();
+            locks.get(lockName).notifyAll();
         }
         return 201;
     }
 
     private int processSendTrack(String profileID, int trackNumber, int rows, int columns, String track) {
-        return processSend(profileID, trackNumber, rows, columns, track, locks.get("profiles"), profiles);
+        return processSend(profileID, trackNumber, rows, columns, track, "profiles", profiles);
     }
 
     private int processSendCostMatrix(String matrixID, int scoreNumber, int scoreSize, String score) {
-        return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, locks.get("scores"), scores);
+        return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, "scores", scores);
     }
 }

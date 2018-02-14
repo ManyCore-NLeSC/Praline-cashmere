@@ -131,7 +131,7 @@ public class WebServer {
             response.status(statusCode);
             return "Added score to Cost Matrix \"" + request.params(":matrix_name") + "\".";
         });
-        // Request an alignment
+        // Request to align two profiles
         get("/align/:profile_one/:profile_two/:cost_matrix/:start_gap/:extend_gap/:mode", (request, response) -> {
             if ( !profiles.containsKey(request.params(":profile_one"))
                     || !profiles.containsKey(request.params(":profile_two")) ) {
@@ -174,6 +174,28 @@ public class WebServer {
             response.status(200);
             return "Alignment processed.";
         });
+        // Retrieve the score associated with the alignment of two profiles
+        get("/retrieve/score/:profile_one/:profile_two", ((request, response) -> {
+            if ( !alignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
+                response.status(404);
+                return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
+                        + " does not exist.";
+            } else {
+                response.status(200);
+                return alignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).getScore();
+            }
+        }));
+        // Retrieve the alignment steps of two profiles
+        get("/retrieve/steps/:profile_one/:profile_two", ((request, response) -> {
+            if ( !alignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
+                response.status(404);
+                return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
+                        + " does not exist.";
+            } else {
+                response.status(200);
+                return alignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).getSteps();
+            }
+        }));
         // Send a global alignment matrix
         get("/receive/alignment_matrix/global/:sequence1/:sequence2", (request, response) -> {
             GlobalAlignmentMatrix alignment = globalAlignments.get(request.params(":sequence1") + "_" + request.params(":sequence2"));

@@ -97,16 +97,16 @@ public class TestAlign {
             System.out.println("custom done");
             end = System.currentTimeMillis();
             long durAlign = end - start;
-            float score = getAlignScore(res.align.steps,stringA.length,stringB.length,gapCostA,gapCostB, testPositionCost(stringA,stringB));
-            if(Math.abs(res.score - oracleRes.score) > MAX_DIFF){
-                System.out.printf("Wrong score reported: %f actual %f \n A: \n", res.score, oracleRes.score);
+            float score = getAlignScore(res.getAlign().getSteps(),stringA.length,stringB.length,gapCostA,gapCostB, testPositionCost(stringA,stringB));
+            if(Math.abs(res.getScore() - oracleRes.getScore()) > MAX_DIFF){
+                System.out.printf("Wrong score reported: %f actual %f \n A: \n", res.getScore(), oracleRes.getScore());
                 System.out.println(Arrays.toString(stringA));
                 System.out.printf(" \n B: \n");
                 System.out.println(Arrays.toString(stringB));
                 return false;
             }
-            if (Math.abs(res.score - score) > MAX_DIFF) {
-                System.out.printf("Wrong answer reported: %f actual %f (size) %d \n A: \n", res.score, score, res.align.steps.size());
+            if (Math.abs(res.getScore() - score) > MAX_DIFF) {
+                System.out.printf("Wrong answer reported: %f actual %f (size) %d \n A: \n", res.getScore(), score, res.getAlign().getSteps().size());
                 System.out.println(Arrays.toString(stringA));
                 System.out.printf(" \n B: \n");
                 System.out.println(Arrays.toString(stringB));

@@ -1,7 +1,5 @@
 package nl.esciencecenter.praline.data;
 
-import nl.esciencecenter.praline.aligners.Coordinate;
-
 import java.util.ArrayList;
 
 public abstract class AlignmentMatrix {

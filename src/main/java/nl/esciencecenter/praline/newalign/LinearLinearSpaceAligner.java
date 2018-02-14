@@ -31,18 +31,18 @@ public class LinearLinearSpaceAligner implements  IAlign {
         while(c.hasNext()){
 
             Coordinate cur = c.next();
-            if(cur.x == prev.x && cur.y == prev.y + 1){
+            if(cur.getX() == prev.getX() && cur.getY() == prev.getY() + 1){
                 res.add(AlignStep.GAPB);
-            } else if(cur.x == prev.x + 1){
-                if(cur.y == prev.y + 1){
+            } else if(cur.getX() == prev.getX() + 1){
+                if(cur.getY() == prev.getY() + 1){
                     res.add(AlignStep.ALIGN);
-                } else if(cur.y == prev.y) {
+                } else if(cur.getY() == prev.getY()) {
                     res.add(AlignStep.GAPA);
                 } else {
-                    throw new Error("assumption violated (" + prev.x + "," + prev.y + ") (" + cur.x + "," + cur.y + ")");
+                    throw new Error("assumption violated (" + prev.getX() + "," + prev.getY() + ") (" + cur.getX() + "," + cur.getY() + ")");
                 }
             } else {
-                throw new Error("assumption violated (" + prev.x + "," + prev.y + ") (" + cur.x + "," + cur.y + ")");
+                throw new Error("assumption violated (" + prev.getX() + "," + prev.getY() + ") (" + cur.getX() + "," + cur.getY() + ")");
             }
             prev = cur;
         }

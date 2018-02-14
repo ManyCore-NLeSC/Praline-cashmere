@@ -2,7 +2,9 @@ package nl.esciencecenter.praline;
 
 import com.beust.jcommander.JCommander;
 import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
+import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Sequence;
+import nl.esciencecenter.praline.integeralign.AlignResultSteps;
 import nl.esciencecenter.praline.network.WebServer;
 
 import java.util.HashMap;
@@ -13,54 +15,35 @@ public class Praline {
     private static WebServer server;
     // Locks
     private static final HashMap<String, ReentrantLock> locks = new HashMap<>();
-    // Sequences
-    private volatile static HashMap<String, Sequence> sequences;
-    // Alignments
-    private volatile static HashMap<String, GlobalAlignmentMatrix> alignments;
+    // Shared data structures
+    private static final HashMap<String, Matrix2DF []> profiles = new HashMap<>();
+    private static final HashMap<String, Matrix2DF []> costs = new HashMap<>();
+    private static final HashMap<String, AlignResultSteps> alignments = new HashMap<>();
 
     public static void main(String [] args) throws InterruptedException {
-        sequences = new HashMap<>();
-        alignments = new HashMap<>();
-
         // Command line arguments
         CommandLineArguments arguments = new CommandLineArguments();
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
+        // Locks
+        locks.put("terminate", new ReentrantLock());
+        locks.put("profiles", new ReentrantLock());
+        locks.put("costs", new ReentrantLock());
+        locks.put("alignements", new ReentrantLock());
+
         // Initialize web server
         server = new WebServer(arguments.getNrServerThreads());
-        server.setSequencesContainer(sequences);
-        server.setGlobalAlignmentMatricesContainer(alignments);
+        server.setLocks(locks);
+        server.setProfiles(profiles);
+        server.setCosts(costs);
+        server.setAlignments(alignments);
         server.run();
 
-        // Locks
-        locks.put("sequence", new ReentrantLock());
-        locks.put("alphabet", new ReentrantLock());
+        // While until termination
+        locks.get("terminate").wait();
 
-        // Receive sequences from network
-        while ( sequences.size() < arguments.getNrExpectedSequences() ) {
-            synchronized ( locks.get("sequence") ) {
-                locks.get("sequence").wait();
-            }
-        }
-//        for ( Sequence sequence : sequences.values() ) {
-//            System.out.print("Sequence \"" + sequence.getName() + "\": ");
-//            for ( Integer symbol : sequence.get() ) {
-//                System.out.print(symbol + " ");
-//            }
-//            System.out.println();
-//        }
-        // Send alignment matrices
-        for ( Sequence sequenceOne : sequences.values() ) {
-            for ( Sequence sequenceTwo : sequences.values() ) {
-                if ( sequenceOne.getName().equals(sequenceTwo.getName()) ) {
-                    continue;
-                }
-                GlobalAlignmentMatrix alignment = new GlobalAlignmentMatrix(sequenceOne.getName() + "_" + sequenceTwo.getName(),sequenceOne,sequenceTwo);
-                alignment.allocate();
-                alignments.put(alignment.getId(), alignment);
-            }
-        }
-        Thread.sleep(60000);
+        // Print exit message
+        System.err.println("Alignments computed: " + alignments.size());
 
         // Clean up
         server.close();

@@ -262,6 +262,11 @@ public class WebServer {
                 return "No alignment for \""+ request.params(":sequence1") + "\" and \" " + request.params(":sequence2") + "\".";
             }
         });
+        get("/terminate", ((request, response) -> {
+            locks.get("terminate").notifyAll();
+            response.status(200);
+            return "Server shutting down.";
+        }));
         // Default routes
         get("/", ((request, response) -> halt(501)));
         post("/", ((request, response) -> halt(501)));

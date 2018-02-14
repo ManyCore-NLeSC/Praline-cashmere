@@ -24,7 +24,7 @@ public class Praline {
         JCommander.newBuilder().addObject(arguments).build().parse(args);
 
         // Locks
-        locks.put("terminate", new ReentrantLock());
+        locks.put("termination", new ReentrantLock());
         locks.put("profiles", new ReentrantLock());
         locks.put("costs", new ReentrantLock());
         locks.put("alignements", new ReentrantLock());
@@ -38,7 +38,9 @@ public class Praline {
         server.run();
 
         // While until termination
-        locks.get("terminate").wait();
+        synchronized ( locks.get("termination") ) {
+            locks.get("termination").wait();
+        }
 
         // Print exit message
         System.err.println("Alignments computed: " + alignments.size());

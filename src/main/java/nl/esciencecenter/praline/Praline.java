@@ -1,9 +1,7 @@
 package nl.esciencecenter.praline;
 
 import com.beust.jcommander.JCommander;
-import nl.esciencecenter.praline.data.GlobalAlignmentMatrix;
 import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.data.Sequence;
 import nl.esciencecenter.praline.integeralign.AlignResultSteps;
 import nl.esciencecenter.praline.network.WebServer;
 

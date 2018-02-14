@@ -312,7 +312,7 @@ public class WebServer {
     }
 
     private int processRegisterCostMatrix(String id, int length) {
-        return processRegister(id, length, "scores", costs);
+        return processRegister(id, length, "costs", costs);
     }
 
     // Receive data structures
@@ -338,6 +338,6 @@ public class WebServer {
     }
 
     private int processSendCostMatrix(String matrixID, int scoreNumber, int scoreSize, String score) {
-        return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, "scores", costs);
+        return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, "costs", costs);
     }
 }

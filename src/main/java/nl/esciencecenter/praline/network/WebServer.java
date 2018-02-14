@@ -263,7 +263,7 @@ public class WebServer {
             }
         });
         get("/terminate", ((request, response) -> {
-            locks.get("terminate").notifyAll();
+            locks.get("termination").notifyAll();
             response.status(200);
             return "Server shutting down.";
         }));

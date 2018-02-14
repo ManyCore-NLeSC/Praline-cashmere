@@ -15,7 +15,7 @@ public class WebServer {
     private HashMap<String, ReentrantLock> locks;
     private HashMap<String, Sequence> sequences;
     private HashMap<String, Alphabet> alphabets;
-    private HashMap<String, Matrix2DF []> scores;
+    private HashMap<String, Matrix2DF []> costs;
     private HashMap<String, Matrix2DF []> profiles;
     private HashMap<String, AlignResultSteps> alignments;
     private HashMap<String, GlobalAlignmentMatrix> globalAlignments;
@@ -42,8 +42,8 @@ public class WebServer {
         this.alphabets = alphabets;
     }
 
-    public void setScoreMatricesContainer(HashMap<String, Matrix2DF []> scores) {
-        this.scores = scores;
+    public void setCosts(HashMap<String, Matrix2DF []> costs) {
+        this.costs = costs;
     }
 
     public void setProfiles(HashMap<String, Matrix2DF []> profiles) {
@@ -121,7 +121,7 @@ public class WebServer {
         }));
         // Add a score to the cost matrix
         post("/send/cost_matrix/:matrix_name/:score_number/:score_size", (request, response) -> {
-            if ( !scores.containsKey(request.params(":matrix_name")) ) {
+            if ( !costs.containsKey(request.params(":matrix_name")) ) {
                response.status(404);
                 return "Cost Matrix \"" + request.params(":matrix_name") + "\" does not exist.";
             }
@@ -138,7 +138,7 @@ public class WebServer {
                 response.status(404);
                 return "The profiles do not exist.";
             }
-            if ( !scores.containsKey(request.params(":cost_matrix")) ) {
+            if ( !costs.containsKey(request.params(":cost_matrix")) ) {
                 response.status(404);
                 return "The cost matrix does not exist.";
             }
@@ -147,7 +147,7 @@ public class WebServer {
                 alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
-                                scores.get(request.params(":cost_matrix")),
+                                costs.get(request.params(":cost_matrix")),
                                 Float.parseFloat(request.params(":start_gap")),
                                 Float.parseFloat(request.params(":extend_gap")),
                                 AlignmentMode.GLOBAL));
@@ -155,7 +155,7 @@ public class WebServer {
                 alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
-                                scores.get(request.params(":cost_matrix")),
+                                costs.get(request.params(":cost_matrix")),
                                 Float.parseFloat(request.params(":start_gap")),
                                 Float.parseFloat(request.params(":extend_gap")),
                                 AlignmentMode.LOCAL));
@@ -163,7 +163,7 @@ public class WebServer {
                 alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
-                                scores.get(request.params(":cost_matrix")),
+                                costs.get(request.params(":cost_matrix")),
                                 Float.parseFloat(request.params(":start_gap")),
                                 Float.parseFloat(request.params(":extend_gap")),
                                 AlignmentMode.SEMIGLOBAL));
@@ -312,7 +312,7 @@ public class WebServer {
     }
 
     private int processRegisterCostMatrix(String id, int length) {
-        return processRegister(id, length, "scores", scores);
+        return processRegister(id, length, "scores", costs);
     }
 
     // Receive data structures
@@ -338,6 +338,6 @@ public class WebServer {
     }
 
     private int processSendCostMatrix(String matrixID, int scoreNumber, int scoreSize, String score) {
-        return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, "scores", scores);
+        return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, "scores", costs);
     }
 }

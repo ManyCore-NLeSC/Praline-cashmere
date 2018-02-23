@@ -5,6 +5,7 @@ import nl.esciencecenter.praline.aligners.Alignment;
 import nl.esciencecenter.praline.newalign.Coordinate;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class AlignResultSteps {
@@ -46,14 +47,20 @@ public class AlignResultSteps {
         return this.steps;
     }
 
+
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-
-        for ( Coordinate coordinate : this.steps ) {
-            builder.append(coordinate.toString());
-            builder.append(" ");
+        Iterator<Coordinate> it = this.steps.iterator();
+        if(it.hasNext()){
+            builder.append(it.next().toString());
+            while(it.hasNext()){
+                builder.append(" ");
+                builder.append(it.next().toString());
+            }
         }
+       
         return builder.toString();
     }
 }

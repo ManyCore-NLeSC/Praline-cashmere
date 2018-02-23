@@ -110,25 +110,32 @@ public class WebServer {
         }));
         // Register the cost matrix
         get("/register/cost_matrix/:matrix_name/:scores_number", ((request, response) -> {
+
             if ( profiles.containsKey(request.params(":matrix_name")) ) {
                 response.status(409);
                 return "Cost Matrix \"" + request.params(":matrix_name") + "\" already registered.";
             }
-            int statusCode = processRegisterCostMatrix(request.params(":profile_name"),
+            int statusCode = processRegisterCostMatrix(request.params(":matrix_name"),
                     Integer.parseInt(request.params(":scores_number")));
             response.status(statusCode);
-            return "Cost Matrix \"" + request.params(":matrix_name") + "\" registered.";
+            String s =  "Cost Matrix \"" + request.params(":matrix_name") + "\" registered.";
+            System.err.println(s);
+            return s;
         }));
         // Add a score to the cost matrix
         post("/send/cost_matrix/:matrix_name/:score_number/:score_size", (request, response) -> {
+            System.err.printf("Start!");
             if ( !costs.containsKey(request.params(":matrix_name")) ) {
                response.status(404);
-                return "Cost Matrix \"" + request.params(":matrix_name") + "\" does not exist.";
+               String s = "Cost Matrix \"" + request.params(":matrix_name") + "\" does not exist.";
+               System.err.println(s);
+               return s;
             }
             int statusCode = processSendCostMatrix(request.params(":matrix_name"),
                     Integer.parseInt(request.params(":score_number")),
                     Integer.parseInt(request.params(":score_size")), request.body());
             response.status(statusCode);
+            System.err.printf("Send matrix %d\n", statusCode);
             return "Added score to Cost Matrix \"" + request.params(":matrix_name") + "\".";
         });
         // Request to align two profiles
@@ -193,7 +200,8 @@ public class WebServer {
                         + " does not exist.";
             } else {
                 response.status(200);
-                return alignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).getSteps();
+
+                return alignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).toString();
             }
         }));
         // Send a global alignment matrix

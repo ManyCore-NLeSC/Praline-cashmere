@@ -16,11 +16,11 @@ public class ProfilePositionCost implements IPositionCost{
     }
 
     Matrix2DF outerProduct(Matrix2DF a, int indexa, Matrix2DF b, int indexb){
-        Matrix2DF res = new Matrix2DF(a.nrRows, a.nrRows );
-        assert b.nrRows == a.nrRows;
-        for(int i = 0 ; i < a.nrRows ; i++){
-            for(int j = 0 ; j < a.nrRows ; j++){
-                res.set(i,j,a.get(i,indexa) * b.get(j, indexb));
+        Matrix2DF res = new Matrix2DF(a.nrCols, a.nrCols );
+        assert b.nrCols == a.nrCols;
+        for(int i = 0 ; i < a.nrCols ; i++){
+            for(int j = 0 ; j < a.nrCols ; j++){
+                res.set(i,j,a.get(indexa,j) * b.get(indexb,j));
             }
         }
         return res;

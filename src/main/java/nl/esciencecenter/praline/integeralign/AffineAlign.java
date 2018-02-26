@@ -95,7 +95,7 @@ public class AffineAlign implements IAlign {
             }
 
         }
-      
+
 //        System.out.println();
 //
 //        System.out.println("traceback\n");

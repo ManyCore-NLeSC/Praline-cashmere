@@ -47,10 +47,18 @@ public class ProfilePositionCost implements IPositionCost{
         return res;
     }
 
+    float atOnce(int indexa, int indexb){
+        float res = 0 ;
+        for(int i = 0 ; i < profileA.nrCols ; i++){
+            for(int j = 0 ; j < profileA.nrCols ; j++){
+                res += costMatrix.get(i,j) * profileA.get(indexa,i) * profileB.get(indexb,j);
+            }
+        }
+        return res;
+    }
+
     @Override
     public float cost(int posA, int posB) {
-        Matrix2DF outer = outerProduct(profileA,posA, profileB, posB);
-        Matrix2DF pw = pieceWiseProduct(outer, costMatrix);
-        return sumMatrix(pw) ;
+        return atOnce(posA, posB) ;
     }
 }

@@ -14,9 +14,12 @@ public class EasyInterface {
             System.out.printf("B rows %d cols %d\n", profileB[i].nrRows, profileB[i].nrCols);
             System.out.printf("C rows %d cols %d\n", costMatrix[i].nrRows, costMatrix[i].nrCols);
         }
+        //profileA[0].printMatrix();
+        int alength = profileA[0].nrRows;
+        int blength = profileB[0].nrRows;
         IGapCost gapA = new AffineGapCost(costStartGap, costExtendGap);
         IPositionCost posCost = new MotifProfilePositionCost(profileA,profileB,costMatrix);
-        AlignResult res = new AffineAlign().align(profileA.length, profileB.length, gapA, gapA, posCost, mode);
+        AlignResult res = new AffineAlign().align(alength, blength, gapA, gapA, posCost, mode);
         return new AlignResultSteps(res);
     }
 }

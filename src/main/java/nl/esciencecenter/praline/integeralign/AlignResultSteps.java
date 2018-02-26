@@ -60,7 +60,7 @@ public class AlignResultSteps {
                 builder.append(it.next().toString());
             }
         }
-       
+
         return builder.toString();
     }
 }

@@ -29,4 +29,14 @@ public class Matrix2DF {
     public void set(int row, int col, float val){
         data[row * nrCols + col] = val;
     }
+
+    public void printMatrix(){
+        for(int i = 0 ; i < nrRows ; i++){
+            for(int j = 0 ; j < nrCols ; j++){
+                System.out.printf("%3.1f ",get(i,j));
+
+            }
+            System.out.println();
+        }
+    }
 }

@@ -20,7 +20,7 @@ public class ProfilePositionCost implements IPositionCost{
         assert b.nrCols == a.nrCols;
         for(int i = 0 ; i < a.nrCols ; i++){
             for(int j = 0 ; j < a.nrCols ; j++){
-                res.set(i,j,a.get(indexa,j) * b.get(indexb,j));
+                res.set(i,j,a.get(indexa,i) * b.get(indexb,j));
             }
         }
         return res;
@@ -51,6 +51,6 @@ public class ProfilePositionCost implements IPositionCost{
     public float cost(int posA, int posB) {
         Matrix2DF outer = outerProduct(profileA,posA, profileB, posB);
         Matrix2DF pw = pieceWiseProduct(outer, costMatrix);
-        return sumMatrix(pw);
+        return sumMatrix(pw) ;
     }
 }

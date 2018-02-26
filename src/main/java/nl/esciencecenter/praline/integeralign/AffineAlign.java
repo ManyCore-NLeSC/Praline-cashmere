@@ -95,12 +95,7 @@ public class AffineAlign implements IAlign {
             }
 
         }
-//        for(int i = 0 ; i < sizeB + 1; i++){
-//            for(int j = 0 ; j < sizeA + 1 ; j++){
-//                System.out.printf("%4d ", cost.get(i,j));
-//            }
-//            System.out.println();
-//        }
+      
 //        System.out.println();
 //
 //        System.out.println("traceback\n");

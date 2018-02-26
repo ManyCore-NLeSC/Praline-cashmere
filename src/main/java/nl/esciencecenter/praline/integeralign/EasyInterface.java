@@ -14,7 +14,12 @@ public class EasyInterface {
             System.out.printf("B rows %d cols %d\n", profileB[i].nrRows, profileB[i].nrCols);
             System.out.printf("C rows %d cols %d\n", costMatrix[i].nrRows, costMatrix[i].nrCols);
         }
-        //profileA[0].printMatrix();
+//        System.out.println("Cost:");
+//        costMatrix[0].printMatrix();
+//        System.out.println("A:");
+//        profileA[0].printMatrix();
+//        System.out.println("B:");
+//        profileB[0].printMatrix();
         int alength = profileA[0].nrRows;
         int blength = profileB[0].nrRows;
         IGapCost gapA = new AffineGapCost(costStartGap, costExtendGap);

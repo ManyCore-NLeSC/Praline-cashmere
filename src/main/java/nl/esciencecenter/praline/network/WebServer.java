@@ -1,5 +1,6 @@
 package nl.esciencecenter.praline.network;
 
+import nl.esciencecenter.praline.aligners.SequenceAligner;
 import nl.esciencecenter.praline.data.*;
 import nl.esciencecenter.praline.integeralign.AlignResultSteps;
 import nl.esciencecenter.praline.integeralign.AlignmentMode;
@@ -11,6 +12,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import static spark.Spark.*;
 
 public class WebServer {
+    // Local data structures
+    HashMap<Integer, SequenceAligner> sequenceAligners;
     // Global data structures
     private HashMap<String, ReentrantLock> locks;
     private HashMap<String, Sequence> sequences;
@@ -24,6 +27,7 @@ public class WebServer {
     private HashMap<String, SequenceAlignments> sequenceAlignments;
 
     public WebServer(int threads) {
+        sequenceAligners = new HashMap<>();
         threadPool(threads);
         init();
     }
@@ -149,13 +153,15 @@ public class WebServer {
             return "Added score to Cost Matrix \"" + request.params(":matrix_name") + "\".";
         });
         // Register an alignment queue
-        get("/register/alignment_queue/:queue_name/:cost_matrix_name/:alignment_mode", (request, response) -> {
+        get("/register/alignment_queue/:queue_name/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
+                (request, response) -> {
             if ( sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
                 response.status(409);
                 return "Queue \"" + request.params(":queue_name") + "\" already registered.";
             }
             int statusCode = registerSequenceAlignmentQueue(request.params(":queue_name"),
-                    request.params(":cost_matrix_name"), request.params(":alignment_mode"));
+                    request.params(":cost_matrix_name"), request.params(":alignment_mode"),
+                    Float.parseFloat(request.params(":start_gap")), Float.parseFloat(request.params(":extend_gap")));
             response.status(statusCode);
             return "Queue \"" + request.params(":queue_name") + "\" registered.";
         });
@@ -371,17 +377,19 @@ public class WebServer {
         return processRegister(id, length, "costs", costs);
     }
 
-    private int registerSequenceAlignmentQueue(String name, String costMatrix, String alignmentMode) {
+    private int registerSequenceAlignmentQueue(String name, String costMatrix, String alignmentMode,
+                                               Float costStartGap, Float costExtendGap) {
         SequenceAlignmentQueue queue;
 
         if (alignmentMode.compareTo("global") == 0 ) {
-            queue = new SequenceAlignmentQueue(name, AlignmentMode.GLOBAL);
+            queue = new SequenceAlignmentQueue(AlignmentMode.GLOBAL);
         } else if ( alignmentMode.compareTo("local") == 0 ) {
-            queue = new SequenceAlignmentQueue(name, AlignmentMode.LOCAL);
+            queue = new SequenceAlignmentQueue(AlignmentMode.LOCAL);
         } else {
-            queue = new SequenceAlignmentQueue(name, AlignmentMode.SEMIGLOBAL);
+            queue = new SequenceAlignmentQueue(AlignmentMode.SEMIGLOBAL);
         }
         queue.setCostMatrices(costs.get(costMatrix));
+        queue.setGapCost(costStartGap, costExtendGap);
         sequenceAlignmentQueue.put(name, queue);
         return 201;
     }
@@ -423,7 +431,10 @@ public class WebServer {
             }
         }
         synchronized ( locks.get("sequence_alignments") ) {
-            sequenceAlignmentQueue.get(queue).addElement(sequence);
+            int sequenceID = sequenceAlignmentQueue.get(queue).addElement(sequence);
+            sequenceAligners.put(sequenceID, new SequenceAligner(queue, locks, sequenceAlignmentQueue,
+                    sequenceAlignments));
+            sequenceAligners.get(sequenceID).start();
             locks.get("sequence_alignments").notifyAll();
         }
         return 201;

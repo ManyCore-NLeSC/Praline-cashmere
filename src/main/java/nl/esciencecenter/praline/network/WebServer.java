@@ -424,6 +424,7 @@ public class WebServer {
     }
 
     private int sendSequence(int length, String queue, String body) {
+        int sequenceID;
         String [] items = body.split(" ");
         int [][] sequence = new int [items.length / length][length];
 
@@ -434,12 +435,12 @@ public class WebServer {
             }
         }
         synchronized ( locks.get("sequence_alignments") ) {
-            int sequenceID = sequenceAlignmentQueue.get(queue).addElement(sequence);
+            sequenceID = sequenceAlignmentQueue.get(queue).addElement(sequence);
             sequenceAligners.put(sequenceID, new SequenceAligner(queue, locks, sequenceAlignmentQueue,
                     sequenceAlignments));
-            sequenceAligners.get(sequenceID).start();
             locks.get("sequence_alignments").notifyAll();
         }
+        sequenceAligners.get(sequenceID).start();
         return 201;
     }
 

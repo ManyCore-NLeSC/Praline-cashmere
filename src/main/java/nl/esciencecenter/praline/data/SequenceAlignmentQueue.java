@@ -33,7 +33,7 @@ public class SequenceAlignmentQueue {
         queue.add(sequence);
     }
 
-    public List<int [][]> getPreviousElements(int index) {
-        return queue.subList(0, index);
+    public List<int [][]> getPreviousElements() {
+        return queue.subList(0, queue.size() - 1);
     }
 }

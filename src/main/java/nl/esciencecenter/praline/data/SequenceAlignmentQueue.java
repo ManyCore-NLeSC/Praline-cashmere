@@ -1,5 +1,6 @@
 package nl.esciencecenter.praline.data;
 
+import nl.esciencecenter.praline.integeralign.AffineGapCost;
 import nl.esciencecenter.praline.integeralign.AlignmentMode;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.List;
 
 public class SequenceAlignmentQueue {
     private String name;
+    private AffineGapCost affineGapCost;
     private Matrix2DF [] costMatrices;
     private AlignmentMode alignmentMode;
     private ArrayList<int [][]> queue;
@@ -15,6 +17,14 @@ public class SequenceAlignmentQueue {
         this.name = name;
         this.alignmentMode = alignmentMode;
         queue = new ArrayList<>();
+    }
+
+    public void setGapCost(Float costStartGap, Float costExtendGap) {
+        affineGapCost = new AffineGapCost(costStartGap, costExtendGap);
+    }
+
+    public AffineGapCost getAffineGapCost() {
+        return affineGapCost;
     }
 
     public void setCostMatrices(Matrix2DF [] costMatrices) {

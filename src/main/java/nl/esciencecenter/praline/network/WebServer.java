@@ -182,6 +182,9 @@ public class WebServer {
                 return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
             }
             String scoreMatrix = receiveScoreMatrix(request.params(":queue_name"));
+            for ( SequenceAligner aligner : sequenceAligners.values() ) {
+                aligner.join();
+            }
             response.status(200);
             return scoreMatrix;
         });

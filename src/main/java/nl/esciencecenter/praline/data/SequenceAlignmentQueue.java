@@ -7,14 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SequenceAlignmentQueue {
-    private String name;
     private AffineGapCost affineGapCost;
     private Matrix2DF [] costMatrices;
     private AlignmentMode alignmentMode;
     private ArrayList<int [][]> queue;
 
-    public SequenceAlignmentQueue(String name, AlignmentMode alignmentMode) {
-        this.name = name;
+    public SequenceAlignmentQueue(AlignmentMode alignmentMode) {
         this.alignmentMode = alignmentMode;
         queue = new ArrayList<>();
     }
@@ -39,8 +37,9 @@ public class SequenceAlignmentQueue {
         return alignmentMode;
     }
 
-    public void addElement(int [][] sequence) {
+    public int addElement(int [][] sequence) {
         queue.add(sequence);
+        return queue.size() - 1;
     }
 
     public List<int [][]> getPreviousElements() {

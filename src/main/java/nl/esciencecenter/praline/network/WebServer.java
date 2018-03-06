@@ -17,9 +17,11 @@ public class WebServer {
     private HashMap<String, Alphabet> alphabets;
     private HashMap<String, Matrix2DF []> costs;
     private HashMap<String, Matrix2DF []> profiles;
-    private HashMap<String, AlignResultSteps> alignments;
+    private HashMap<String, AlignResultSteps> profileAlignments;
     private HashMap<String, GlobalAlignmentMatrix> globalAlignments;
     private HashMap<String, LocalAlignmentMatrix> localAlignments;
+    private HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue;
+    private HashMap<String, SequenceAlignments> sequenceAlignments;
 
     public WebServer(int threads) {
         threadPool(threads);
@@ -50,8 +52,8 @@ public class WebServer {
         this.profiles = profiles;
     }
 
-    public void setAlignments(HashMap<String, AlignResultSteps> alignments) {
-        this.alignments = alignments;
+    public void setProfileAlignments(HashMap<String, AlignResultSteps> profileAlignments) {
+        this.profileAlignments = profileAlignments;
     }
 
     public void setGlobalAlignmentMatricesContainer(HashMap<String, GlobalAlignmentMatrix> globalAlignments) {
@@ -60,6 +62,14 @@ public class WebServer {
 
     public void setLocalAlignmentMatricesContainer(HashMap<String, LocalAlignmentMatrix> localAlignments) {
         this.localAlignments = localAlignments;
+    }
+
+    public void setSequenceAlignmentQueue(HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue) {
+        this.sequenceAlignmentQueue = sequenceAlignmentQueue;
+    }
+
+    public void setSequenceAlignments(HashMap<String, SequenceAlignments> sequenceAlignments) {
+        this.sequenceAlignments = sequenceAlignments;
     }
 
     public void run() {
@@ -138,6 +148,37 @@ public class WebServer {
             System.err.printf("Send matrix %d\n", statusCode);
             return "Added score to Cost Matrix \"" + request.params(":matrix_name") + "\".";
         });
+        // Register an alignment queue
+        get("/register/alignment_queue/:queue_name/:cost_matrix_name/:alignment_mode", (request, response) -> {
+            if ( sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
+                response.status(409);
+                return "Queue \"" + request.params(":queue_name") + "\" already registered.";
+            }
+            int statusCode = registerSequenceAlignmentQueue(request.params(":queue_name"),
+                    request.params(":cost_matrix_name"), request.params(":alignment_mode"));
+            response.status(statusCode);
+            return "Queue \"" + request.params(":queue_name") + "\" registered.";
+        });
+        // Add a sequence to the alignment queue
+        post("/send/sequence/:length/toqueue/:queue_name", (request, response) -> {
+            if ( !sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
+                response.status(404);
+                return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
+            }
+            int statusCode = sendSequence(Integer.parseInt(request.params(":length")), request.params(":queue_name"),
+                    request.body());
+            response.status(statusCode);
+            return "Added sequence to queue.";
+        });
+        get("/receive/score_matrix/:queue_name", (request, response) -> {
+            if ( !sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
+                response.status(404);
+                return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
+            }
+            String scoreMatrix = receiveScoreMatrix(request.params(":queue_name"));
+            response.status(200);
+            return scoreMatrix;
+        });
         // Request to align two profiles
         get("/align/:profile_one/:profile_two/:cost_matrix/:start_gap/:extend_gap/:mode", (request, response) -> {
             if ( !profiles.containsKey(request.params(":profile_one"))
@@ -151,7 +192,7 @@ public class WebServer {
             }
             EasyInterface aligner = new EasyInterface();
             if ( request.params(":mode").compareTo("global") == 0) {
-                alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
+                profileAlignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
                                 costs.get(request.params(":cost_matrix")),
@@ -159,7 +200,7 @@ public class WebServer {
                                 Float.parseFloat(request.params(":extend_gap")),
                                 AlignmentMode.GLOBAL));
             } else if ( request.params(":mode").compareTo("local") == 0 ) {
-                alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
+                profileAlignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
                                 costs.get(request.params(":cost_matrix")),
@@ -167,7 +208,7 @@ public class WebServer {
                                 Float.parseFloat(request.params(":extend_gap")),
                                 AlignmentMode.LOCAL));
             } else if ( request.params(":mode").compareTo("semiglobal") == 0 ) {
-                alignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
+                profileAlignments.put(request.params(":profile_one") + "_" + request.params(":profile_two"),
                         aligner.computeAlignment(profiles.get(request.params(":profile_one")),
                                 profiles.get(request.params(":profile_two")),
                                 costs.get(request.params(":cost_matrix")),
@@ -183,25 +224,25 @@ public class WebServer {
         });
         // Retrieve the score associated with the alignment of two profiles
         get("/retrieve/score/:profile_one/:profile_two", ((request, response) -> {
-            if ( !alignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
+            if ( !profileAlignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
                 response.status(404);
                 return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
                         + " does not exist.";
             } else {
                 response.status(200);
-                return alignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).getScore();
+                return profileAlignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).getScore();
             }
         }));
         // Retrieve the alignment steps of two profiles
         get("/retrieve/steps/:profile_one/:profile_two", ((request, response) -> {
-            if ( !alignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
+            if ( !profileAlignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
                 response.status(404);
                 return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
                         + " does not exist.";
             } else {
                 response.status(200);
 
-                return alignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).toString();
+                return profileAlignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).toString();
             }
         }));
         // Send a global alignment matrix
@@ -330,6 +371,21 @@ public class WebServer {
         return processRegister(id, length, "costs", costs);
     }
 
+    private int registerSequenceAlignmentQueue(String name, String costMatrix, String alignmentMode) {
+        SequenceAlignmentQueue queue;
+
+        if (alignmentMode.compareTo("global") == 0 ) {
+            queue = new SequenceAlignmentQueue(name, AlignmentMode.GLOBAL);
+        } else if ( alignmentMode.compareTo("local") == 0 ) {
+            queue = new SequenceAlignmentQueue(name, AlignmentMode.LOCAL);
+        } else {
+            queue = new SequenceAlignmentQueue(name, AlignmentMode.SEMIGLOBAL);
+        }
+        queue.setCostMatrices(costs.get(costMatrix));
+        sequenceAlignmentQueue.put(name, queue);
+        return 201;
+    }
+
     // Receive data structures
     private int processSend(String name, int position, int rows, int columns, String values, String lockName,
                             HashMap<String, Matrix2DF []> data) {
@@ -354,5 +410,27 @@ public class WebServer {
 
     private int processSendCostMatrix(String matrixID, int scoreNumber, int scoreSize, String score) {
         return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, "costs", costs);
+    }
+
+    private int sendSequence(int length, String queue, String body) {
+        String [] items = body.split(" ");
+        int [][] sequence = new int [items.length / length][length];
+
+
+        for ( int row = 0; row < items.length / length; row++ ) {
+            for ( int column = 0; column < length; column++ ) {
+                sequence[row][column] = Integer.parseInt(items[(row * length) + column]);
+            }
+        }
+        synchronized ( locks.get("sequence_alignments") ) {
+            sequenceAlignmentQueue.get(queue).addElement(sequence);
+            locks.get("sequence_alignments").notifyAll();
+        }
+        return 201;
+    }
+
+    // Receive
+    private String receiveScoreMatrix(String queue) {
+        return sequenceAlignments.get(queue).toString();
     }
 }

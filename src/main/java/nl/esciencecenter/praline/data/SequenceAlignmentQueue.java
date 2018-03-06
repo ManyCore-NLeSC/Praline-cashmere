@@ -36,4 +36,8 @@ public class SequenceAlignmentQueue {
     public List<int [][]> getPreviousElements() {
         return queue.subList(0, queue.size() - 1);
     }
+
+    public int [][] getLastElement() {
+        return queue.get(queue.size() - 1);
+    }
 }

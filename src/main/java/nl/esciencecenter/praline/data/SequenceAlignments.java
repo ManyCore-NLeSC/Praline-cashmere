@@ -25,7 +25,7 @@ public class SequenceAlignments {
         for ( int row = 0; row < matrix.size(); row++ ) {
             for ( int column = 0; column < matrix.size(); column++ ) {
                 stringBuilder.append(matrix.get(row).get(column));
-                stringBuilder.append(" ");
+                if(!(row == matrix.size() - 1 && column == matrix.size() - 1)) stringBuilder.append(" ");
             }
         }
         return stringBuilder.toString();

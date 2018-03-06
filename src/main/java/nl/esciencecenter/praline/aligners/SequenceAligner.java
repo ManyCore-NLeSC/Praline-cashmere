@@ -29,24 +29,23 @@ public class SequenceAligner extends Thread {
     @Override
     public void run() {
         synchronized ( locks.get("sequence_alignments") ) {
-            try {
-                locks.get("sequence_alignments").wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             int [][] sequence = sequenceAlignmentQueue.get(name).getLastElement();
             ArrayList<int [][]> targetSequences = new ArrayList<int[][]>(
                     (sequenceAlignmentQueue.get(name).getPreviousElements()));
+            sequenceAlignments.get(name).addElement(targetSequences.size(), targetSequences.size(), 0f);
             for ( int targetSequence = 0; targetSequence < targetSequences.size(); targetSequence++ ) {
-                Float cost = affineAlignCost.alignCost(sequence.length, sequence.length,
+                int[][] seqB = targetSequences.get(targetSequence);
+                Float cost = affineAlignCost.alignCost(sequence.length, seqB.length,
                         sequenceAlignmentQueue.get(name).getAffineGapCost(),
                         sequenceAlignmentQueue.get(name).getAffineGapCost(), EasyCostMatrixInterface.getPosCost(
-                                sequence, targetSequences.get(targetSequence),
+                                sequence, seqB,
                                 sequenceAlignmentQueue.get(name).getCostMatrices()),
                         sequenceAlignmentQueue.get(name).getAlignmentMode());
-                sequenceAlignments.get("name").addElement(targetSequences.size(), targetSequence, cost);
-                sequenceAlignments.get("name").addElement(targetSequence, targetSequences.size(), cost);
+                sequenceAlignments.get(name).addElement(targetSequences.size(), targetSequence, cost);
+                sequenceAlignments.get(name).addElement(targetSequence, targetSequences.size(), cost);
             }
+            locks.get("sequence_alignments").notifyAll();
+            System.err.println("DONE!");
         }
     }
 }

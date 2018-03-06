@@ -5,8 +5,18 @@ import java.util.HashMap;
 public class SequenceAlignments {
     private HashMap<Integer, HashMap<Integer, Float>> matrix;
 
+    public SequenceAlignments() {
+        this.matrix = new HashMap<>();
+    }
+
     public void addElement(Integer sequenceOne, Integer sequenceTwo, Float score) {
-        matrix.get(sequenceOne).put(sequenceTwo, score);
+        if ( matrix.containsKey(sequenceOne) ) {
+            matrix.get(sequenceOne).put(sequenceTwo, score);
+        } else {
+            HashMap<Integer, Float> pair = new HashMap<>();
+            pair.put(sequenceTwo, score);
+            matrix.put(sequenceOne, pair);
+        }
     }
 
     public String toString() {

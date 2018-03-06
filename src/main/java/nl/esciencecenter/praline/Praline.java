@@ -44,7 +44,7 @@ public class Praline {
         server.setSequenceAlignments(sequenceAlignments);
         server.run();
 
-        // While until termination
+        // Wait until termination
         synchronized ( locks.get("termination") ) {
             locks.get("termination").wait();
         }

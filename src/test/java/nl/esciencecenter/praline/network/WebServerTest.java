@@ -40,7 +40,7 @@
 //        server.setLocks(locks);
 //        server.setSequencesContainer(sequences);
 //        server.setAlphabetsContainer(alphabets);
-//        server.setScoreMatricesContainer(scoreMatrices);
+//        server.setCosts(scoreMatrices);
 //        server.setGlobalAlignmentMatricesContainer(globalAlignments);
 //        server.setLocalAlignmentMatricesContaines(localAlignments);
 //        server.run();

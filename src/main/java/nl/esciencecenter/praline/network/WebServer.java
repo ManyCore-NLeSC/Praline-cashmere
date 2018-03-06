@@ -138,7 +138,7 @@ public class WebServer {
         }));
         // Add a score to the cost matrix
         post("/send/cost_matrix/:matrix_name/:score_number/:score_size", (request, response) -> {
-            System.err.printf("Start!");
+
             if ( !costs.containsKey(request.params(":matrix_name")) ) {
                response.status(404);
                String s = "Cost Matrix \"" + request.params(":matrix_name") + "\" does not exist.";
@@ -167,6 +167,7 @@ public class WebServer {
         });
         // Add a sequence to the alignment queue
         post("/send/sequence/:length/toqueue/:queue_name", (request, response) -> {
+            System.out.printf("Gotten one\n");
             if ( !sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
                 response.status(404);
                 return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
@@ -177,6 +178,7 @@ public class WebServer {
             return "Added sequence to queue.";
         });
         get("/receive/score_matrix/:queue_name", (request, response) -> {
+
             if ( !sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
                 response.status(404);
                 return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
@@ -394,6 +396,7 @@ public class WebServer {
         queue.setCostMatrices(costs.get(costMatrix));
         queue.setGapCost(costStartGap, costExtendGap);
         sequenceAlignmentQueue.put(name, queue);
+        sequenceAlignments.put(name,new SequenceAlignments());
         return 201;
     }
 

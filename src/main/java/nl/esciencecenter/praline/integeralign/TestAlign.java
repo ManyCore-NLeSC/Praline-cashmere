@@ -196,7 +196,7 @@ public class TestAlign {
     public static void main(String[] argv){
         //testAligner(new ReferenceO3Aligner(), new ReferenceO3Aligner(), new LinearGapCost(-1), new LinearGapCost(-1.1f), 4,100, 10000);
         // IAlign aling = new FastLinearSpaceAligner(100,100);
-       testAligner(new ReferenceO3Aligner(), new AffineAlignCost(), new AffineGapCost(-2f, -1f),
+       testAligner(new AffineAlign(), new AffineAlignCost(), new AffineGapCost(-2f, -1f),
                new AffineGapCost(-3f,-2f), 1,500, 1000000);
        // test();
         //testAligner(new LinearAligner(), new AffineAlign(), new LinearGapCost(-1), new LinearGapCost(-2),3, 5000,30000);

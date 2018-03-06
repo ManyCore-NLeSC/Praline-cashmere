@@ -35,8 +35,8 @@ public class SequenceAligner extends Thread {
                 e.printStackTrace();
             }
             int [][] sequence = sequenceAlignmentQueue.get(name).getLastElement();
-            ArrayList<int [][]> targetSequences = (ArrayList<int[][]>)
-                    (sequenceAlignmentQueue.get(name).getPreviousElements());
+            ArrayList<int [][]> targetSequences = new ArrayList<int[][]>(
+                    (sequenceAlignmentQueue.get(name).getPreviousElements()));
             for ( int targetSequence = 0; targetSequence < targetSequences.size(); targetSequence++ ) {
                 Float cost = affineAlignCost.alignCost(sequence.length, sequence.length,
                         sequenceAlignmentQueue.get(name).getAffineGapCost(),

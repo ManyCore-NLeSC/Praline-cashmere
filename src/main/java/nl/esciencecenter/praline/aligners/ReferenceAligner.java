@@ -1,17 +1,9 @@
-package nl.esciencecenter.praline.integeralign.aligners;
+package nl.esciencecenter.praline.aligners;
 
-import nl.esciencecenter.praline.integeralign.AlignStep;
-import nl.esciencecenter.praline.integeralign.Alignment;
-import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.data.Matrix2DI;
-import nl.esciencecenter.praline.data.Move;
-import nl.esciencecenter.praline.integeralign.AlignResult;
-import nl.esciencecenter.praline.data.AlignmentMode;
-import nl.esciencecenter.praline.integeralign.gapcost.IGapCost;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
-import nl.esciencecenter.praline.data.Coordinate;
+import nl.esciencecenter.praline.data.*;
+import nl.esciencecenter.praline.gapcost.IGapCost;
+import nl.esciencecenter.praline.positioncost.IPositionCost;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -26,14 +18,14 @@ public class ReferenceAligner implements IAlign {
         int bestCol = 0;
         float bestScore = 0;
         cost.set(0,0,0);
-        traceback.set(0,0, Move.NIL.ordinal());
+        traceback.set(0,0, AlignStep.NIL.ordinal());
         for(int row = 1 ; row < sizeB + 1 ; row++){
             cost.set(row,0, gapCostA.getGapCost(row));
-            traceback.set(row,0, Move.TOP.ordinal());
+            traceback.set(row,0, AlignStep.GAPA.ordinal());
         }
         for(int col = 1 ; col < sizeA + 1 ; col++){
             cost.set(0,col, gapCostB.getGapCost(col));
-            traceback.set(0,col, Move.LEFT.ordinal());
+            traceback.set(0,col, AlignStep.GAPB.ordinal());
         }
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
@@ -53,19 +45,19 @@ public class ReferenceAligner implements IAlign {
 
                 float score = match;
 
-                Move move = Move.TOP_LEFT;
+                AlignStep move = AlignStep.ALIGN;
 
                 if(gapA >= score){
                     score = gapA;
-                    move = Move.TOP;
+                    move = AlignStep.GAPA;
                 }
 
                 if(gapB >= score){
                     score = gapB;
-                    move = Move.LEFT;
+                    move = AlignStep.GAPB;
                 }
                 if(mode == AlignmentMode.LOCAL && score <= 0){
-                    move = Move.NIL;
+                    move = AlignStep.NIL;
                     score = 0;
                 }
 
@@ -84,7 +76,7 @@ public class ReferenceAligner implements IAlign {
         }
 
 
-        Alignment align;
+        List<Coordinate> align;
         float endScore;
         switch (mode) {
             case LOCAL:
@@ -116,45 +108,39 @@ public class ReferenceAligner implements IAlign {
         return new AlignResult(endScore,align);
     }
 
-    public static Alignment getTraceback(Matrix2DI traceback, int rowstart, int colstart) {
-        Stack<Move> trace = new Stack<>();
+    public static List<Coordinate> getTraceback(Matrix2DI traceback, int rowstart, int colstart) {
+        Stack<Coordinate> trace = new Stack<>();
         int rowi = rowstart;
         int coli = colstart;
-        Move got;
+        trace.push(new Coordinate(rowi,coli));
+        AlignStep got;
 
-        while((got = Move.values()[traceback.get(rowi,coli)]) != Move.NIL) {
-            trace.push(got);
+        while((got = AlignStep.values()[traceback.get(rowi,coli)]) != AlignStep.NIL) {
             switch (got) {
-                case TOP:
+                case GAPA:
                     rowi--;
                     break;
-                case TOP_LEFT:
+                case ALIGN:
                     rowi--;
                     coli--;
                     break;
-                case LEFT:
+                case GAPB:
                     coli--;
                     break;
             }
+            trace.push(new Coordinate(rowi,coli));
         }
-        List<AlignStep> steps =  moveToAlignSteps(trace);
-        return new Alignment(new Coordinate(rowi,coli), steps);
+        return reverse(trace);
 
     }
 
-    public static List<AlignStep> moveToAlignSteps(Stack<Move> trace) {
-        LinkedList<AlignStep> res = new LinkedList<>();
-        while(!trace.isEmpty()){
-            AlignStep ns;
-            switch(trace.pop()){
-                case TOP_LEFT: ns = AlignStep.ALIGN; break;
-                case TOP: ns = AlignStep.GAPA; break;
-                case LEFT: default: ns = AlignStep.GAPB; break;
-            }
-//            System.out.println(ns);
-            res.add(ns);
-        }
 
+    static Stack<Coordinate> reverse(Stack<Coordinate> e){
+        Stack<Coordinate> res = new Stack<>();
+        while(!e.isEmpty()){
+            res.push(e.pop());
+        }
         return res;
     }
+
 }

@@ -1,6 +1,4 @@
-package nl.esciencecenter.praline.integeralign;
-
-import nl.esciencecenter.praline.data.Coordinate;
+package nl.esciencecenter.praline.data;
 
 import java.util.List;
 

@@ -1,18 +1,19 @@
-package nl.esciencecenter.praline.integeralign;
+package nl.esciencecenter.praline.network;
 
+import nl.esciencecenter.praline.data.AlignResult;
 import nl.esciencecenter.praline.data.AlignmentMode;
 import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.integeralign.aligners.AffineGapAligner;
-import nl.esciencecenter.praline.integeralign.gapcost.AffineGapCost;
-import nl.esciencecenter.praline.integeralign.gapcost.IGapCost;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
-import nl.esciencecenter.praline.integeralign.positioncost.MotifProfilePositionCost;
+import nl.esciencecenter.praline.aligners.AffineGapAligner;
+import nl.esciencecenter.praline.gapcost.AffineGapCost;
+import nl.esciencecenter.praline.gapcost.IGapCost;
+import nl.esciencecenter.praline.positioncost.IPositionCost;
+import nl.esciencecenter.praline.positioncost.MotifProfilePositionCost;
 
-public class EasyInterface {
+public class AffineMotifProfileAlignInterface {
 
-    public AlignResultSteps computeAlignment(Matrix2DF[] profileA, Matrix2DF[] profileB,
-                                 Matrix2DF[] costMatrix,
-                                 float costStartGap, float costExtendGap, AlignmentMode mode){
+    public AlignResult computeAlignment(Matrix2DF[] profileA, Matrix2DF[] profileB,
+                                        Matrix2DF[] costMatrix,
+                                        float costStartGap, float costExtendGap, AlignmentMode mode){
         assert profileA.length == profileB.length && profileB.length == costMatrix.length;
         for(int i = 0 ; i < profileA.length; i++){
             System.out.println(i);
@@ -30,7 +31,6 @@ public class EasyInterface {
         int blength = profileB[0].nrRows;
         IGapCost gapA = new AffineGapCost(costStartGap, costExtendGap);
         IPositionCost posCost = new MotifProfilePositionCost(profileA,profileB,costMatrix);
-        AlignResult res = new AffineGapAligner().align(alength, blength, gapA, gapA, posCost, mode);
-        return new AlignResultSteps(res);
+        return new AffineGapAligner().align(alength, blength, gapA, gapA, posCost, mode);
     }
 }

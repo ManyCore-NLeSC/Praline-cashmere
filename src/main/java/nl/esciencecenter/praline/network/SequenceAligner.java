@@ -1,7 +1,7 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.integeralign.aligners.AffineGapAlignerCostOnly;
-import nl.esciencecenter.praline.integeralign.positioncost.PositionCostFromCostMatrices;
+import nl.esciencecenter.praline.aligners.AffineGapAlignerCostOnly;
+import nl.esciencecenter.praline.positioncost.PositionCostFromCostMatrices;
 
 import java.util.List;
 

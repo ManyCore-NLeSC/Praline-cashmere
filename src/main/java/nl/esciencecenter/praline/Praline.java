@@ -1,14 +1,7 @@
 package nl.esciencecenter.praline;
 
 import com.beust.jcommander.JCommander;
-import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.network.SequenceAlignmentQueue;
-import nl.esciencecenter.praline.network.SequenceAlignmentResults;
-import nl.esciencecenter.praline.integeralign.AlignResultSteps;
 import nl.esciencecenter.praline.network.WebServer;
-
-import java.util.HashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Praline {
 

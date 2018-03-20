@@ -1,7 +1,6 @@
-package nl.esciencecenter.praline.integeralign.positioncost;
+package nl.esciencecenter.praline.positioncost;
 
 import nl.esciencecenter.praline.data.Matrix2DI;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
 
 public class MotifPositionCost implements IPositionCost {
     final Matrix2DI a,b;

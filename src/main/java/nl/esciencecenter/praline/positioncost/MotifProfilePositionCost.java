@@ -1,4 +1,4 @@
-package nl.esciencecenter.praline.integeralign.positioncost;
+package nl.esciencecenter.praline.positioncost;
 
 import nl.esciencecenter.praline.data.Matrix2DF;
 

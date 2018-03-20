@@ -1,16 +1,13 @@
-package nl.esciencecenter.praline.integeralign.aligners;
+package nl.esciencecenter.praline.aligners;
 
-import nl.esciencecenter.praline.integeralign.Alignment;
-import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.data.Matrix2DI;
-import nl.esciencecenter.praline.data.Move;
-import nl.esciencecenter.praline.integeralign.AlignResult;
-import nl.esciencecenter.praline.data.AlignmentMode;
-import nl.esciencecenter.praline.integeralign.gapcost.IGapCost;
-import nl.esciencecenter.praline.integeralign.gapcost.LinearGapCost;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
+import nl.esciencecenter.praline.data.*;
+import nl.esciencecenter.praline.gapcost.IGapCost;
+import nl.esciencecenter.praline.gapcost.LinearGapCost;
+import nl.esciencecenter.praline.positioncost.IPositionCost;
 
-import static nl.esciencecenter.praline.integeralign.aligners.ReferenceAligner.*;
+import java.util.List;
+
+import static nl.esciencecenter.praline.aligners.ReferenceAligner.*;
 public class LinearGapAligner implements IAlign {
 
     @Override
@@ -20,17 +17,17 @@ public class LinearGapAligner implements IAlign {
         Matrix2DF cost = new Matrix2DF(sizeB+1,sizeA+1);
         Matrix2DI traceback = new Matrix2DI(sizeB+1, sizeA+1);
         cost.set(0,0,0);
-        traceback.set(0,0, Move.NIL.ordinal());
+        traceback.set(0,0, AlignStep.NIL.ordinal());
         int bestRow = 0;
         int bestCol = 0;
         float bestScore = 0;
         for(int row = 1 ; row < sizeB + 1 ; row++){
             cost.set(row,0,gapCostA * row);
-            traceback.set(row,0, Move.TOP.ordinal());
+            traceback.set(row,0, AlignStep.GAPA.ordinal());
         }
         for(int col = 1 ; col < sizeA + 1 ; col++){
             cost.set(0,col, gapCostB * col);
-            traceback.set(0,col, Move.LEFT.ordinal());
+            traceback.set(0,col, AlignStep.GAPB.ordinal());
         }
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
@@ -42,20 +39,20 @@ public class LinearGapAligner implements IAlign {
 
                 float score = match;
 
-                Move move = Move.TOP_LEFT;
+                AlignStep move = AlignStep.ALIGN;
 
                 if(gapA > score){
                     score = gapA;
-                    move = Move.TOP;
+                    move = AlignStep.GAPA;
                 }
 
                 if(gapB > score){
                     score = gapB;
-                    move = Move.LEFT;
+                    move = AlignStep.GAPB;
                 }
 
                 if(mode == AlignmentMode.LOCAL && score <= 0){
-                    move = Move.NIL;
+                    move = AlignStep.NIL;
                     score = 0;
                 }
 
@@ -71,7 +68,7 @@ public class LinearGapAligner implements IAlign {
             }
 
         }
-        Alignment align;
+        List<Coordinate> align;
         float endScore;
         switch (mode) {
             case LOCAL:

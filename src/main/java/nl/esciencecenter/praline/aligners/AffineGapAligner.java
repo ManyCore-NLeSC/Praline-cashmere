@@ -1,18 +1,13 @@
-package nl.esciencecenter.praline.integeralign.aligners;
+package nl.esciencecenter.praline.aligners;
 
 
-import nl.esciencecenter.praline.integeralign.AlignStep;
-import nl.esciencecenter.praline.integeralign.Alignment;
-import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.data.Matrix2DI;
-import nl.esciencecenter.praline.integeralign.AlignResult;
-import nl.esciencecenter.praline.data.AlignmentMode;
-import nl.esciencecenter.praline.integeralign.gapcost.AffineGapCost;
-import nl.esciencecenter.praline.integeralign.gapcost.IGapCost;
-import nl.esciencecenter.praline.integeralign.gapcost.LinearGapCost;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
-import nl.esciencecenter.praline.data.Coordinate;
+import nl.esciencecenter.praline.data.*;
+import nl.esciencecenter.praline.gapcost.AffineGapCost;
+import nl.esciencecenter.praline.gapcost.IGapCost;
+import nl.esciencecenter.praline.gapcost.LinearGapCost;
+import nl.esciencecenter.praline.positioncost.IPositionCost;
 
+import java.util.List;
 import java.util.Stack;
 
 public class AffineGapAligner implements IAlign {
@@ -114,7 +109,7 @@ public class AffineGapAligner implements IAlign {
 //        System.out.println();
 
 
-        Alignment align;
+        List<Coordinate> align;
         float endScore;
         switch (mode) {
             case LOCAL:
@@ -146,11 +141,14 @@ public class AffineGapAligner implements IAlign {
         return new AlignResult(endScore,align);
     }
 //
-    static Alignment getTraceback(Matrix2DI traceback, int rowstart, int colstart) {
-        Stack<AlignStep> res = new Stack<>();
+    static List<Coordinate> getTraceback(Matrix2DI traceback, int rowstart, int colstart) {
         int rowi = rowstart;
         int coli = colstart;
+        Stack<Coordinate> res = new Stack<>();
+        res.add(new Coordinate(rowi,coli));
+
         AlignStep lastStep = AlignStep.NIL;
+
         int trace;
         while((trace = traceback.get(rowi,coli)) != 0){
             AlignStep newStep;
@@ -172,23 +170,14 @@ public class AffineGapAligner implements IAlign {
                     coli--;
                 }
             }
-
-//            System.out.println(newStep);
-            res.push(newStep);
+            res.add(new Coordinate(rowi,coli));
             lastStep = newStep;
 
         }
-        Stack<AlignStep> steps =  reverse(res);
-        return new Alignment(new Coordinate(rowi,coli),steps);
+        Stack<Coordinate> steps =  ReferenceAligner.reverse(res);
+        return steps;
 
     }
 
-    static Stack<AlignStep> reverse(Stack<AlignStep> e){
-        Stack<AlignStep> res = new Stack<>();
-        while(!e.isEmpty()){
-            res.push(e.pop());
-        }
-        return res;
-    }
 
 }

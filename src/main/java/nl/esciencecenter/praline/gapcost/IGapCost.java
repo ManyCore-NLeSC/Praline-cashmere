@@ -1,4 +1,4 @@
-package nl.esciencecenter.praline.integeralign.gapcost;
+package nl.esciencecenter.praline.gapcost;
 
 
 public interface IGapCost {

@@ -1,12 +1,10 @@
 package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.*;
-import nl.esciencecenter.praline.integeralign.AlignResultSteps;
+import nl.esciencecenter.praline.data.AlignResult;
 import nl.esciencecenter.praline.data.AlignmentMode;
-import nl.esciencecenter.praline.integeralign.EasyInterface;
 
 import java.util.HashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static spark.Spark.*;
 
@@ -15,7 +13,7 @@ public class WebServer {
     // Global data structures
     private final HashMap<String, Matrix2DF []> costs;
     private final HashMap<String, Matrix2DF []> profiles;
-    private final HashMap<String, AlignResultSteps> profileAlignments;
+    private final HashMap<String, AlignResult> profileAlignments;
     private final HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue;
     public WebServer(int threads) {
         costs = new HashMap<>();
@@ -138,7 +136,7 @@ public class WebServer {
                 response.status(404);
                 return "The cost matrix does not exist.";
             }
-            EasyInterface aligner = new EasyInterface();
+            AffineMotifProfileAlignInterface aligner = new AffineMotifProfileAlignInterface();
             AlignmentMode mode;
             if ( request.params(":mode").equals("global")) {
                 mode = AlignmentMode.GLOBAL;

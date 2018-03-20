@@ -1,7 +1,6 @@
-package nl.esciencecenter.praline.integeralign.positioncost;
+package nl.esciencecenter.praline.positioncost;
 
 import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
 
 public class ProfilePositionCost implements IPositionCost {
 

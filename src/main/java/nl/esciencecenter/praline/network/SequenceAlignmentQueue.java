@@ -1,7 +1,7 @@
 package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.integeralign.gapcost.AffineGapCost;
+import nl.esciencecenter.praline.gapcost.AffineGapCost;
 import nl.esciencecenter.praline.data.AlignmentMode;
 
 import java.util.ArrayList;

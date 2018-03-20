@@ -1,16 +1,12 @@
 package nl.esciencecenter.praline.aligners;
 
+import nl.esciencecenter.praline.data.AlignResult;
 import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.integeralign.AlignResult;
-import nl.esciencecenter.praline.integeralign.AlignStep;
+import nl.esciencecenter.praline.data.AlignStep;
 import nl.esciencecenter.praline.data.AlignmentMode;
-import nl.esciencecenter.praline.integeralign.aligners.AffineGapAligner;
-import nl.esciencecenter.praline.integeralign.aligners.AffineGapAlignerCostOnly;
-import nl.esciencecenter.praline.integeralign.aligners.IAlign;
-import nl.esciencecenter.praline.integeralign.aligners.ReferenceAligner;
-import nl.esciencecenter.praline.integeralign.gapcost.AffineGapCost;
-import nl.esciencecenter.praline.integeralign.gapcost.IGapCost;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
+import nl.esciencecenter.praline.gapcost.AffineGapCost;
+import nl.esciencecenter.praline.gapcost.IGapCost;
+import nl.esciencecenter.praline.positioncost.IPositionCost;
 
 import java.util.Arrays;
 import java.util.List;
@@ -68,26 +64,26 @@ public class TestAlign {
         }
         return res;
     }
-
-    static void test(){
-        int[] a = new int[]{2};
-        int[] b = new int[]{2,2,2,0};
-
-        AlignResult res = new AffineGapAligner().align(a.length,b.length,new AffineGapCost(-2, -1),
-                new AffineGapCost(-3,-2), testPositionCost(a,b), AlignmentMode.GLOBAL);
-        System.out.println();
-        System.out.println();
-        new ReferenceAligner().align(a.length,b.length,new AffineGapCost(-2, -1),
-                new AffineGapCost(-3,-2), testPositionCost(a,b), AlignmentMode.GLOBAL);
-
-//        for(AlignStep x : res.align..steps){
-//            System.out.println(x.name());
-//        }
-//        printAlign("2","2220", res.align);
-//        System.out.printf("%d %d \n",res.score, getAlignScore(res.align,a.length,b.length,new AffineGapCost(-2, -1),
-//                new AffineGapCost(-3,-2), testPositionCost(a,b) ));
-
-    }
+//
+//    static void test(){
+//        int[] a = new int[]{2};
+//        int[] b = new int[]{2,2,2,0};
+//
+//        AlignResult res = new AffineGapAligner().align(a.length,b.length,new AffineGapCost(-2, -1),
+//                new AffineGapCost(-3,-2), testPositionCost(a,b), AlignmentMode.GLOBAL);
+//        System.out.println();
+//        System.out.println();
+//        new ReferenceAligner().align(a.length,b.length,new AffineGapCost(-2, -1),
+//                new AffineGapCost(-3,-2), testPositionCost(a,b), AlignmentMode.GLOBAL);
+//
+////        for(AlignStep x : res.align..steps){
+////            System.out.println(x.name());
+////        }
+////        printAlign("2","2220", res.align);
+////        System.out.printf("%d %d \n",res.score, getAlignScore(res.align,a.length,b.length,new AffineGapCost(-2, -1),
+////                new AffineGapCost(-3,-2), testPositionCost(a,b) ));
+//
+//    }
 
     static final float MAX_DIFF = 0.5f;
 
@@ -122,7 +118,7 @@ public class TestAlign {
 //            }
 
             if(measure){
-                System.out.printf("Took %d ms, reference took %d ms\n", durAlign, durOracle);
+                System.out.printf("reference took %5d ms, align took %5d\n", durOracle,durAlign);
             }
         } catch (Exception e){
             System.out.printf("Wrong answer on: \n A: \n");
@@ -204,8 +200,8 @@ public class TestAlign {
     public static void main(String[] argv){
         //testAligner(new ReferenceAligner(), new ReferenceAligner(), new LinearGapCost(-1), new LinearGapCost(-1.1f), 4,100, 10000);
         // IAlign aling = new NonWorkingLinearGapLinearSpaceAligner(100,100);
-       testAligner(new AffineGapAligner(), new AffineGapAlignerCostOnly(), new AffineGapCost(-2f, -1f),
-               new AffineGapCost(-3f,-2f), 1,500, 1000000);
+       testAligner( new AffineGapAligner(),new AffineGapAlignerCostOnly(), new AffineGapCost(-2f, -1f),
+               new AffineGapCost(-3f,-2f), 5000,5000, 1000000);
        // test();
         //testAligner(new LinearGapAligner(), new AffineGapAligner(), new LinearGapCost(-1), new LinearGapCost(-2),3, 5000,30000);
 //        testAlign(new LinearGapAligner(), new AffineGapAligner(), new LinearGapCost(-1), new LinearGapCost(-2), 10000,10000,true );

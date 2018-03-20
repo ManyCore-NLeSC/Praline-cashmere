@@ -1,13 +1,10 @@
-package nl.esciencecenter.praline.integeralign.aligners;
+package nl.esciencecenter.praline.aligners;
 
-import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.data.Matrix2DI;
-import nl.esciencecenter.praline.integeralign.AlignResult;
-import nl.esciencecenter.praline.data.AlignmentMode;
-import nl.esciencecenter.praline.integeralign.gapcost.AffineGapCost;
-import nl.esciencecenter.praline.integeralign.gapcost.IGapCost;
-import nl.esciencecenter.praline.integeralign.gapcost.LinearGapCost;
-import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
+import nl.esciencecenter.praline.data.*;
+import nl.esciencecenter.praline.gapcost.AffineGapCost;
+import nl.esciencecenter.praline.gapcost.IGapCost;
+import nl.esciencecenter.praline.gapcost.LinearGapCost;
+import nl.esciencecenter.praline.positioncost.IPositionCost;
 
 public class AffineGapAlignerCostOnly implements IAlign {
 

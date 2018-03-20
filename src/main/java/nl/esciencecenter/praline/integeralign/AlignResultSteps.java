@@ -1,8 +1,6 @@
 package nl.esciencecenter.praline.integeralign;
 
-import nl.esciencecenter.praline.aligners.AlignStep;
-import nl.esciencecenter.praline.aligners.Alignment;
-import nl.esciencecenter.praline.newalign.Coordinate;
+import nl.esciencecenter.praline.data.Coordinate;
 
 import java.util.ArrayList;
 import java.util.Iterator;

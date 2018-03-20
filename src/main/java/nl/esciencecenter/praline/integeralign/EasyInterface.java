@@ -1,6 +1,12 @@
 package nl.esciencecenter.praline.integeralign;
 
+import nl.esciencecenter.praline.data.AlignmentMode;
 import nl.esciencecenter.praline.data.Matrix2DF;
+import nl.esciencecenter.praline.integeralign.aligners.AffineGapAligner;
+import nl.esciencecenter.praline.integeralign.gapcost.AffineGapCost;
+import nl.esciencecenter.praline.integeralign.gapcost.IGapCost;
+import nl.esciencecenter.praline.integeralign.positioncost.IPositionCost;
+import nl.esciencecenter.praline.integeralign.positioncost.MotifProfilePositionCost;
 
 public class EasyInterface {
 
@@ -24,7 +30,7 @@ public class EasyInterface {
         int blength = profileB[0].nrRows;
         IGapCost gapA = new AffineGapCost(costStartGap, costExtendGap);
         IPositionCost posCost = new MotifProfilePositionCost(profileA,profileB,costMatrix);
-        AlignResult res = new AffineAlign().align(alength, blength, gapA, gapA, posCost, mode);
+        AlignResult res = new AffineGapAligner().align(alength, blength, gapA, gapA, posCost, mode);
         return new AlignResultSteps(res);
     }
 }

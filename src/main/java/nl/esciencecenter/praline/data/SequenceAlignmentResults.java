@@ -2,10 +2,10 @@ package nl.esciencecenter.praline.data;
 
 import java.util.HashMap;
 
-public class SequenceAlignments {
+public class SequenceAlignmentResults {
     private HashMap<Integer, HashMap<Integer, Float>> matrix;
 
-    public SequenceAlignments() {
+    public SequenceAlignmentResults() {
         this.matrix = new HashMap<>();
     }
 

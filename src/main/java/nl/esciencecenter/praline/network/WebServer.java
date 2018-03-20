@@ -12,8 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import static spark.Spark.*;
 
 public class WebServer {
-    // Local data structures
-    HashMap<Integer, SequenceAligner> sequenceAligners;
+
     // Global data structures
     private HashMap<String, ReentrantLock> locks;
     private HashMap<String, Sequence> sequences;
@@ -24,12 +23,10 @@ public class WebServer {
     private HashMap<String, GlobalAlignmentMatrix> globalAlignments;
     private HashMap<String, LocalAlignmentMatrix> localAlignments;
     private HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue;
-    private HashMap<String, SequenceAlignments> sequenceAlignments;
-
     public WebServer(int threads) {
-        sequenceAligners = new HashMap<>();
         threadPool(threads);
         init();
+        this.sequenceAlignmentQueue = new HashMap<>();
     }
 
     public void close() {
@@ -68,13 +65,7 @@ public class WebServer {
         this.localAlignments = localAlignments;
     }
 
-    public void setSequenceAlignmentQueue(HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue) {
-        this.sequenceAlignmentQueue = sequenceAlignmentQueue;
-    }
 
-    public void setSequenceAlignments(HashMap<String, SequenceAlignments> sequenceAlignments) {
-        this.sequenceAlignments = sequenceAlignments;
-    }
 
     public void run() {
         awaitInitialization();
@@ -167,7 +158,6 @@ public class WebServer {
         });
         // Add a sequence to the alignment queue
         post("/send/sequence/:length/toqueue/:queue_name", (request, response) -> {
-            System.out.printf("Gotten one\n");
             if ( !sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
                 response.status(404);
                 return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
@@ -178,17 +168,18 @@ public class WebServer {
             return "Added sequence to queue.";
         });
         get("/receive/score_matrix/:queue_name", (request, response) -> {
-
-            if ( !sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
+            String queueName= request.params(":queue_name");
+            if ( !sequenceAlignmentQueue.containsKey(queueName) ) {
                 response.status(404);
                 return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
             }
-            for ( SequenceAligner aligner : sequenceAligners.values() ) {
-                aligner.join();
-            }
-            String scoreMatrix = receiveScoreMatrix(request.params(":queue_name"));
+            SequenceAlignmentQueue queue;
+            synchronized (sequenceAlignmentQueue){
+                queue  = sequenceAlignmentQueue.get(queueName);
 
-            System.out.println(scoreMatrix);
+            }
+            queue.waitForResult();
+            String scoreMatrix = queue.getScoreMatrixString();
             response.status(200);
             return scoreMatrix;
         });
@@ -387,18 +378,19 @@ public class WebServer {
     private int registerSequenceAlignmentQueue(String name, String costMatrix, String alignmentMode,
                                                Float costStartGap, Float costExtendGap) {
         SequenceAlignmentQueue queue;
-
-        if (alignmentMode.compareTo("global") == 0 ) {
-            queue = new SequenceAlignmentQueue(AlignmentMode.GLOBAL);
-        } else if ( alignmentMode.compareTo("local") == 0 ) {
-            queue = new SequenceAlignmentQueue(AlignmentMode.LOCAL);
+        AlignmentMode mode;
+        if (alignmentMode.equals("global") ) {
+            mode = AlignmentMode.GLOBAL;
+        } else if ( alignmentMode.equals("local") ) {
+            mode = AlignmentMode.LOCAL;
         } else {
-            queue = new SequenceAlignmentQueue(AlignmentMode.SEMIGLOBAL);
+            mode = AlignmentMode.SEMIGLOBAL;
         }
-        queue.setCostMatrices(costs.get(costMatrix));
-        queue.setGapCost(costStartGap, costExtendGap);
-        sequenceAlignmentQueue.put(name, queue);
-        sequenceAlignments.put(name,new SequenceAlignments());
+        queue = new SequenceAlignmentQueue(mode, costs.get(costMatrix),costStartGap, costExtendGap);
+        synchronized(sequenceAlignmentQueue){
+            sequenceAlignmentQueue.put(name, queue);
+        }
+
         return 201;
     }
 
@@ -428,8 +420,7 @@ public class WebServer {
         return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score, "costs", costs);
     }
 
-    private int sendSequence(int length, String queue, String body) {
-        int sequenceID;
+    private int sendSequence(int length, String queueName, String body) {
         String [] items = body.split(" ");
         int [][] sequence = new int [items.length / length][length];
 
@@ -439,18 +430,15 @@ public class WebServer {
                 sequence[row][column] = Integer.parseInt(items[(row * length) + column]);
             }
         }
-        synchronized ( locks.get("sequence_alignments") ) {
-            sequenceID = sequenceAlignmentQueue.get(queue).addElement(sequence);
-            sequenceAligners.put(sequenceID, new SequenceAligner(queue, locks, sequenceAlignmentQueue,
-                    sequenceAlignments));
-            locks.get("sequence_alignments").notifyAll();
+        synchronized ( sequenceAlignmentQueue) {
+            SequenceAlignmentQueue queue = sequenceAlignmentQueue.get(queueName);
+
+            queue.addElement(sequence);
         }
-        sequenceAligners.get(sequenceID).start();
+
         return 201;
     }
 
     // Receive
-    private String receiveScoreMatrix(String queue) {
-        return sequenceAlignments.get(queue).toString();
-    }
+
 }

@@ -201,7 +201,7 @@ public class TestAlign {
         //testAligner(new ReferenceAligner(), new ReferenceAligner(), new LinearGapCost(-1), new LinearGapCost(-1.1f), 4,100, 10000);
         // IAlign aling = new NonWorkingLinearGapLinearSpaceAligner(100,100);
        testAligner( new AffineGapAligner(),new AffineGapAlignerCostOnly(), new AffineGapCost(-2f, -1f),
-               new AffineGapCost(-3f,-2f), 5000,5000, 1000000);
+               new AffineGapCost(-3f,-2f), 10000,10000, 1000000);
        // test();
         //testAligner(new LinearGapAligner(), new AffineGapAligner(), new LinearGapCost(-1), new LinearGapCost(-2),3, 5000,30000);
 //        testAlign(new LinearGapAligner(), new AffineGapAligner(), new LinearGapCost(-1), new LinearGapCost(-2), 10000,10000,true );

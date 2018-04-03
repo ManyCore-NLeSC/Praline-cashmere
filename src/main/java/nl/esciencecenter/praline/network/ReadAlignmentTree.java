@@ -6,7 +6,7 @@ import java.util.Vector;
 
 public class ReadAlignmentTree {
 
-    AlignmentTree readTree(int nrLeafs, String s){
+    public static AlignmentTree readTree(int nrLeafs, String s){
         Vector<AlignmentTree> treeArr = new Vector<>();
         for(int i = 0 ; i < nrLeafs; i++){
             treeArr.add(new AlignmentTree(i));

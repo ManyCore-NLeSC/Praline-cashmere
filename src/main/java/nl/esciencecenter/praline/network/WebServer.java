@@ -15,11 +15,14 @@ public class WebServer {
     private final HashMap<String, Matrix2DF []> profiles;
     private final HashMap<String, AlignResult> profileAlignments;
     private final HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue;
+    private final HashMap<String, AlignmentTree> treeQueue;
+
     public WebServer(int threads) {
         costs = new HashMap<>();
         profiles = new HashMap<>();
         profileAlignments = new HashMap<>();
         sequenceAlignmentQueue = new HashMap<>();
+        treeQueue = new HashMap<>();
         threadPool(threads);
         init();
     }
@@ -87,7 +90,7 @@ public class WebServer {
         });
         // Register an alignment queue
         get("/register/alignment_queue/:queue_name/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
-                (request, response) -> {
+            (request, response) -> {
             if ( sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
                 response.status(409);
                 return "Queue \"" + request.params(":queue_name") + "\" already registered.";
@@ -181,6 +184,16 @@ public class WebServer {
                 return profileAlignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).toString();
             }
         }));
+        post("/register/tree/:name/:leaves/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
+            (request, response) -> {
+            if ( treeQueue.containsKey(request.params(":name")) ) {
+                response.status(409);
+                return "Tree \"" + request.params(":name") + "\" already registered.";
+            }
+            int statusCode = registerTree(request.params(":name"), Integer.parseInt(request.params(":leaves")), request.body());
+            response.status(statusCode);
+            return "Tree \"" + request.params(":name") + "\" registered.";
+        });
         get("/terminate", ((request, response) -> {
             synchronized ( this ) {
                 this.notifyAll();
@@ -198,7 +211,7 @@ public class WebServer {
 
     // Register data structures
     private int processRegister(String name, int size, HashMap<String, Matrix2DF []> data) {
-        synchronized ( data) {
+        synchronized ( data ) {
             data.put(name, new Matrix2DF [size]);
         }
         return 201;
@@ -228,6 +241,13 @@ public class WebServer {
             sequenceAlignmentQueue.put(name, queue);
         }
 
+        return 201;
+    }
+
+    private int registerTree(String name, int nrLeaves, String body) {
+        synchronized ( treeQueue ) {
+            treeQueue.put(name, ReadAlignmentTree.readTree(nrLeaves, body));
+        }
         return 201;
     }
 
@@ -276,5 +296,4 @@ public class WebServer {
     }
 
     // Receive
-
 }

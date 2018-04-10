@@ -1,8 +1,6 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.data.AlignmentTree;
 import nl.esciencecenter.praline.data.MSATree;
-import nl.esciencecenter.praline.data.Matrix2DI;
 
 import java.util.Vector;
 

@@ -1,8 +1,6 @@
 package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.*;
-import nl.esciencecenter.praline.data.AlignResult;
-import nl.esciencecenter.praline.data.AlignmentMode;
 
 import java.util.HashMap;
 

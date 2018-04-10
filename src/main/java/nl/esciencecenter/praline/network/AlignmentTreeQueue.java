@@ -6,7 +6,6 @@ import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Matrix2DI;
 import nl.esciencecenter.praline.gapcost.AffineGapCost;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AlignmentTreeQueue {
@@ -16,6 +15,7 @@ public class AlignmentTreeQueue {
     private final AffineGapCost affineGapCost;
     private final HashMap<Integer, int [][]> sequences;
     private final AlignmentTreeInteger alignmentTreeInteger;
+    private TreeAligner thread;
 
     public AlignmentTreeQueue(int nrLeaves, AlignmentMode mode, Matrix2DF[] costMatrices, Float costStartGap,
                               Float costExtendGap, AlignmentTreeInteger alignmentTreeInteger) {
@@ -42,7 +42,16 @@ public class AlignmentTreeQueue {
     public void addElement(int leaf, int [][] sequence) {
         sequences.put(leaf, sequence);
         if ( sequences.size() == nrLeaves ) {
-            // TODO: compute
+            thread = new TreeAligner(this);
+            thread.start();
+        }
+    }
+
+    public void waitForResult() {
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

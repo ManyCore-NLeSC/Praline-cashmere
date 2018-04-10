@@ -1,23 +1,26 @@
 package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.AlignmentTree;
+import nl.esciencecenter.praline.data.Matrix2DI;
 
 import java.util.Vector;
 
 public class ReadAlignmentTree {
 
-    public static AlignmentTree readTree(int nrLeafs, String s){
-        Vector<AlignmentTree> treeArr = new Vector<>();
+
+
+    public static AlignmentTreeInteger readTree(int nrLeafs, String s){
+        Vector<AlignmentTreeInteger> treeArr = new Vector<>();
         for(int i = 0 ; i < nrLeafs; i++){
-            treeArr.add(new AlignmentTree(i));
+            treeArr.add(new AlignmentTreeInteger(i));
         }
         String[] ss = s.split(" ");
-        AlignmentTree res = null;
+        AlignmentTreeInteger res = null;
         for(String v : ss){
             String[] mv = v.split(",");
             int merge = Integer.parseInt(mv[0]);
             int with = Integer.parseInt(mv[1]);
-            res = new AlignmentTree(treeArr.get(merge), treeArr.get(with));
+            res = new AlignmentTreeInteger(treeArr.get(merge), treeArr.get(with));
             treeArr.set(merge,res);
             treeArr.remove(with);
         }

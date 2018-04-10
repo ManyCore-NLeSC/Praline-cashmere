@@ -62,7 +62,8 @@ public class MSA {
                     new MotifProfilePositionCost(leftProf, rightProf, costMatrices), mode);
         }
         Matrix2DI steps = mergeSteps(leftSteps,rightSteps,res.getSteps());
-
+        Matrix2DF[] prof = mergeProfile(leftProf,rightProf,res.getSteps());
+        return new MSATree(left,right,prof,res,steps);
 
     }
 
@@ -87,7 +88,10 @@ public class MSA {
     Matrix2DF[] mergeProfile(Matrix2DF[] profA, Matrix2DF[] profB, List<Coordinate> steps){
         assert profA.length == profB.length;
         Iterator<Coordinate> it = steps.iterator();
-        Matrix2DF[] result = new Matrix2DF(steps.size()-1, profA.nrCols, profA.nrTracks);
+        Matrix2DF[] result = new Matrix2DF[profA.length];
+        for(int i = 0 ; i < result.length; i++){
+            result[i] = new Matrix2DF(steps.size()-1,profA[i].nrCols);
+        }
         if(!it.hasNext()){
             throw new Error("Not enough elements in alignment for merge profile");
         }
@@ -98,29 +102,29 @@ public class MSA {
             int xdiff = nxt.getX() - prev.getX();
             int ydiff = nxt.getY() - prev.getY();
             if(xdiff == 0 && ydiff == 1) {
-
-                for (int i = 0; i < profB.nrCols; i++) {
-                    for(int t = 0 ; t < profB.nrTracks; t++){
-
-                        result.set(j, i, t, profB.get(nxt.getY(), i, t));
+                for (int i = 0; i < profA[0].nrCols; i++) {
+                    for(int t = 0 ; t < profA.length; t++){
+                        result[t].set(j,i,profA[t].get(nxt.getX()-1,i));
                     }
                 }
             } else if( xdiff == 1 && ydiff == 0) {
-                for (int i = 0; i < profB.nrCols; i++) {
-                    for(int t = 0 ; t < profB.nrTracks; t++) {
-                        result.set(j, i, t, profA.get(nxt.getY(), i, t));
+                for (int i = 0; i < profB[0].nrCols; i++) {
+                    for(int t = 0 ; t < profB.length; t++){
+                        result[t].set(j,i,profB[t].get(nxt.getY()-1,i));
                     }
                 }
             } else if (xdiff == 1 && ydiff == 1) {
-                for (int i = 0; i < profB.nrCols; i++) {
-                    for(int t = 0 ; t < profB.nrTracks; t++) {
-                        result.set(j, i,t,
-                                0.5f * (profA.get(nxt.getY(), i,t) + profB.get(nxt.getY(), i,t)));
+                for (int i = 0; i < profB[0].nrCols; i++) {
+                    for(int t = 0 ; t < profB.length; t++) {
+                        result[t].set(j,i, 0.5f * (
+                                profA[t].get(nxt.getX()-1,i) +
+                                        profB[t].get(nxt.getY()-1,i)));
                     }
                 }
             } else {
                 throw new Error("Non-adjacent coordinates");
             }
+            j++;
         }
         return result;
     }

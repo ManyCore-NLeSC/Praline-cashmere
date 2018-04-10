@@ -21,7 +21,7 @@ public class MSA {
         this.mode = mode;
     }
 
-    MSATree msa(AlignmentTree tree ){
+    public MSATree msa(AlignmentTree tree ){
         if(tree.sequence !=null){
             return new MSATree(tree.sequence);
         }

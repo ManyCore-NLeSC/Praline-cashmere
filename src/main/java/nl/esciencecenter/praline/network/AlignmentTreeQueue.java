@@ -1,9 +1,6 @@
 package nl.esciencecenter.praline.network;
 
-import nl.esciencecenter.praline.data.AlignmentMode;
-import nl.esciencecenter.praline.data.AlignmentTree;
-import nl.esciencecenter.praline.data.Matrix2DF;
-import nl.esciencecenter.praline.data.Matrix2DI;
+import nl.esciencecenter.praline.data.*;
 import nl.esciencecenter.praline.gapcost.AffineGapCost;
 
 import java.util.HashMap;
@@ -47,11 +44,13 @@ public class AlignmentTreeQueue {
         }
     }
 
-    public void waitForResult() {
+    public MSATree waitForResult() {
         try {
             thread.join();
+            return thread.getResult();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            throw new Error("Error while waiting");
         }
     }
 

@@ -203,12 +203,15 @@ public class WebServer {
          * Retrieve the alignment steps of a tree.
          */
         get("/retrieve/steps/:tree_name", ((request, response) -> {
+
             if ( !alignmentTreeQueue.containsKey(request.params(":tree_name")) ) {
                 response.status(404);
                 return "Tree \"" + request.params(":tree_name") + "\" does not exist.";
             }
-            // TODO: implement serialization of the alignment steps of a tree.
-            return "";
+            AlignmentTreeQueue q =
+                    alignmentTreeQueue.get(request.params(":tree_name"));
+            return SerializeMSA.serializeMSA(q.waitForResult());
+
         }));
         /*
          * Align two profiles.

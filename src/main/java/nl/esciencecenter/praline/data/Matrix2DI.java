@@ -28,6 +28,16 @@ public class Matrix2DI {
     public void set(int row, int col, int val){
         data[row * nrCols + col] = val;
     }
+
+    public void printMatrix(){
+        for(int i = 0 ; i < nrRows ; i++){
+            for(int j = 0 ; j < nrCols ; j++){
+                System.out.printf("%3d ",get(i,j));
+
+            }
+            System.out.println();
+        }
+    }
 }
 
 

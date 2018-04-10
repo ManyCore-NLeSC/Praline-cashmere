@@ -31,6 +31,10 @@ public class AlignmentTreeQueue {
         sequences.put(leaf, sequence);
     }
 
+    AlignmentTree getTree(){
+        return getTree(alignmentTreeInteger);
+    }
+
     AlignmentTree getTree(AlignmentTreeInteger node){
         if(node.sequence == null){
             return new AlignmentTree(getTree(node.left),getTree(node.right));

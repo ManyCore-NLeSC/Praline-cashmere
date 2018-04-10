@@ -1,13 +1,10 @@
 package nl.esciencecenter.praline.data;
 
-import nl.esciencecenter.praline.gapcost.AffineGapCost;
-import nl.esciencecenter.praline.gapcost.IGapCost;
-import nl.esciencecenter.praline.positioncost.IPositionCost;
 
 public class AlignmentTree {
-    final AlignmentTree left;
-    final AlignmentTree right;
-    final Integer sequence;
+    public final AlignmentTree left;
+    public final AlignmentTree right;
+    public final Matrix2DI sequence;
 
     public AlignmentTree(AlignmentTree left, AlignmentTree right){
         this.left = left;
@@ -15,7 +12,7 @@ public class AlignmentTree {
         this.sequence = null;
     }
 
-    public AlignmentTree(int sequence){
+    public AlignmentTree(Matrix2DI sequence){
         this.sequence = sequence;
         this.left = null;
         this.right = null;

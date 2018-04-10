@@ -26,6 +26,20 @@ public class Matrix2DF {
         return data[row * nrCols + col ];
     }
 
+
+    public boolean sameShape(Matrix2DF other) {
+        return nrCols == other.nrCols() && nrRows == other.nrRows();
+    }
+
+
+    public int nrCols() {
+        return nrCols;
+    }
+
+    public int nrRows() {
+        return nrRows;
+    }
+
     public void set(int row, int col, float val){
         data[row * nrCols + col] = val;
     }

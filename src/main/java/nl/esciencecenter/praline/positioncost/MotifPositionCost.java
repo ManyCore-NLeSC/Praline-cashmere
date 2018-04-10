@@ -1,12 +1,13 @@
 package nl.esciencecenter.praline.positioncost;
 
+import nl.esciencecenter.praline.data.Matrix2DF;
 import nl.esciencecenter.praline.data.Matrix2DI;
 
 public class MotifPositionCost implements IPositionCost {
     final Matrix2DI a,b;
-    final Matrix2DI[] alignCosts;
+    final Matrix2DF[] alignCosts;
 
-    MotifPositionCost(Matrix2DI a, Matrix2DI b, Matrix2DI[] alignCosts){
+    public MotifPositionCost(Matrix2DI a, Matrix2DI b, Matrix2DF[] alignCosts){
         if(a.nrRows != b.nrRows || b.nrRows != alignCosts.length){
             throw new Error("Not the same number of tracks");
         }

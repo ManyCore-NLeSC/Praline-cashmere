@@ -1,7 +1,9 @@
 package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.AlignmentMode;
+import nl.esciencecenter.praline.data.AlignmentTree;
 import nl.esciencecenter.praline.data.Matrix2DF;
+import nl.esciencecenter.praline.data.Matrix2DI;
 import nl.esciencecenter.praline.gapcost.AffineGapCost;
 
 import java.util.ArrayList;
@@ -27,5 +29,14 @@ public class AlignmentTreeQueue {
 
     public void addElement(int leaf, int [][] sequence) {
         sequences.put(leaf, sequence);
+    }
+
+    AlignmentTree getTree(AlignmentTreeInteger node){
+        if(node.sequence == null){
+            return new AlignmentTree(getTree(node.left),getTree(node.right));
+        } else {
+            return new AlignmentTree(new Matrix2DI(sequences.get(node.sequence)));
+        }
+
     }
 }

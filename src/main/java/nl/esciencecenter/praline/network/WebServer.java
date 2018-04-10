@@ -11,8 +11,8 @@ import static spark.Spark.*;
 public class WebServer {
 
     // Global data structures
-    private final HashMap<String, Matrix2DF []> costs;
-    private final HashMap<String, Matrix2DF []> profiles;
+    private final HashMap<String, Matrix2DF[]> costs;
+    private final HashMap<String, Matrix2DF[]> profiles;
     private final HashMap<String, AlignResult> profileAlignments;
     private final HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue;
     public WebServer(int threads) {
@@ -197,9 +197,9 @@ public class WebServer {
 
 
     // Register data structures
-    private int processRegister(String name, int size, HashMap<String, Matrix2DF []> data) {
+    private int processRegister(String name, int size, HashMap<String, Matrix2DF[]> data) {
         synchronized ( data) {
-            data.put(name, new Matrix2DF [size]);
+            data.put(name, new Matrix2DF[size]);
         }
         return 201;
     }
@@ -233,7 +233,7 @@ public class WebServer {
 
     // Receive data structures
     private int processSend(String name, int position, int rows, int columns, String values,
-                            HashMap<String, Matrix2DF []> data) {
+                            HashMap<String, Matrix2DF[]> data) {
         String [] items = values.split(" ");
         float [][] initializationMatrix = new float [rows][columns];
 

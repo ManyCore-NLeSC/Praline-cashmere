@@ -15,14 +15,14 @@ public class WebServer {
     private final HashMap<String, Matrix2DF[]> profiles;
     private final HashMap<String, AlignResult> profileAlignments;
     private final HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue;
-    private final HashMap<String, AlignmentTree> treeQueue;
+    private final HashMap<String, AlignmentTreeQueue> alignmentTreeQueue;
 
     public WebServer(int threads) {
         costs = new HashMap<>();
         profiles = new HashMap<>();
         profileAlignments = new HashMap<>();
         sequenceAlignmentQueue = new HashMap<>();
-        treeQueue = new HashMap<>();
+        alignmentTreeQueue = new HashMap<>();
         threadPool(threads);
         init();
     }
@@ -40,11 +40,14 @@ public class WebServer {
          */
         post("/register/tree/:name/:leaves/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
                 (request, response) -> {
-                    if ( treeQueue.containsKey(request.params(":name")) ) {
+                    if ( alignmentTreeQueue.containsKey(request.params(":name")) ) {
                         response.status(409);
                         return "Tree \"" + request.params(":name") + "\" already registered.";
                     }
-                    int statusCode = registerTree(request.params(":name"), Integer.parseInt(request.params(":leaves")), request.body());
+                    int statusCode = registerTree(request.params(":name"), Integer.parseInt(request.params(":leaves")),
+                        request.params(":cost_matrix_name"), request.params(":alignment_mode"),
+                        Float.parseFloat(request.params(":start_gap")),
+                        Float.parseFloat(request.params(":extend_gap")), request.body());
                     response.status(statusCode);
                     return "Tree \"" + request.params(":name") + "\" registered.";
                 });
@@ -140,13 +143,13 @@ public class WebServer {
         /*
          * Send a sequence to a tree.
          */
-        post("/send/sequence/:length/totree/:tree_name", ((request, response) -> {
-            if ( !treeQueue.containsKey(request.params(":tree_name")) ) {
+        post("/send/sequence/:leaf/:length/totree/:tree_name", ((request, response) -> {
+            if ( !alignmentTreeQueue.containsKey(request.params(":tree_name")) ) {
                 response.status(404);
                 return "Tree \"" + request.params(":tree_name") + "\" does not exist.";
             }
-            int statusCode = sendSequenceToTree(Integer.parseInt(request.params(":length")), request.params(":tree_name"),
-                    request.body());
+            int statusCode = sendSequenceToTree(Integer.parseInt(request.params(":leaf")), 
+                    Integer.parseInt(request.params(":length")), request.params(":tree_name"), request.body());
             response.status(statusCode);
             return "Added sequence to tree.";
         }));
@@ -200,7 +203,7 @@ public class WebServer {
          * Retrieve the alignment steps of a tree.
          */
         get("/retrieve/steps/:tree_name", ((request, response) -> {
-            if ( !treeQueue.containsKey(request.params(":tree_name")) ) {
+            if ( !alignmentTreeQueue.containsKey(request.params(":tree_name")) ) {
                 response.status(404);
                 return "Tree \"" + request.params(":tree_name") + "\" does not exist.";
             }
@@ -287,7 +290,7 @@ public class WebServer {
         } else {
             mode = AlignmentMode.SEMIGLOBAL;
         }
-        queue = new SequenceAlignmentQueue(mode, costs.get(costMatrix),costStartGap, costExtendGap);
+        queue = new SequenceAlignmentQueue(mode, costs.get(costMatrix), costStartGap, costExtendGap);
         synchronized(sequenceAlignmentQueue){
             sequenceAlignmentQueue.put(name, queue);
         }
@@ -295,9 +298,21 @@ public class WebServer {
         return 201;
     }
 
-    private int registerTree(String name, int nrLeaves, String body) {
-        synchronized ( treeQueue ) {
-            treeQueue.put(name, ReadAlignmentTree.readTree(nrLeaves, body));
+    private int registerTree(String name, int nrLeaves, String costMatrix, String alignmentMode,
+                             Float costStartGap, Float costExtendGap, String body) {
+        AlignmentTreeQueue queue;
+        AlignmentMode mode;
+        if (alignmentMode.equals("global") ) {
+            mode = AlignmentMode.GLOBAL;
+        } else if ( alignmentMode.equals("local") ) {
+            mode = AlignmentMode.LOCAL;
+        } else {
+            mode = AlignmentMode.SEMIGLOBAL;
+        }
+        queue = new AlignmentTreeQueue(nrLeaves, mode, costs.get(costMatrix), costStartGap, costExtendGap,
+            ReadAlignmentTree.readTree(nrLeaves, body));
+        synchronized ( alignmentTreeQueue ) {
+            alignmentTreeQueue.put(name, queue);
         }
         return 201;
     }
@@ -349,9 +364,10 @@ public class WebServer {
         return 201;
     }
 
-    private int sendSequenceToTree(int length, String queueName, String body) {
+    private int sendSequenceToTree(int leaf, int length, String treeName, String body) {
         int [][] sequence = parseSequence(length, body);
-        synchronized ( treeQueue ) {
+        synchronized ( alignmentTreeQueue ) {
+            alignmentTreeQueue.get(treeName).addElement(leaf, sequence);
         }
 
         return 201;

@@ -184,6 +184,17 @@ public class WebServer {
             }
         }));
         /*
+         * Retrieve the alignment steps of a tree.
+         */
+        get("/retrieve/steps/:tree_name", ((request, response) -> {
+            if ( !treeQueue.containsKey(request.params(":tree_name")) ) {
+                response.status(404);
+                return "Tree " + request.params(":tree_name") + " does not exist.";
+            }
+            // TODO: implement serialization of the alignment steps of a tree.
+            return "";
+        }));
+        /*
          * Align two profiles.
          */
         get("/align/:profile_one/:profile_two/:cost_matrix/:start_gap/:extend_gap/:mode", (request, response) -> {

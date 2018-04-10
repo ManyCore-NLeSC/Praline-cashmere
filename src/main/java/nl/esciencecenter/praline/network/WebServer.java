@@ -35,31 +35,22 @@ public class WebServer {
 
     public void run() {
         awaitInitialization();
-        // Register a profile
-        get("/register/profile/:profile_name/:tracks_number", ((request, response) -> {
-            if ( profiles.containsKey(request.params(":profile_name")) ) {
-                response.status(409);
-                return "Profile \"" + request.params(":profile_name") + "\" already registered.";
-            }
-            int statusCode = processRegisterProfile(request.params(":profile_name"),
-                    Integer.parseInt(request.params(":tracks_number")));
-            response.status(statusCode);
-            return "Profile \"" + request.params(":profile_name") + "\" registered.";
-        }));
-        // Add a track to a profile
-        post("/send/track/:profile_name/:track_number/:track_rows/:track_columns", ((request, response) -> {
-            if ( !profiles.containsKey(request.params(":profile_name")) ) {
-                response.status(404);
-                return "Profile \"" + request.params(":profile_name") + "\" does not exist.";
-            }
-            int statusCode = processSendTrack(request.params(":profile_name"),
-                    Integer.parseInt(request.params(":track_number")),
-                    Integer.parseInt(request.params(":track_rows")),
-                    Integer.parseInt(request.params(":track_columns")), request.body());
-            response.status(statusCode);
-            return "Added track to profile \"" + request.params(":profile_name") + "\".";
-        }));
-        // Register the cost matrix
+        /*
+         * Register a tree to process.
+         */
+        post("/register/tree/:name/:leaves/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
+                (request, response) -> {
+                    if ( treeQueue.containsKey(request.params(":name")) ) {
+                        response.status(409);
+                        return "Tree \"" + request.params(":name") + "\" already registered.";
+                    }
+                    int statusCode = registerTree(request.params(":name"), Integer.parseInt(request.params(":leaves")), request.body());
+                    response.status(statusCode);
+                    return "Tree \"" + request.params(":name") + "\" registered.";
+                });
+        /*
+         * Register a cost matrix.
+         */
         get("/register/cost_matrix/:matrix_name/:scores_number", ((request, response) -> {
 
             if ( profiles.containsKey(request.params(":matrix_name")) ) {
@@ -73,7 +64,52 @@ public class WebServer {
             System.err.println(s);
             return s;
         }));
-        // Add a score to the cost matrix
+        /*
+         * Register an alignment queue.
+         */
+        get("/register/alignment_queue/:queue_name/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
+                (request, response) -> {
+                    if ( sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
+                        response.status(409);
+                        return "Queue \"" + request.params(":queue_name") + "\" already registered.";
+                    }
+                    int statusCode = registerSequenceAlignmentQueue(request.params(":queue_name"),
+                            request.params(":cost_matrix_name"), request.params(":alignment_mode"),
+                            Float.parseFloat(request.params(":start_gap")), Float.parseFloat(request.params(":extend_gap")));
+                    response.status(statusCode);
+                    return "Queue \"" + request.params(":queue_name") + "\" registered.";
+                });
+        /*
+         * Register a profile.
+         */
+        get("/register/profile/:profile_name/:tracks_number", ((request, response) -> {
+            if ( profiles.containsKey(request.params(":profile_name")) ) {
+                response.status(409);
+                return "Profile \"" + request.params(":profile_name") + "\" already registered.";
+            }
+            int statusCode = processRegisterProfile(request.params(":profile_name"),
+                    Integer.parseInt(request.params(":tracks_number")));
+            response.status(statusCode);
+            return "Profile \"" + request.params(":profile_name") + "\" registered.";
+        }));
+        /*
+         * Add a track to a profile.
+         */
+        post("/send/track/:profile_name/:track_number/:track_rows/:track_columns", ((request, response) -> {
+            if ( !profiles.containsKey(request.params(":profile_name")) ) {
+                response.status(404);
+                return "Profile \"" + request.params(":profile_name") + "\" does not exist.";
+            }
+            int statusCode = processSendTrack(request.params(":profile_name"),
+                    Integer.parseInt(request.params(":track_number")),
+                    Integer.parseInt(request.params(":track_rows")),
+                    Integer.parseInt(request.params(":track_columns")), request.body());
+            response.status(statusCode);
+            return "Added track to profile \"" + request.params(":profile_name") + "\".";
+        }));
+        /*
+         * Add a score to a cost matrix.
+         */
         post("/send/cost_matrix/:matrix_name/:score_number/:score_size", (request, response) -> {
 
             if ( !costs.containsKey(request.params(":matrix_name")) ) {
@@ -88,20 +124,9 @@ public class WebServer {
             response.status(statusCode);
             return "Added score to Cost Matrix \"" + request.params(":matrix_name") + "\".";
         });
-        // Register an alignment queue
-        get("/register/alignment_queue/:queue_name/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
-            (request, response) -> {
-            if ( sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
-                response.status(409);
-                return "Queue \"" + request.params(":queue_name") + "\" already registered.";
-            }
-            int statusCode = registerSequenceAlignmentQueue(request.params(":queue_name"),
-                    request.params(":cost_matrix_name"), request.params(":alignment_mode"),
-                    Float.parseFloat(request.params(":start_gap")), Float.parseFloat(request.params(":extend_gap")));
-            response.status(statusCode);
-            return "Queue \"" + request.params(":queue_name") + "\" registered.";
-        });
-        // Add a sequence to the alignment queue
+        /*
+         * Add a sequence to an alignment queue.
+         */
         post("/send/sequence/:length/toqueue/:queue_name", (request, response) -> {
             if ( !sequenceAlignmentQueue.containsKey(request.params(":queue_name")) ) {
                 response.status(404);
@@ -112,6 +137,9 @@ public class WebServer {
             response.status(statusCode);
             return "Added sequence to queue.";
         });
+        /*
+         * Retrieve the alignment score matrix associated with an alignment queue.
+         */
         get("/receive/score_matrix/:queue_name", (request, response) -> {
             String queueName= request.params(":queue_name");
             if ( !sequenceAlignmentQueue.containsKey(queueName) ) {
@@ -128,7 +156,36 @@ public class WebServer {
             response.status(200);
             return scoreMatrix;
         });
-        // Request to align two profiles
+        /*
+         * Retrieve the alignment score of two profiles.
+         */
+        get("/retrieve/score/:profile_one/:profile_two", ((request, response) -> {
+            if ( !profileAlignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
+                response.status(404);
+                return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
+                        + " does not exist.";
+            } else {
+                response.status(200);
+                return profileAlignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).getScore();
+            }
+        }));
+        /*
+         * Retrieve the alignment steps of two profiles.
+         */
+        get("/retrieve/steps/:profile_one/:profile_two", ((request, response) -> {
+            if ( !profileAlignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
+                response.status(404);
+                return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
+                        + " does not exist.";
+            } else {
+                response.status(200);
+
+                return profileAlignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).toString();
+            }
+        }));
+        /*
+         * Align two profiles.
+         */
         get("/align/:profile_one/:profile_two/:cost_matrix/:start_gap/:extend_gap/:mode", (request, response) -> {
             if ( !profiles.containsKey(request.params(":profile_one"))
                     || !profiles.containsKey(request.params(":profile_two")) ) {
@@ -146,7 +203,7 @@ public class WebServer {
             } else if ( request.params(":mode").equals("local") ) {
                 mode = AlignmentMode.LOCAL;
             } else if ( request.params(":mode").compareTo("semiglobal") == 0 ) {
-               mode = AlignmentMode.SEMIGLOBAL;
+                mode = AlignmentMode.SEMIGLOBAL;
             } else {
                 response.status(405);
                 return "Alignment mode \"" + request.params(":mode") + "\" not supported.";
@@ -157,43 +214,13 @@ public class WebServer {
                             costs.get(request.params(":cost_matrix")),
                             Float.parseFloat(request.params(":start_gap")),
                             Float.parseFloat(request.params(":extend_gap")),
-                           mode));
+                            mode));
             response.status(200);
             return "Alignment processed.";
         });
-        // Retrieve the score associated with the alignment of two profiles
-        get("/retrieve/score/:profile_one/:profile_two", ((request, response) -> {
-            if ( !profileAlignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
-                response.status(404);
-                return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
-                        + " does not exist.";
-            } else {
-                response.status(200);
-                return profileAlignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).getScore();
-            }
-        }));
-        // Retrieve the alignment steps of two profiles
-        get("/retrieve/steps/:profile_one/:profile_two", ((request, response) -> {
-            if ( !profileAlignments.containsKey(request.params(":profile_one") + "_" + request.params(":profile_two")) ) {
-                response.status(404);
-                return "Alignment " + request.params(":profile_one") + "_" + request.params(":profile_two")
-                        + " does not exist.";
-            } else {
-                response.status(200);
-
-                return profileAlignments.get(request.params(":profile_one") + "_" + request.params(":profile_two")).toString();
-            }
-        }));
-        post("/register/tree/:name/:leaves/:cost_matrix_name/:alignment_mode/:start_gap/:extend_gap",
-            (request, response) -> {
-            if ( treeQueue.containsKey(request.params(":name")) ) {
-                response.status(409);
-                return "Tree \"" + request.params(":name") + "\" already registered.";
-            }
-            int statusCode = registerTree(request.params(":name"), Integer.parseInt(request.params(":leaves")), request.body());
-            response.status(statusCode);
-            return "Tree \"" + request.params(":name") + "\" registered.";
-        });
+        /*
+         * Shut down the server.
+         */
         get("/terminate", ((request, response) -> {
             synchronized ( this ) {
                 this.notifyAll();

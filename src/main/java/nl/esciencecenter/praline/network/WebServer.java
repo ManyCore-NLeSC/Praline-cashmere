@@ -132,11 +132,24 @@ public class WebServer {
                 response.status(404);
                 return "Queue \"" + request.params(":queue_name") + "\" does not exist.";
             }
-            int statusCode = sendSequence(Integer.parseInt(request.params(":length")), request.params(":queue_name"),
+            int statusCode = sendSequenceToQueue(Integer.parseInt(request.params(":length")), request.params(":queue_name"),
                     request.body());
             response.status(statusCode);
             return "Added sequence to queue.";
         });
+        /*
+         * Send a sequence to a tree.
+         */
+        post("/send/sequence/:length/totree/:tree_name", ((request, response) -> {
+            if ( !treeQueue.containsKey(request.params(":tree_name")) ) {
+                response.status(404);
+                return "Tree \"" + request.params(":tree_name") + "\" does not exist.";
+            }
+            int statusCode = sendSequenceToTree(Integer.parseInt(request.params(":length")), request.params(":tree_name"),
+                    request.body());
+            response.status(statusCode);
+            return "Added sequence to tree.";
+        }));
         /*
          * Retrieve the alignment score matrix associated with an alignment queue.
          */
@@ -189,7 +202,7 @@ public class WebServer {
         get("/retrieve/steps/:tree_name", ((request, response) -> {
             if ( !treeQueue.containsKey(request.params(":tree_name")) ) {
                 response.status(404);
-                return "Tree " + request.params(":tree_name") + " does not exist.";
+                return "Tree \"" + request.params(":tree_name") + "\" does not exist.";
             }
             // TODO: implement serialization of the alignment steps of a tree.
             return "";
@@ -314,7 +327,7 @@ public class WebServer {
         return processSend(matrixID, scoreNumber, scoreSize, scoreSize, score,  costs);
     }
 
-    private int sendSequence(int length, String queueName, String body) {
+    private int [][] parseSequence(int length, String body) {
         String [] items = body.split(" ");
         int [][] sequence = new int [items.length / length][length];
 
@@ -324,14 +337,23 @@ public class WebServer {
                 sequence[row][column] = Integer.parseInt(items[(row * length) + column]);
             }
         }
-        synchronized ( sequenceAlignmentQueue) {
-            SequenceAlignmentQueue queue = sequenceAlignmentQueue.get(queueName);
+        return sequence;
+    }
 
-            queue.addElement(sequence);
+    private int sendSequenceToQueue(int length, String queueName, String body) {
+        int [][] sequence = parseSequence(length, body);
+        synchronized ( sequenceAlignmentQueue) {
+            sequenceAlignmentQueue.get(queueName).addElement(sequence);
         }
 
         return 201;
     }
 
-    // Receive
+    private int sendSequenceToTree(int length, String queueName, String body) {
+        int [][] sequence = parseSequence(length, body);
+        synchronized ( treeQueue ) {
+        }
+
+        return 201;
+    }
 }

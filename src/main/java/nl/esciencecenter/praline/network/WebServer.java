@@ -310,7 +310,7 @@ public class WebServer {
             mode = AlignmentMode.SEMIGLOBAL;
         }
         queue = new AlignmentTreeQueue(nrLeaves, mode, costs.get(costMatrix), costStartGap, costExtendGap,
-            ReadAlignmentTree.readTree(nrLeaves, body));
+            SerializeMSA.readTree(nrLeaves, body));
         synchronized ( alignmentTreeQueue ) {
             alignmentTreeQueue.put(name, queue);
         }

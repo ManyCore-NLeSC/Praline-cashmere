@@ -1,11 +1,12 @@
 package nl.esciencecenter.praline.network;
 
 import nl.esciencecenter.praline.data.AlignmentTree;
+import nl.esciencecenter.praline.data.MSATree;
 import nl.esciencecenter.praline.data.Matrix2DI;
 
 import java.util.Vector;
 
-public class ReadAlignmentTree {
+public class SerializeMSA {
 
 
 
@@ -25,5 +26,19 @@ public class ReadAlignmentTree {
             treeArr.remove(with);
         }
         return res;
+    }
+
+    public static String serializeMSA(MSATree res){
+        StringBuilder b = new StringBuilder();
+        for(int row = 0 ; row < res.coordinates.nrRows; row++){
+            for(int col = 0; col < res.coordinates.nrCols; col++){
+                b.append(res.coordinates.get(row,col));
+                if(col != res.coordinates.nrCols -1) {
+                    b.append(';');
+                }
+            }
+            b.append(' ');
+        }
+        return b.toString();
     }
 }

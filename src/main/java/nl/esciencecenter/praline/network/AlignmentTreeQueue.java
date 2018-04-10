@@ -25,7 +25,22 @@ public class AlignmentTreeQueue {
         this.alignmentTreeInteger = alignmentTreeInteger;
     }
 
+    public Matrix2DF [] getCostMatrices() {
+        return costMatrices;
+    }
+
+    public AffineGapCost getAffineGapCost() {
+        return affineGapCost;
+    }
+
+    public AlignmentMode getAlignmentMode() {
+        return alignmentMode;
+    }
+
     public void addElement(int leaf, int [][] sequence) {
         sequences.put(leaf, sequence);
+        if ( sequences.size() == nrLeaves ) {
+            // TODO: compute
+        }
     }
 }

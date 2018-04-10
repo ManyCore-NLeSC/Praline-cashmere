@@ -8,7 +8,7 @@ public class MotifPositionCost implements IPositionCost {
     final Matrix2DF[] alignCosts;
 
     public MotifPositionCost(Matrix2DI a, Matrix2DI b, Matrix2DF[] alignCosts){
-        if(a.nrRows != b.nrRows || b.nrRows != alignCosts.length){
+        if(a.nrCols != b.nrCols || b.nrCols != alignCosts.length){
             throw new Error("Not the same number of tracks");
         }
         this.a = a;
@@ -20,7 +20,7 @@ public class MotifPositionCost implements IPositionCost {
     @Override
     public float cost(int posA, int posB) {
         int cost = 0;
-        for(int track = 0; track < a.nrRows; track++){
+        for(int track = 0; track < alignCosts.length; track++){
             cost+=alignCosts[track].get(a.get(track,posA), b.get(track,posB));
         }
         return cost;

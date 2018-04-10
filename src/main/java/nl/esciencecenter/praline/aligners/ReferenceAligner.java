@@ -138,7 +138,8 @@ public class ReferenceAligner implements IAlign {
     static Stack<Coordinate> reverse(Stack<Coordinate> e){
         Stack<Coordinate> res = new Stack<>();
         while(!e.isEmpty()){
-            res.push(e.pop());
+            Coordinate c = e.pop();
+            res.push(new Coordinate(c.getY(),c.getX()));
         }
         return res;
     }

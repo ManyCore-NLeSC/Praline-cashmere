@@ -297,7 +297,7 @@ public class WebServer {
 
     private int registerTree(String name, int nrLeaves, String body) {
         synchronized ( treeQueue ) {
-            treeQueue.put(name, ReadAlignmentTree.readTree(nrLeaves, body));
+            //treeQueue.put(name, ReadAlignmentTree.readTree(nrLeaves, body));
         }
         return 201;
     }

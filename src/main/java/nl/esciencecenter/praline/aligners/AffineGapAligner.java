@@ -66,20 +66,25 @@ public class AffineGapAligner implements IAlign {
                 float match =  cost.get(row-1,col - 1) +
                         posCosts.cost(col - 1, row-1);
                 float score = max3(gapA,gapB,match);
-                int trace;
+                int trace = 0 ;
                 if(mode == AlignmentMode.LOCAL && score <= 0){
-                    trace = 0;
                     score = 0;
-                } else if(gapA == score){
-                    if(gapB == score){
-                        trace = GAPB_MASK | GAPA_MASK;
+                }
+                if(gapA == score) {
+                    if(gapB == score) {
+                        trace = GAPA_MASK | GAPB_MASK;
                     } else {
                         trace = GAPA_MASK;
                     }
-                } else if(gapB == score){
-                    trace = GAPB_MASK;
-                } else {
+                } else if (gapB == score) {
+                    trace |= GAPB_MASK;
+                } else if(match == score){
                     trace = ALIGN_MASK;
+                }
+
+                if(mode == AlignmentMode.LOCAL && score <= 0){
+                    score = 0;
+                    trace = 0;
                 }
 
                 if(mode == AlignmentMode.LOCAL && score > bestScore){

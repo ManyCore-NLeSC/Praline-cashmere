@@ -13,6 +13,7 @@ public class AlignmentTreeQueue {
     private final HashMap<Integer, int [][]> sequences;
     private final AlignmentTreeInteger alignmentTreeInteger;
     private TreeAligner thread;
+    public long start;
 
     public AlignmentTreeQueue(int nrLeaves, AlignmentMode mode, Matrix2DF[] costMatrices, Float costStartGap,
                               Float costExtendGap, AlignmentTreeInteger alignmentTreeInteger) {
@@ -40,6 +41,7 @@ public class AlignmentTreeQueue {
         sequences.put(leaf, sequence);
         if ( sequences.size() == nrLeaves ) {
             thread = new TreeAligner(this);
+            start = System.currentTimeMillis();
             thread.start();
         }
     }

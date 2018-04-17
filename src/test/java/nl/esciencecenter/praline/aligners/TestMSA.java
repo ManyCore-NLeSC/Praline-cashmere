@@ -63,6 +63,6 @@ public class TestMSA {
 
     public static void main(String[] argv){
         while(true)
-        fishForError(10,10,50);
+        fishForError(50,10,50);
     }
 }

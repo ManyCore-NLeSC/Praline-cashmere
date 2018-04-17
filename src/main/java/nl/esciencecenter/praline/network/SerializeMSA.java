@@ -23,7 +23,6 @@ public class SerializeMSA {
             int with = Integer.parseInt(mv[1]);
             res = new AlignmentTreeInteger(treeArr.get(merge), treeArr.get(with));
             treeArr.set(merge,res);
-            treeArr.remove(with);
         }
         return res;
     }
@@ -37,7 +36,7 @@ public class SerializeMSA {
                     b.append(';');
                 }
             }
-            b.append(' ');
+            if(row!= res.coordinates.nrRows -1) b.append(' ');
         }
         return b.toString();
     }

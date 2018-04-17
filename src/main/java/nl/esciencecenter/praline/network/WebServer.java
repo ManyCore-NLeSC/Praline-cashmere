@@ -49,7 +49,9 @@ public class WebServer {
                         Float.parseFloat(request.params(":start_gap")),
                         Float.parseFloat(request.params(":extend_gap")), request.body());
                     response.status(statusCode);
-                    return "Tree \"" + request.params(":name") + "\" registered.";
+                    String s =  "Tree \"" + request.params(":name") + "\" registered.";
+                    System.err.println(s);
+                    return s;
                 });
         /*
          * Register a cost matrix.
@@ -210,7 +212,10 @@ public class WebServer {
             }
             AlignmentTreeQueue q =
                     alignmentTreeQueue.get(request.params(":tree_name"));
-            return SerializeMSA.serializeMSA(q.waitForResult());
+            System.err.println("Done sending, now waiting");
+            String s =  SerializeMSA.serializeMSA(q.waitForResult());
+            System.err.println("Given " + request.params(":tree_name") + "took " + (System.currentTimeMillis() - q.start));
+            return s;
 
         }));
         /*

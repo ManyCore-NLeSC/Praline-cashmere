@@ -101,7 +101,7 @@ public class TestAlign {
             System.out.println("custom done");
             end = System.currentTimeMillis();
             long durAlign = end - start;
-            //float score = getAlignScore(res.getAlign().getSteps(),stringA.length,stringB.length,gapCostA,gapCostB, testPositionCost(stringA,stringB));
+            float score = getAlignScore(res.getAlignSteps(),stringA.length,stringB.length,gapCostA,gapCostB, testPositionCost(stringA,stringB));
             if(Math.abs(res.getScore() - oracleRes.getScore()) > MAX_DIFF){
                 System.out.printf("Wrong score reported: %f actual %f \n A: \n", res.getScore(), oracleRes.getScore());
                 System.out.println(Arrays.toString(stringA));
@@ -109,13 +109,13 @@ public class TestAlign {
                 System.out.println(Arrays.toString(stringB));
                 return false;
             }
-//            if (Math.abs(res.getScore() - score) > MAX_DIFF) {
-//                System.out.printf("Wrong answer reported: %f actual %f (size) %d \n A: \n", res.getScore(), score, res.getAlign().getSteps().size());
-//                System.out.println(Arrays.toString(stringA));
-//                System.out.printf(" \n B: \n");
-//                System.out.println(Arrays.toString(stringB));
-//                return false;
-//            }
+            if (Math.abs(res.getScore() - score) > MAX_DIFF) {
+                System.out.printf("Wrong answer reported: %f actual %f (size) %d \n A: \n", res.getScore(), score, res.getAlignSteps().size());
+                System.out.println(Arrays.toString(stringA));
+                System.out.printf(" \n B: \n");
+                System.out.println(Arrays.toString(stringB));
+                return false;
+            }
 
             if(measure){
                 System.out.printf("reference took %5d ms, align took %5d\n", durOracle,durAlign);
@@ -200,8 +200,8 @@ public class TestAlign {
     public static void main(String[] argv){
         //testAligner(new ReferenceAligner(), new ReferenceAligner(), new LinearGapCost(-1), new LinearGapCost(-1.1f), 4,100, 10000);
         // IAlign aling = new NonWorkingLinearGapLinearSpaceAligner(100,100);
-       testAligner( new AffineGapAligner(),new AffineGapAlignerCostOnly(), new AffineGapCost(-2f, -1f),
-               new AffineGapCost(-3f,-2f), 10000,10000, 1000000);
+       testAligner( new AffineGapAligner(),new ReferenceAligner(), new AffineGapCost(-4f, -2f),
+               new AffineGapCost(-4f,-2f), 500,1000, 1000000);
        // test();
         //testAligner(new LinearGapAligner(), new AffineGapAligner(), new LinearGapCost(-1), new LinearGapCost(-2),3, 5000,30000);
 //        testAlign(new LinearGapAligner(), new AffineGapAligner(), new LinearGapCost(-1), new LinearGapCost(-2), 10000,10000,true );

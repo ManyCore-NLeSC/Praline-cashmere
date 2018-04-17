@@ -82,7 +82,9 @@ public class MSA {
 
 
     Matrix2DI mergeSteps(Matrix2DI a, Matrix2DI b,List<Coordinate> steps){
-        assert a.nrRows == b.nrRows;
+
+
+        //assert a.nrRows == b.nrRows;
         Matrix2DI res = new Matrix2DI(steps.size(),a.nrCols + b.nrCols);
         for(int i = 0 ; i < steps.size() ; i++){
             int x = steps.get(i).getX();

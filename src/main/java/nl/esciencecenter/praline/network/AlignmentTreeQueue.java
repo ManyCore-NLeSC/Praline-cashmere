@@ -1,5 +1,6 @@
 package nl.esciencecenter.praline.network;
 
+import ibis.constellation.Constellation;
 import nl.esciencecenter.praline.data.*;
 import nl.esciencecenter.praline.gapcost.AffineGapCost;
 
@@ -12,10 +13,9 @@ public class AlignmentTreeQueue {
     private final AffineGapCost affineGapCost;
     private final HashMap<Integer, int [][]> sequences;
     private final AlignmentTreeInteger alignmentTreeInteger;
-    private TreeAligner thread;
     public long start;
 
-    public AlignmentTreeQueue(int nrLeaves, AlignmentMode mode, Matrix2DF[] costMatrices, Float costStartGap,
+    public AlignmentTreeQueue(Constellation constellation, int nrLeaves, AlignmentMode mode, Matrix2DF[] costMatrices, Float costStartGap,
                               Float costExtendGap, AlignmentTreeInteger alignmentTreeInteger) {
         this.nrLeaves = nrLeaves;
         this.alignmentMode = mode;
@@ -37,24 +37,20 @@ public class AlignmentTreeQueue {
         return alignmentMode;
     }
 
+    public TreeAligner getAligner() {
+        return new TreeAligner(this);
+    }
+
     public void addElement(int leaf, int [][] sequence) {
         sequences.put(leaf, sequence);
-        if ( sequences.size() == nrLeaves ) {
+        /*if ( sequences.size() == nrLeaves ) {
             thread = new TreeAligner(this);
             start = System.currentTimeMillis();
             thread.start();
-        }
+        }*/
     }
 
-    public MSATree waitForResult() {
-        try {
-            thread.join();
-            return thread.getResult();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new Error("Error while waiting");
-        }
-    }
+
 
     AlignmentTree getTree(){
         return getTree(alignmentTreeInteger);

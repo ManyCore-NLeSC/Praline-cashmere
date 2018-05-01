@@ -4,10 +4,9 @@ import nl.esciencecenter.praline.aligners.MSA;
 import nl.esciencecenter.praline.data.AlignmentTree;
 import nl.esciencecenter.praline.data.MSATree;
 
-public class TreeAligner extends Thread {
+public class TreeAligner  {
     private final AlignmentTree tree;
     private final MSA aligner;
-    private MSATree result;
 
     public TreeAligner(AlignmentTreeQueue treeQueue) {
         tree = treeQueue.getTree();
@@ -15,12 +14,7 @@ public class TreeAligner extends Thread {
             treeQueue.getAlignmentMode());
     }
 
-    @Override
-    public void run() {
-        result = aligner.msa(tree);
-    }
-
-    public MSATree getResult() {
-        return result;
+    public MSATree run() {
+        return aligner.msa(tree);
     }
 }

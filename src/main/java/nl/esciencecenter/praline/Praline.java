@@ -1,30 +1,45 @@
 package nl.esciencecenter.praline;
 
 import com.beust.jcommander.JCommander;
+import ibis.constellation.*;
 import nl.esciencecenter.praline.network.WebServer;
 
 public class Praline {
 
     public static void main(String [] args) throws InterruptedException {
-        // Command line arguments
-        CommandLineArguments arguments = new CommandLineArguments();
-        JCommander.newBuilder().addObject(arguments).build().parse(args);
+        try {
+            // Command line arguments
+            CommandLineArguments arguments = new CommandLineArguments();
+            JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-        WebServer server;
-        // Initialize web server
-        server = new WebServer(arguments.getNrServerThreads());
+            Constellation c = ConstellationFactory.createConstellation(new ConstellationConfiguration(new Context("MSA")));
+            if (c.isMaster()) {
 
-        server.run();
+                WebServer server;
+                // Initialize web server
+                server = new WebServer(arguments.getNrServerThreads(),c);
 
-        // Wait until termination
-        synchronized ( server) {
-            server.wait();
+                server.run();
+
+                c.done();
+                // Wait until termination
+                synchronized (server) {
+                    server.wait();
+                }
+                // Clean up
+                server.close();
+            } else {
+                c.done();
+            }
+
+
+        } catch (ConstellationCreationException e) {
+            e.printStackTrace();
         }
 
 
 
-        // Clean up
-        server.close();
+
         System.exit(0);
     }
 }

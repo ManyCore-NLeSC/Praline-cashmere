@@ -1,8 +1,16 @@
 package nl.esciencecenter.praline.network;
 
+import ibis.constellation.Constellation;
 import nl.esciencecenter.praline.data.*;
+import nl.esciencecenter.praline.network.constellation.SimpleConstellationRunner;
+import nl.esciencecenter.praline.network.constellation.SimpleConstellationScheduler;
+import sun.reflect.generics.tree.Tree;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import static spark.Spark.*;
 
@@ -14,13 +22,17 @@ public class WebServer {
     private final HashMap<String, AlignResult> profileAlignments;
     private final HashMap<String, SequenceAlignmentQueue> sequenceAlignmentQueue;
     private final HashMap<String, AlignmentTreeQueue> alignmentTreeQueue;
+    SimpleConstellationRunner<Map.Entry<String,TreeAligner>, Map.Entry<String,MSATree>> busy;
+    private HashMap<String, MSATree> results;
+    Constellation constellation;
 
-    public WebServer(int threads) {
+    public WebServer(int threads, Constellation c) {
         costs = new HashMap<>();
         profiles = new HashMap<>();
         profileAlignments = new HashMap<>();
         sequenceAlignmentQueue = new HashMap<>();
         alignmentTreeQueue = new HashMap<>();
+        this.constellation = c;
         threadPool(threads);
         init();
     }
@@ -204,15 +216,24 @@ public class WebServer {
          */
         get("/retrieve/steps/:tree_name", ((request, response) -> {
 
-            if ( !alignmentTreeQueue.containsKey(request.params(":tree_name")) ) {
+
+
+            System.err.println("Done sending, now waiting");
+            busy.join();
+            System.out.println("Done, gonna send result!");
+            synchronized (this) {
+                if (this.results == null) {
+                    results = new HashMap<>();
+                    for(Map.Entry<String,MSATree> v : busy.res){
+                        results.put(v.getKey(),v.getValue());
+                    }
+                }
+            }
+            if ( !results.containsKey(request.params(":tree_name")) ) {
                 response.status(404);
                 return "Tree \"" + request.params(":tree_name") + "\" does not exist.";
             }
-            AlignmentTreeQueue q =
-                    alignmentTreeQueue.get(request.params(":tree_name"));
-            System.err.println("Done sending, now waiting");
-            String s =  SerializeMSA.serializeMSA(q.waitForResult());
-            System.err.println("Given " + request.params(":tree_name") + "took " + (System.currentTimeMillis() - q.start));
+            String s =  SerializeMSA.serializeMSA(results.get(request.params(":tree_name")));
             return s;
 
         }));
@@ -251,6 +272,25 @@ public class WebServer {
             response.status(200);
             return "Alignment processed.";
         });
+        get("/processtrees", ((request, response) -> {
+            ArrayList<Map.Entry<String,TreeAligner>> aligns = new ArrayList<>();
+            synchronized (alignmentTreeQueue) {
+  ;
+                for(Map.Entry<String,AlignmentTreeQueue> q : alignmentTreeQueue.entrySet()){
+                    aligns.add(new AbstractMap.SimpleEntry<>(q.getKey(),q.getValue().getAligner()));
+                }
+                alignmentTreeQueue.clear();
+            }
+            this.busy = new SimpleConstellationRunner<>();
+            results = null;
+            busy.run((x) -> new AbstractMap.SimpleEntry<>(x.getKey(),x.getValue().run()), aligns);
+
+            System.out.println("Going to process!");
+
+
+            response.status(200);
+            return "Processing on cluster";
+        }));
         /*
          * Shut down the server.
          */
@@ -315,7 +355,7 @@ public class WebServer {
         } else {
             mode = AlignmentMode.SEMIGLOBAL;
         }
-        queue = new AlignmentTreeQueue(nrLeaves, mode, costs.get(costMatrix), costStartGap, costExtendGap,
+        queue = new AlignmentTreeQueue(constellation,nrLeaves, mode, costs.get(costMatrix), costStartGap, costExtendGap,
             SerializeMSA.readTree(nrLeaves, body));
         synchronized ( alignmentTreeQueue ) {
             alignmentTreeQueue.put(name, queue);

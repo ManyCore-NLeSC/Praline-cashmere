@@ -10,7 +10,7 @@ public class SimpleConstellationRunner<A,B> extends Thread {
     public ArrayList<B> res;
 
     public SimpleConstellationRunner(){
-        res = new ArrayList<>();
+        res = null;
     }
 
     public void run(Function<A, B> compute, ArrayList<A> in){

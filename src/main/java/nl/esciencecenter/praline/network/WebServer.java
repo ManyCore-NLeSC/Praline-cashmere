@@ -215,11 +215,10 @@ public class WebServer {
          * Retrieve the alignment steps of a tree.
          */
         get("/retrieve/steps/:tree_name", ((request, response) -> {
-
-
-
             System.err.println("Done sending, now waiting");
-            busy.join();
+            if(busy.res == null){
+                return "Not done:  \"" + request.params(":tree_name") + "\" not done yet.";
+            }
             System.out.println("Done, gonna send result!");
             synchronized (this) {
                 if (this.results == null) {

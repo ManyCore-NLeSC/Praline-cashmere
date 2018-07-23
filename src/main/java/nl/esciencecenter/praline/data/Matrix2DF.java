@@ -23,6 +23,14 @@ public class Matrix2DF {
     }
 
     public float get(int row, int col){
+        if(row >= nrRows){
+            System.err.printf("Row out of bound %d bound %d\n",row, nrRows);
+            throw new Error("Row out of bound");
+        }
+        if(col >= nrCols){
+            System.err.printf("Col out of bound %d bound %d\n",col, nrCols);
+            throw new Error("Col out of bound");
+        }
         return data[row * nrCols + col ];
     }
 

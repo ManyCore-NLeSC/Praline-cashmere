@@ -24,4 +24,18 @@ public class MSATree {
         this.coordinates = coordinates;
         this.leaf = null;
     }
+
+    public void print(){
+        if(left != null) {
+            left.print();
+        }
+        if(right != null){
+            right.print();
+        }
+        if(res != null){
+            System.out.println(res.getScore());
+        }
+
+
+    }
 }

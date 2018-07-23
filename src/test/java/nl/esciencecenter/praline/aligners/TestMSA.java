@@ -14,7 +14,13 @@ public class TestMSA {
             new float[] {0 , 6f, -4f},
             new float[] {-2, -4, 2f} });
 
-    static final Matrix2DF[] tstScoreMts = new Matrix2DF[]{testScoreMatrix};
+    static final Matrix2DF testScoreMatrix2 = new Matrix2DF(new float[][] {
+            new float[] {1f, 0f , -1f},
+            new float[] {0 , 6f, -1f},
+            new float[] {0, -1, 2f}
+    });
+
+    static final Matrix2DF[] tstScoreMts = new Matrix2DF[]{testScoreMatrix,testScoreMatrix2};
     static final IGapCost gaps = new AffineGapCost(-2,-1);
     static final Matrix2DI sequence = new Matrix2DI(5,1);
 
@@ -29,9 +35,11 @@ public class TestMSA {
         Random rnd = new Random();
         for(int i = 0 ; i < nrSeqs ; i++){
             int size = rnd.nextInt(maxLen - minLen + 1) + minLen;
-            Matrix2DI seq = new Matrix2DI(size,1);
-            for(int p = 0 ; p < seq.nrRows ; p++){
-                seq.set(p,0,rnd.nextInt(3));
+            Matrix2DI seq = new Matrix2DI(2,size);
+            for(int t = 0 ; t < 2 ; t++) {
+                for (int p = 0; p < seq.nrCols; p++) {
+                    seq.set(t, p, rnd.nextInt(3));
+                }
             }
             res.add(new AlignmentTree(seq));
         }

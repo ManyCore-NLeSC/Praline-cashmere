@@ -215,23 +215,30 @@ public class WebServer {
          * Retrieve the alignment steps of a tree.
          */
         get("/retrieve/steps/:tree_name", ((request, response) -> {
-            System.err.println("Done sending, now waiting");
+            //System.err.println("Done sending, now waiting");
             if(busy.res == null){
-                return "Not done:  \"" + request.params(":tree_name") + "\" not done yet.";
+                response.status(503);
+                return "ij j:  \"" + request.params(":tree_name") + "\" not done yet.";
             }
-            System.out.println("Done, gonna send result!");
+            //System.out.println("Done, gonna send result!");
+
             synchronized (this) {
                 if (this.results == null) {
                     results = new HashMap<>();
                     for(Map.Entry<String,MSATree> v : busy.res){
+                        System.out.printf("%s done!\n", v.getKey());
+                        System.out.printf("%s requested\n", request.params(":tree_name"));
+                        v.getValue().print();
                         results.put(v.getKey(),v.getValue());
                     }
                 }
             }
             if ( !results.containsKey(request.params(":tree_name")) ) {
                 response.status(404);
+                //System.out.printf("%s does not exist!\n", request.params(":tree_name"));
                 return "Tree \"" + request.params(":tree_name") + "\" does not exist.";
             }
+            response.status(200);
             String s =  SerializeMSA.serializeMSA(results.get(request.params(":tree_name")));
             return s;
 
@@ -389,6 +396,7 @@ public class WebServer {
 
     private int [][] parseSequence(int length, String body) {
         String [] items = body.split(" ");
+        System.err.printf("Size %d, nr tracks %d left %d\n", length, items.length / length, items.length % length );
         int [][] sequence = new int [items.length / length][length];
 
 

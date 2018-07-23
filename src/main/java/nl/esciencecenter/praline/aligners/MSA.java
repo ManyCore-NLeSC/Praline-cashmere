@@ -25,6 +25,7 @@ public class MSA {
         if(tree.sequence !=null){
             return new MSATree(tree.sequence);
         }
+
         MSATree left = msa(tree.left);
         MSATree right = msa(tree.right);
         AlignResult res;
@@ -32,7 +33,7 @@ public class MSA {
         Matrix2DI leftSteps;
         if (left.prof == null) {
             leftProf = sequenceToProfile(left.leaf );
-            leftSteps = new Matrix2DI(left.leaf.nrRows + 1,1);
+            leftSteps = new Matrix2DI(left.leaf.nrCols + 1,1);
             for(int i = 0 ; i < leftSteps.nrRows; i++) {
                 leftSteps.set(i, 0, i);
             }
@@ -44,7 +45,7 @@ public class MSA {
         Matrix2DI rightSteps;
         if (right.prof == null) {
             rightProf = sequenceToProfile(right.leaf );
-            rightSteps = new Matrix2DI(right.leaf.nrRows + 1,1);
+            rightSteps = new Matrix2DI(right.leaf.nrCols + 1,1);
             for(int i = 0 ; i < rightSteps.nrRows; i++) {
                 rightSteps.set(i, 0, i);
             }
@@ -52,11 +53,13 @@ public class MSA {
             rightProf = right.prof;
             rightSteps = right.coordinates;
         }
+
         if(left.prof == null && right.prof == null){
-            res = new AffineGapAligner().align(left.leaf.nrRows, right.leaf.nrRows,
+            res = new AffineGapAligner().align(left.leaf.nrCols, right.leaf.nrCols,
                     gapCostAg, gapCostBg,
                     new MotifPositionCost(left.leaf, right.leaf, costMatrices), mode);
         } else {
+
             res = new AffineGapAligner().align(leftProf[0].nrRows, rightProf[0].nrRows,
                     gapCostAg, gapCostBg,
                     new MotifProfilePositionCost(leftProf, rightProf, costMatrices), mode);
@@ -71,7 +74,10 @@ public class MSA {
 //        }
 //        System.out.println("\n\n");
 
-
+//        for(int i= 0 ; i < res.getSteps().size(); i++){
+//            System.err.printf("%d %d\n", res.getSteps().get(i).getX(), res.getSteps().get(i).getY());
+//        }
+//        System.err.printf("Left %d %d Right %d %d\n", leftSteps.nrRows, leftSteps.nrCols, rightSteps.nrRows, rightSteps.nrCols);
         Matrix2DI steps = mergeSteps(leftSteps,rightSteps,res.getSteps());
         Matrix2DF[] prof = mergeProfile(leftProf,rightProf,res.getSteps());
 //        prof[0].printMatrix();
@@ -83,10 +89,10 @@ public class MSA {
 
     Matrix2DI mergeSteps(Matrix2DI a, Matrix2DI b,List<Coordinate> steps){
 
-
-        //assert a.nrRows == b.nrRows;
+        assert a.nrRows == b.nrRows;
         Matrix2DI res = new Matrix2DI(steps.size(),a.nrCols + b.nrCols);
         for(int i = 0 ; i < steps.size() ; i++){
+
             int x = steps.get(i).getX();
             for(int j = 0 ; j < a.nrCols ; j++){
                 res.set(i,j,a.get(x,j));
@@ -102,6 +108,7 @@ public class MSA {
 
     Matrix2DF[] mergeProfile(Matrix2DF[] profA, Matrix2DF[] profB, List<Coordinate> steps){
         assert profA.length == profB.length;
+        assert profA[0].nrCols == profB[0].nrCols;
         Iterator<Coordinate> it = steps.iterator();
         Matrix2DF[] result = new Matrix2DF[profA.length];
         for(int i = 0 ; i < result.length; i++){
@@ -117,23 +124,29 @@ public class MSA {
             int xdiff = nxt.getX() - prev.getX();
             int ydiff = nxt.getY() - prev.getY();
             if(xdiff == 1 && ydiff == 0) {
-                for (int i = 0; i < profA[0].nrCols; i++) {
-                    for(int t = 0 ; t < profA.length; t++){
+                for(int t = 0 ; t < profA.length; t++){
+                    for (int i = 0; i < profA[t].nrCols; i++) {
+
                         result[t].set(j,i,profA[t].get(nxt.getX()-1,i));
                     }
                 }
             } else if( xdiff == 0 && ydiff == 1) {
-                for (int i = 0; i < profB[0].nrCols; i++) {
-                    for(int t = 0 ; t < profB.length; t++){
+                for(int t = 0 ; t < profB.length; t++){
+                    for (int i = 0; i < profB[t].nrCols; i++) {
+
                         result[t].set(j,i,profB[t].get(nxt.getY()-1,i));
                     }
                 }
             } else if (xdiff == 1 && ydiff == 1) {
-                for (int i = 0; i < profB[0].nrCols; i++) {
-                    for(int t = 0 ; t < profB.length; t++) {
+                if(profA[0].nrCols != profB[0].nrCols){
+                    throw new Error("Nr cols neq " +profA[0].nrCols + " " + profB[0].nrCols );
+                }
+                for(int t = 0 ; t < profB.length; t++) {
+                for (int i = 0; i < profB[t].nrCols; i++) {
                         result[t].set(j,i, 0.5f * (
-                                profA[t].get(nxt.getX()-1,i) +
-                                        profB[t].get(nxt.getY()-1,i)));
+
+                                        profB[t].get(nxt.getY()-1,i) +
+                                                profA[t].get(nxt.getX()-1,i)));
                     }
                 }
             } else {
@@ -150,13 +163,20 @@ public class MSA {
 
     Matrix2DF[] sequenceToProfile(Matrix2DI a){
         // initialize to zero
-        Matrix2DF[] profiles = new Matrix2DF[a.nrCols];
-        for(int i = 0 ; i < profiles.length; i++){
-            profiles[i] = new Matrix2DF(a.nrRows,costMatrices[i].nrCols);
+
+        int tracks = a.nrRows;
+        if(costMatrices.length != tracks){
+            System.err.printf("tracks %d costmatrices %d nrCols %d\n", tracks, costMatrices.length, a.nrCols);
+            throw new Error("");
         }
-        for(int pos = 0 ; pos < a.nrRows ; pos++){
-            for(int t = 0 ; t < a.nrCols; t++){
-                profiles[t].set(pos,a.get(pos,t),1.0f);
+        int nrPos = a.nrCols;
+        Matrix2DF[] profiles = new Matrix2DF[tracks];
+        for(int i = 0 ; i < tracks; i++){
+            profiles[i] = new Matrix2DF(nrPos,costMatrices[i].nrCols);
+        }
+        for(int t = 0 ; t < tracks; t++){
+            for(int pos = 0 ; pos < nrPos ; pos++){
+                profiles[t].set(pos,a.get(t,pos),1.0f);
             }
         }
 

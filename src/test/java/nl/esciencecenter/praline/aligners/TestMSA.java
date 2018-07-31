@@ -15,9 +15,8 @@ public class TestMSA {
             new float[] {-2, -4, 2f} });
 
     static final Matrix2DF testScoreMatrix2 = new Matrix2DF(new float[][] {
-            new float[] {1f, 0f , -1f},
-            new float[] {0 , 6f, -1f},
-            new float[] {0, -1, 2f}
+            new float[] {1f, 0f},
+            new float[] {0 , 6f}
     });
 
     static final Matrix2DF[] tstScoreMts = new Matrix2DF[]{testScoreMatrix,testScoreMatrix2};
@@ -38,7 +37,7 @@ public class TestMSA {
             Matrix2DI seq = new Matrix2DI(2,size);
             for(int t = 0 ; t < 2 ; t++) {
                 for (int p = 0; p < seq.nrCols; p++) {
-                    seq.set(t, p, rnd.nextInt(3));
+                    seq.set(t, p, rnd.nextInt(tstScoreMts[t].nrCols));
                 }
             }
             res.add(new AlignmentTree(seq));

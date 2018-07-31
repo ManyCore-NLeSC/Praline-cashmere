@@ -15,7 +15,10 @@ public class SerializeMSA {
         }
         String[] ss = s.split(" ");
         AlignmentTreeInteger res = null;
+       // System.out.println("nrLeaves: " + nrLeafs);
         for(String v : ss){
+           // System.out.println(v);
+
             String[] mv = v.split(",");
             int merge = Integer.parseInt(mv[0]);
             int with = Integer.parseInt(mv[1]);

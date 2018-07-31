@@ -41,6 +41,7 @@ public class DivideMapActivity<A,B> extends Activity{
     public int initialize(Constellation c) {
         logger.info("got size {}", inputs.size());
         if(inputs.size() <= threshold){
+            logger.info("Computing {}", inputs.size());
             for(int i = 0 ; i < inputs.size() ; i++){
                 output.set(i,compute.apply(inputs.get(i)));
             }

@@ -16,7 +16,7 @@ public class TestAlign {
 
     static final int TEST_ALPHABET_SIZE = 3;
 
-    static float getAlignScore(List<AlignStep> align, int sizeA, int sizeB, IGapCost gapCostA, IGapCost gapCostB, IPositionCost costs) {
+    public static float getAlignScore(List<AlignStep> align, int sizeA, int sizeB, IGapCost gapCostA, IGapCost gapCostB, IPositionCost costs) {
         float score = 0;
         int indexA = 0;
         int indexB = 0;

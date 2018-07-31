@@ -289,9 +289,9 @@ public class WebServer {
             }
             this.busy = new SimpleConstellationRunner<>();
             results = null;
-            busy.run((x) -> new AbstractMap.SimpleEntry<>(x.getKey(),x.getValue().run()), aligns);
+            busy.run((x) -> new AbstractMap.SimpleEntry<>(x.getKey(),x.getValue().run()), aligns,2);
 
-            System.out.println("Going to process!");
+            System.out.println("Going to process ! " + aligns.size());
 
 
             response.status(200);
@@ -396,7 +396,7 @@ public class WebServer {
 
     private int [][] parseSequence(int length, String body) {
         String [] items = body.split(" ");
-        System.err.printf("Size %d, nr tracks %d left %d\n", length, items.length / length, items.length % length );
+        //System.err.printf("Size %d, nr tracks %d left %d\n", length, items.length / length, items.length % length );
         int [][] sequence = new int [items.length / length][length];
 
 

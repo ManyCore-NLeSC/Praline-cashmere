@@ -31,7 +31,7 @@ public class MSA {
         AlignResult res;
         Matrix2DF[] leftProf;
         Matrix2DI leftSteps;
-        if (left.prof == null) {
+        if (left.prof == null ) {
             leftProf = sequenceToProfile(left.leaf );
             leftSteps = new Matrix2DI(left.leaf.nrCols + 1,1);
             for(int i = 0 ; i < leftSteps.nrRows; i++) {
@@ -58,11 +58,17 @@ public class MSA {
             res = new AffineGapAligner().align(left.leaf.nrCols, right.leaf.nrCols,
                     gapCostAg, gapCostBg,
                     new MotifPositionCost(left.leaf, right.leaf, costMatrices), mode);
+            assert ComputeScore.getAlignScore(res.getAlignSteps(),left.leaf.nrCols, right.leaf.nrCols,gapCostAg, gapCostBg,
+                    new MotifPositionCost(left.leaf, right.leaf, costMatrices)) == res.getScore();
+
         } else {
 
             res = new AffineGapAligner().align(leftProf[0].nrRows, rightProf[0].nrRows,
                     gapCostAg, gapCostBg,
                     new MotifProfilePositionCost(leftProf, rightProf, costMatrices), mode);
+            assert ComputeScore.getAlignScore(res.getAlignSteps(),leftProf[0].nrRows, rightProf[0].nrRows,
+                    gapCostAg, gapCostBg,
+                    new MotifProfilePositionCost(leftProf, rightProf, costMatrices)) == res.getScore();
         }
 //        System.out.println("LEFTA");
 //        leftSteps.printMatrix();
@@ -82,6 +88,9 @@ public class MSA {
         Matrix2DF[] prof = mergeProfile(leftProf,rightProf,res.getSteps());
 //        prof[0].printMatrix();
 //        System.out.println("\n");
+
+
+
         return new MSATree(left,right,prof,res,steps);
 
     }
@@ -89,7 +98,7 @@ public class MSA {
 
     Matrix2DI mergeSteps(Matrix2DI a, Matrix2DI b,List<Coordinate> steps){
 
-        assert a.nrRows == b.nrRows;
+        //assert a.nrRows == b.nrRows;
         Matrix2DI res = new Matrix2DI(steps.size(),a.nrCols + b.nrCols);
         for(int i = 0 ; i < steps.size() ; i++){
 

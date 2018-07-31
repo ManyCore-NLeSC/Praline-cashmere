@@ -1,5 +1,7 @@
 package nl.esciencecenter.praline.data;
 
+import nl.esciencecenter.praline.aligners.ComputeScore;
+
 public class MSATree {
     public final Matrix2DI leaf;
     public final MSATree left, right;
@@ -38,4 +40,5 @@ public class MSATree {
 
 
     }
+
 }

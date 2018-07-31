@@ -1,7 +1,12 @@
+plugins {
+	id 'java'
+	id 'application'
+}
+
 group 'nl.esciencecenter'
 version '0.1'
 
-apply plugin: 'java'
+mainClassName = 'nl.esciencecenter.praline.Praline'
 
 sourceCompatibility = 1.8
 

@@ -17,13 +17,14 @@ repositories {
 }
 
 dependencies {
+    implementation 'nl.junglecomputing.ipl:ipl-support:2.3.1'
+    implementation 'nl.junglecomputing.cashmere:cashmere:0.2.0'
     implementation "com.sparkjava:spark-core:2.6.0"
     implementation "com.beust:jcommander:1.72"
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
     implementation 'nl.junglecomputing:constellation:2.0.0'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    api 'nl.junglecomputing.ipl:ipl-support:2.3.1'
 }
 
 
@@ -38,7 +39,7 @@ distributions {
 	    	from 'scripts'
 	    }
 	    into('lib') {
-	    	//from configurations.runtimeClasspath
+	    	from configurations.runtimeClasspath
 	    	from jar.archivePath
 	    }
         }

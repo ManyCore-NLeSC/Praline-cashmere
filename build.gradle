@@ -1,12 +1,12 @@
 plugins {
-	id 'java'
-	id 'application'
+    id 'java'
+    id 'distribution'
 }
 
 group 'nl.esciencecenter'
 version '0.1'
 
-mainClassName = 'nl.esciencecenter.praline.Praline'
+//mainClassName = 'nl.esciencecenter.praline.Praline'
 
 sourceCompatibility = 1.8
 
@@ -17,10 +17,33 @@ repositories {
 }
 
 dependencies {
-    compile "com.sparkjava:spark-core:2.6.0"
-    compile "com.beust:jcommander:1.72"
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
-    compile 'nl.junglecomputing:constellation:2.0.0'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation "com.sparkjava:spark-core:2.6.0"
+    implementation "com.beust:jcommander:1.72"
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+    implementation 'nl.junglecomputing:constellation:2.0.0'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    api 'nl.junglecomputing.ipl:ipl-support:2.3.1'
 }
+
+
+installDist.dependsOn jar
+
+distributions {
+    main {
+        baseName = project.name
+        contents {
+	    from 'log4j.properties'
+	    into('bin') {
+	    	from 'scripts'
+	    }
+	    into('lib') {
+	    	//from configurations.runtimeClasspath
+	    	from jar.archivePath
+	    }
+        }
+    }
+}
+
+
+

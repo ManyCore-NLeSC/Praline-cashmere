@@ -12,14 +12,15 @@ import java.util.function.Function;
 
 public class SimpleConstellationScheduler<A,B>  {
 
-    final static Logger logger = LoggerFactory.getLogger(DivideMapActivity.class);
+
+    final static Logger logger = LoggerFactory.getLogger(SimpleConstellationScheduler.class);
 
     ArrayList<B> mapConstellation(Constellation c, Context ctx, int threshhold, Function<A, B> compute, ArrayList<A> in){
 
         try {
             SingleEventCollector eventCollector = new SingleEventCollector(ctx);
             ActivityIdentifier id = c.submit(eventCollector);
-            logger.info(" " + in.size());
+            logger.info("got input size: " + in.size());
             c.submit(new DivideMapActivity<>(threshhold,id,Side.LEFT,ctx,compute,in));
             logger.info("Waiting for toplevel event {}", id);
             Event a = eventCollector.waitForEvent();

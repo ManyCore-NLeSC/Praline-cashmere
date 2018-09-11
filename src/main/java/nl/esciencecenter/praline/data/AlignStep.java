@@ -1,5 +1,7 @@
 package nl.esciencecenter.praline.data;
 
-public enum AlignStep {
+import java.io.Serializable;
+
+public enum AlignStep implements Serializable {
     ALIGN, GAPA, GAPB, NIL
 }

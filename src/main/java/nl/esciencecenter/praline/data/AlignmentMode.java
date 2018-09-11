@@ -1,5 +1,7 @@
 package nl.esciencecenter.praline.data;
 
-public enum AlignmentMode {
+import java.io.Serializable;
+
+public enum AlignmentMode implements Serializable {
     GLOBAL, LOCAL, SEMIGLOBAL
 }

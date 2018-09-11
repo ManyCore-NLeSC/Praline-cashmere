@@ -4,7 +4,9 @@ import nl.esciencecenter.praline.aligners.MSA;
 import nl.esciencecenter.praline.data.AlignmentTree;
 import nl.esciencecenter.praline.data.MSATree;
 
-public class TreeAligner  {
+import java.io.Serializable;
+
+public class TreeAligner  implements Serializable{
     private final AlignmentTree tree;
     private final MSA aligner;
 

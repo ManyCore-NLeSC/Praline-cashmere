@@ -1,6 +1,8 @@
 package nl.esciencecenter.praline.data;
 
-public class Matrix2DI {
+import java.io.Serializable;
+
+public class Matrix2DI implements Serializable {
     final int[] data;
     public final int nrRows, nrCols;
 

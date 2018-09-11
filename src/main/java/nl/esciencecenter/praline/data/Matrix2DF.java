@@ -1,6 +1,8 @@
 package nl.esciencecenter.praline.data;
 
-public class Matrix2DF {
+import java.io.Serializable;
+
+public class Matrix2DF implements Serializable {
     final float[] data;
     public final int nrRows, nrCols;
 

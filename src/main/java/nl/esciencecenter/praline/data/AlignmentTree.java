@@ -1,7 +1,9 @@
 package nl.esciencecenter.praline.data;
 
 
-public class AlignmentTree {
+import java.io.Serializable;
+
+public class AlignmentTree implements Serializable{
     public final AlignmentTree left;
     public final AlignmentTree right;
     public final Matrix2DI sequence;

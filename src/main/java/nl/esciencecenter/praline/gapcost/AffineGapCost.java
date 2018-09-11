@@ -1,6 +1,8 @@
 package nl.esciencecenter.praline.gapcost;
 
-public class AffineGapCost implements IGapCost {
+import java.io.Serializable;
+
+public class AffineGapCost implements IGapCost, Serializable {
     public final float start;
     public final float extend;
 

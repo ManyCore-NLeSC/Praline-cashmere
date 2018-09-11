@@ -17,6 +17,6 @@ command = "prun -np #{$nrNodes} " +
     "-Dibis.pool.size=#{$nrNodes} -Dibis.server.port=#{$port} " +
     "-Dibis.pool.name=das5.#{$$} #{$classname} #{$rest.join(" ")}\n"
 
-print command
+#print command
 
 exec(command)

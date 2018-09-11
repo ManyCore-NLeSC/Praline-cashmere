@@ -5,10 +5,11 @@ import nl.esciencecenter.praline.gapcost.IGapCost;
 import nl.esciencecenter.praline.positioncost.MotifPositionCost;
 import nl.esciencecenter.praline.positioncost.MotifProfilePositionCost;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
-public class MSA {
+public class MSA implements Serializable {
     final Matrix2DF[] costMatrices;
     final IGapCost gapCostAg;
     final IGapCost gapCostBg;

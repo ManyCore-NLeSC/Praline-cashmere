@@ -1,7 +1,9 @@
 package nl.esciencecenter.praline.gapcost;
 
 
-public class LinearGapCost implements IGapCost {
+import java.io.Serializable;
+
+public class LinearGapCost implements IGapCost, Serializable {
 
     public final int cost;
 

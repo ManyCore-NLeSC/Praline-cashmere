@@ -2,7 +2,9 @@ package nl.esciencecenter.praline.data;
 
 import nl.esciencecenter.praline.aligners.ComputeScore;
 
-public class MSATree {
+import java.io.Serializable;
+
+public class MSATree implements Serializable {
     public final Matrix2DI leaf;
     public final MSATree left, right;
     public final Matrix2DF[] prof;

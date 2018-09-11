@@ -1,10 +1,11 @@
 package nl.esciencecenter.praline.data;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-public class AlignResult {
+public class AlignResult implements Serializable {
     private final float score;
     private final List<Coordinate> steps;
 

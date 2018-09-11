@@ -6,6 +6,7 @@ import nl.esciencecenter.praline.network.constellation.SimpleConstellationRunner
 import nl.esciencecenter.praline.network.constellation.SimpleConstellationScheduler;
 import sun.reflect.generics.tree.Tree;
 
+import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -289,7 +290,10 @@ public class WebServer {
             }
             this.busy = new SimpleConstellationRunner<>();
             results = null;
-            busy.run((x) -> new AbstractMap.SimpleEntry<>(x.getKey(),x.getValue().run()), aligns,2);
+            Function<Map.Entry<String,TreeAligner>,Map.Entry<String,MSATree>> f =
+                    (Function<Map.Entry<String,TreeAligner>,Map.Entry<String,MSATree>> & Serializable)
+                            (x) -> new AbstractMap.SimpleEntry<>(x.getKey(),x.getValue().run());
+            busy.run(constellation,f, aligns);
 
             System.out.println("Going to process ! " + aligns.size());
 

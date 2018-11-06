@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.function.Function;
 
-public class SimpleConstellationScheduler<A extends Serializable,B extends Serializable>  {
+public class SimpleConstellationScheduler<A,B>  {
 
 
     final static Logger logger = LoggerFactory.getLogger(SimpleConstellationScheduler.class);

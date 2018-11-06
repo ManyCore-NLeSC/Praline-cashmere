@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.function.Function;
 
-public class DivideMapActivity<A extends Serializable,B extends Serializable> extends Activity{
+public class DivideMapActivity<A,B> extends Activity{
 
     final static Logger logger = LoggerFactory.getLogger(DivideMapActivity.class);
     final ArrayList<A> inputs;

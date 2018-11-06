@@ -41,7 +41,8 @@ public class Praline {
             Constellation c = ConstellationFactory.createConstellation(cons);
             c.activate();
             if (c.isMaster()) {
-                File f = new File("/home/avdploeg/bowbeforeme");
+		String dir = System.getenv("PRALINE_CASHMERE_DIR");
+                File f = new File(dir + "/" + "bowbeforeme");
                 f.createNewFile();
                 PrintWriter out = new PrintWriter(f);
                 out.print(HOSTNAME);

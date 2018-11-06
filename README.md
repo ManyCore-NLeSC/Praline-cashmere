@@ -4,7 +4,7 @@ Java server to compute sequence alignments using Cashmere and MCL.
 To run on DAS-5:
 
 clone this repository
-clone the repository @ https://github.com/NLeSC/whole-genome-tool, this contains the python client code
+clone the repository @ https://github.com/ManyCore-NLeSC/whole-genome-tool, this contains the python client code
 
 run gradlew jar here, this will create the build directory
 export an evironment variable PRALINE_CASHMERE_DIR and set it to build/install/praline-cashmere

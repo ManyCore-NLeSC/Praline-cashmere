@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-public class SimpleConstellationRunner<A,B> extends Thread {
+public class SimpleConstellationRunner<A extends Serializable,B extends Serializable> extends Thread {
 
     public ArrayList<B> res;
 

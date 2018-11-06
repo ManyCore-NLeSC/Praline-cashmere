@@ -6,11 +6,12 @@ import ibis.constellation.util.SingleEventCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.function.Function;
 
-public class SimpleConstellationScheduler<A,B>  {
+public class SimpleConstellationScheduler<A extends Serializable,B extends Serializable>  {
 
 
     final static Logger logger = LoggerFactory.getLogger(SimpleConstellationScheduler.class);
@@ -21,7 +22,7 @@ public class SimpleConstellationScheduler<A,B>  {
             SingleEventCollector eventCollector = new SingleEventCollector(ctx);
             ActivityIdentifier id = c.submit(eventCollector);
             logger.info("got input size: " + in.size());
-            c.submit(new DivideMapActivity<>(threshhold,id,Side.LEFT,ctx,compute,in));
+            c.submit(new DivideMapActivity<A,B>(threshhold,id,Side.LEFT,ctx,compute,in));
             logger.info("Waiting for toplevel event {}", id);
             Event a = eventCollector.waitForEvent();
             logger.info("Got toplevel event ");

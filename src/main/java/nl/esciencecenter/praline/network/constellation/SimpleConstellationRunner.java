@@ -16,9 +16,13 @@ public class SimpleConstellationRunner<A,B> extends Thread {
     }
 
     public void run(Constellation c, Function<A, B> compute, ArrayList<A> in){
+        Timer t = c.getOverallTimer();
+        int i = t.start();
             Context ctxt = new Context("MSA");
                 res = new SimpleConstellationScheduler<A,B>().
                         mapConstellation(c, ctxt, 2, compute , in);
+        t.stop(i);
+
 
 
     }

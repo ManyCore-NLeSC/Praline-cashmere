@@ -1,6 +1,7 @@
 package nl.esciencecenter.praline.network;
 
 import ibis.constellation.Constellation;
+import ibis.constellation.Timer;
 import nl.esciencecenter.praline.data.*;
 import nl.esciencecenter.praline.network.constellation.SimpleConstellationRunner;
 import nl.esciencecenter.praline.network.constellation.SimpleConstellationScheduler;

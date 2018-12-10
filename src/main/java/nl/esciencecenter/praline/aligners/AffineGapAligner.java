@@ -12,7 +12,18 @@ import java.util.Stack;
 
 public class AffineGapAligner implements IAlign {
 
-    static final int GAPA_MASK=1, GAPB_MASK =2, ALIGN_MASK =4;
+    /* we need bitmasks to encode which directions
+       we possibly can take, we need this
+       to see if the gap is already started in a direction
+
+       we also need this
+       when doing the traceback because
+       we need to keep walking in the same direction
+       until we can no longer to pay the start cost
+       */
+
+
+    static final int GAPA_MASK=0b001, GAPB_MASK =0b010, ALIGN_MASK =0b100;
 
     static float max3(float a,float b, float c){
         return Math.max(a,Math.max(b,c));
@@ -101,18 +112,6 @@ public class AffineGapAligner implements IAlign {
 
         }
 
-//        System.out.println();
-//
-//        System.out.println("traceback\n");
-//
-//        for(int i = 0 ; i < sizeB + 1; i++){
-//            for(int j = 0 ; j < sizeA + 1 ; j++){
-//                System.out.printf("%4d ", traceback.get(i,j));
-//            }
-//            System.out.println();
-//        }
-//        System.out.println();
-
 
         List<Coordinate> align;
         float endScore;
@@ -153,6 +152,13 @@ public class AffineGapAligner implements IAlign {
         res.add(new Coordinate(rowi,coli));
 
         AlignStep lastStep = AlignStep.NIL;
+        /* We need to keep walking in the same
+           direction until the start cost is paid
+
+           Hence we remember the direction we took last
+           and keep walking that way until we can no longer
+           walk in that direction.
+         */
 
         int trace;
         while((trace = traceback.get(rowi,coli)) != 0){
@@ -167,6 +173,7 @@ public class AffineGapAligner implements IAlign {
                 newStep = AlignStep.GAPB;
                 coli--;
             } else { // must be both gap a and b
+
                 if(lastStep == AlignStep.GAPA){
                     newStep = lastStep;
                     rowi--;

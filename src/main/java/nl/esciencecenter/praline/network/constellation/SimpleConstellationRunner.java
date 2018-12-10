@@ -20,7 +20,7 @@ public class SimpleConstellationRunner<A,B> extends Thread {
         int i = t.start();
             Context ctxt = new Context("MSA");
                 res = new SimpleConstellationScheduler<A,B>().
-                        mapConstellation(c, ctxt, 2, compute , in);
+                        mapConstellation(c, ctxt, 1, compute , in);
         t.stop(i);
         c.done();
 

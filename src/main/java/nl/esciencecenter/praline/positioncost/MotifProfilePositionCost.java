@@ -6,6 +6,7 @@ public class MotifProfilePositionCost implements IPositionCost {
 
     final ProfilePositionCost[] costs;
 
+    // matrix for each track, cost matrix also for each track
     public MotifProfilePositionCost(Matrix2DF[] profileA, Matrix2DF[] profileB, Matrix2DF[] costMatrix) {
         assert profileA.length == profileB.length && profileA.length == costMatrix.length;
         costs = new ProfilePositionCost[profileA.length];

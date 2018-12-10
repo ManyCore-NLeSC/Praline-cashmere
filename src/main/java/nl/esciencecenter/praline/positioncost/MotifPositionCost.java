@@ -7,6 +7,9 @@ public class MotifPositionCost implements IPositionCost {
     final Matrix2DI a,b;
     final Matrix2DF[] alignCosts;
 
+    // sequences are two dimensional, represented as a matrix (as opposed to profilepositioncost):
+    //  first dimension: track, second dimension: position
+    // cost matrix per track
     public MotifPositionCost(Matrix2DI a, Matrix2DI b, Matrix2DF[] alignCosts){
         if(a.nrRows != b.nrRows) {
             throw new Error("Not the same number of tracks" + a.nrRows + " " + b.nrRows + "cols " + a.nrCols + " " + b.nrCols);
@@ -41,8 +44,6 @@ public class MotifPositionCost implements IPositionCost {
             } else {
                 cost+=alignCosts[track].get(ac, bc);
             }
-            //System.out.printf("track %d rows %d cols %d\n", track, alignCosts[track].nrRows, alignCosts[track].nrCols);
-            //System.out.printf("ding %d %d\n",  ac, bc);
 
 
         }

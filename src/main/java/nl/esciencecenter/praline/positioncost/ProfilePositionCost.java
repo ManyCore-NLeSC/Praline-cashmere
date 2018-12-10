@@ -4,6 +4,8 @@ import nl.esciencecenter.praline.data.Matrix2DF;
 
 public class ProfilePositionCost implements IPositionCost {
 
+    // first dimension : position
+    // second dimension: symbol
     final Matrix2DF profileA;
     final Matrix2DF profileB;
     final Matrix2DF costMatrix;

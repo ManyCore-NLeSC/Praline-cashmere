@@ -8,6 +8,10 @@ import java.util.List;
 
 public class ComputeScore {
 
+    // compute align score from align steps and gap and position costs
+    // this is used as a sanity check, the score reported here
+    // and the score computed by an alignment algorithm should
+    // be the same
     public static float getAlignScore(List<AlignStep> align, int sizeA, int sizeB, IGapCost gapCostA, IGapCost gapCostB, IPositionCost costs) {
         float score = 0;
         int indexA = 0;

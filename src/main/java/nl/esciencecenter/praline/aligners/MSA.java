@@ -33,8 +33,10 @@ public class MSA implements Serializable {
         Matrix2DF[] leftProf;
         Matrix2DI leftSteps;
         if (left.prof == null ) {
+            // prepare profile for mergeProfile
             leftProf = sequenceToProfile(left.leaf );
             leftSteps = new Matrix2DI(left.leaf.nrCols + 1,1);
+            // Prepare 1 dimensional align path for mergeSteps
             for(int i = 0 ; i < leftSteps.nrRows; i++) {
                 leftSteps.set(i, 0, i);
             }
@@ -45,7 +47,9 @@ public class MSA implements Serializable {
         Matrix2DF[] rightProf;
         Matrix2DI rightSteps;
         if (right.prof == null) {
+            // prepare profile for mergeProfile
             rightProf = sequenceToProfile(right.leaf );
+            // Prepare 1 dimensional align path for mergeSteps
             rightSteps = new Matrix2DI(right.leaf.nrCols + 1,1);
             for(int i = 0 ; i < rightSteps.nrRows; i++) {
                 rightSteps.set(i, 0, i);
@@ -55,21 +59,23 @@ public class MSA implements Serializable {
             rightSteps = right.coordinates;
         }
 
+        // if left and right nodes are leaves we can
+        // use the more efficient non-profile aligner
         if(left.prof == null && right.prof == null){
             res = new AffineGapAligner().align(left.leaf.nrCols, right.leaf.nrCols,
                     gapCostAg, gapCostBg,
                     new MotifPositionCost(left.leaf, right.leaf, costMatrices), mode);
-            assert ComputeScore.getAlignScore(res.getAlignSteps(),left.leaf.nrCols, right.leaf.nrCols,gapCostAg, gapCostBg,
-                    new MotifPositionCost(left.leaf, right.leaf, costMatrices)) == res.getScore();
+            //assert ComputeScore.getAlignScore(res.getAlignSteps(),left.leaf.nrCols, right.leaf.nrCols,gapCostAg, gapCostBg,
+            //       new MotifPositionCost(left.leaf, right.leaf, costMatrices)) == res.getScore();
 
         } else {
 
             res = new AffineGapAligner().align(leftProf[0].nrRows, rightProf[0].nrRows,
                     gapCostAg, gapCostBg,
                     new MotifProfilePositionCost(leftProf, rightProf, costMatrices), mode);
-            assert ComputeScore.getAlignScore(res.getAlignSteps(),leftProf[0].nrRows, rightProf[0].nrRows,
-                    gapCostAg, gapCostBg,
-                    new MotifProfilePositionCost(leftProf, rightProf, costMatrices)) == res.getScore();
+            //assert ComputeScore.getAlignScore(res.getAlignSteps(),leftProf[0].nrRows, rightProf[0].nrRows,
+            //        gapCostAg, gapCostBg,
+            //        new MotifProfilePositionCost(leftProf, rightProf, costMatrices)) == res.getScore();
         }
 //        System.out.println("LEFTA");
 //        leftSteps.printMatrix();
@@ -96,20 +102,27 @@ public class MSA implements Serializable {
 
     }
 
-
-    Matrix2DI mergeSteps(Matrix2DI a, Matrix2DI b,List<Coordinate> steps){
+    
+    Matrix2DI mergeSteps(Matrix2DI stepsLeft, Matrix2DI stepsRight,List<Coordinate> stepsCurrent){
 
         //assert a.nrRows == b.nrRows;
-        Matrix2DI res = new Matrix2DI(steps.size(),a.nrCols + b.nrCols);
-        for(int i = 0 ; i < steps.size() ; i++){
+        //
+        // vertical = steps, horizontal= n-dimensional coordinate
+        // stepsLeft = k-dimensional coordinate steps, length a
+        // stepsRight = l-dimensional coordinate steps, length b
+        // stepsCurrent = 2-dimensional coordinate steps, length n,
+        //        (first coordinate is in range (0,a) , second in range (0,b))
+        // result = (k+l)-dimensional coordinate steps
+        Matrix2DI res = new Matrix2DI(stepsCurrent.size(),stepsLeft.nrCols + stepsRight.nrCols);
+        for(int i = 0 ; i < stepsCurrent.size() ; i++){
 
-            int x = steps.get(i).getX();
-            for(int j = 0 ; j < a.nrCols ; j++){
-                res.set(i,j,a.get(x,j));
+            int x = stepsCurrent.get(i).getX();
+            for(int j = 0 ; j < stepsLeft.nrCols ; j++){
+                res.set(i,j,stepsLeft.get(x,j));
             }
-            int y = steps.get(i).getY();
-            for(int j = 0 ; j < b.nrCols; j++){
-                res.set(i,a.nrCols + j, b.get(y,j));
+            int y = stepsCurrent.get(i).getY();
+            for(int j = 0 ; j < stepsRight.nrCols; j++){
+                res.set(i,stepsLeft.nrCols + j, stepsRight.get(y,j));
             }
         }
         return res;
@@ -133,6 +146,7 @@ public class MSA implements Serializable {
             Coordinate nxt = it.next();
             int xdiff = nxt.getX() - prev.getX();
             int ydiff = nxt.getY() - prev.getY();
+            // gap in B, copy from A
             if(xdiff == 1 && ydiff == 0) {
                 for(int t = 0 ; t < profA.length; t++){
                     for (int i = 0; i < profA[t].nrCols; i++) {
@@ -140,6 +154,7 @@ public class MSA implements Serializable {
                         result[t].set(j,i,profA[t].get(nxt.getX()-1,i));
                     }
                 }
+            // gap in A, copy from B
             } else if( xdiff == 0 && ydiff == 1) {
                 for(int t = 0 ; t < profB.length; t++){
                     for (int i = 0; i < profB[t].nrCols; i++) {
@@ -147,6 +162,7 @@ public class MSA implements Serializable {
                         result[t].set(j,i,profB[t].get(nxt.getY()-1,i));
                     }
                 }
+            // align, average A and B
             } else if (xdiff == 1 && ydiff == 1) {
                 if(profA[0].nrCols != profB[0].nrCols){
                     throw new Error("Nr cols neq " +profA[0].nrCols + " " + profB[0].nrCols );
@@ -154,11 +170,11 @@ public class MSA implements Serializable {
                 for(int t = 0 ; t < profB.length; t++) {
                 for (int i = 0; i < profB[t].nrCols; i++) {
                         result[t].set(j,i, 0.5f * (
-
                                         profB[t].get(nxt.getY()-1,i) +
                                                 profA[t].get(nxt.getX()-1,i)));
                     }
                 }
+            // should not happen
             } else {
                 System.out.println(nxt.toString());
                 System.out.println(prev.toString());

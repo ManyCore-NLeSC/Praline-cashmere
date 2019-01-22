@@ -5,11 +5,14 @@ import nl.esciencecenter.praline.aligners.ComputeScore;
 import java.io.Serializable;
 
 public class MSATree implements Serializable {
+
     public final Matrix2DI leaf;
     public final MSATree left, right;
     public final Matrix2DF[] prof;
     public final AlignResult res;
     public final Matrix2DI coordinates;
+
+    private static final int INDENTATION = 2;
 
     public MSATree(Matrix2DI leaf){
         this.leaf = leaf;
@@ -29,18 +32,25 @@ public class MSATree implements Serializable {
         this.leaf = null;
     }
 
-    public void print(){
-        if(left != null) {
-            left.print();
-        }
-        if(right != null){
-            right.print();
-        }
-        if(res != null){
-            System.out.println(res.getScore());
-        }
-
-
+    public String valueToString() {
+	StringBuilder sb = new StringBuilder("\n");
+	valueToString(sb, 0);
+	return sb.toString();
     }
 
+    private void valueToString(StringBuilder sb, int levelIndentation) {
+        if(left != null) {
+            left.valueToString(sb, levelIndentation++);
+        }
+        if(right != null){
+            right.valueToString(sb, levelIndentation++);
+        }
+        if(res != null){
+	    for (int i = 0; i < levelIndentation * INDENTATION; i++) {
+		sb.append(" ");
+	    }
+	    sb.append(res.getScore());
+	    sb.append("\n");
+        }
+    }
 }

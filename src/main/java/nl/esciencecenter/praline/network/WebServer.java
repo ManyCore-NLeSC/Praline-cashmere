@@ -236,9 +236,9 @@ public class WebServer {
                 if (this.results == null) {
                     results = new HashMap<>();
                     for(Map.Entry<String,MSATree> v : busy.res){
-                        System.out.printf("%s done!\n", v.getKey());
-                        System.out.printf("%s requested\n", request.params(":tree_name"));
-                        v.getValue().print();
+                        logger.info("{} done!", v.getKey());
+                        logger.info("{} requested", request.params(":tree_name"));
+			logger.info(v.getValue().valueToString());
                         results.put(v.getKey(),v.getValue());
                     }
                 }

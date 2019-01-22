@@ -1,15 +1,22 @@
 package nl.esciencecenter.praline.aligners;
 
+import java.io.Serializable;
+
+import java.util.Iterator;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.praline.data.*;
 import nl.esciencecenter.praline.gapcost.IGapCost;
 import nl.esciencecenter.praline.positioncost.MotifPositionCost;
 import nl.esciencecenter.praline.positioncost.MotifProfilePositionCost;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-
 public class MSA implements Serializable {
+
+    final static Logger logger = LoggerFactory.getLogger(MSA.class);
+    
     final Matrix2DF[] costMatrices;
     final IGapCost gapCostAg;
     final IGapCost gapCostBg;
@@ -24,38 +31,52 @@ public class MSA implements Serializable {
 
     public MSATree msa(AlignmentTree tree ){
         if(tree.sequence !=null){
+	    logger.debug("The alignment tree has a sequence, returning it");
             return new MSATree(tree.sequence);
         }
 
+
         MSATree left = msa(tree.left);
         MSATree right = msa(tree.right);
-        AlignResult res;
+
+	logger.debug("Running MSA");
+
+	AlignResult res;
+
         Matrix2DF[] leftProf;
         Matrix2DI leftSteps;
+	
         if (left.prof == null ) {
+	    logger.debug("left.prof == null, so create a profile from sequence");
             leftProf = sequenceToProfile(left.leaf );
             leftSteps = new Matrix2DI(left.leaf.nrCols + 1,1);
             for(int i = 0 ; i < leftSteps.nrRows; i++) {
                 leftSteps.set(i, 0, i);
             }
         } else {
+	    logger.debug("left.prof != null, so using steps and profile from left");
             leftProf = left.prof;
             leftSteps = left.coordinates;
         }
+	
         Matrix2DF[] rightProf;
         Matrix2DI rightSteps;
+	
         if (right.prof == null) {
+	    logger.debug("right.prof == null, so create a profile from sequence");
             rightProf = sequenceToProfile(right.leaf );
             rightSteps = new Matrix2DI(right.leaf.nrCols + 1,1);
             for(int i = 0 ; i < rightSteps.nrRows; i++) {
                 rightSteps.set(i, 0, i);
             }
         } else {
+	    logger.debug("right.prof != null, so using steps and profile from right");
             rightProf = right.prof;
             rightSteps = right.coordinates;
         }
 
         if(left.prof == null && right.prof == null){
+	    logger.debug("Both left.prof and right.prof == null, so applying AffineGapAligner on the leafs");
             res = new AffineGapAligner().align(left.leaf.nrCols, right.leaf.nrCols,
                     gapCostAg, gapCostBg,
                     new MotifPositionCost(left.leaf, right.leaf, costMatrices), mode);
@@ -63,7 +84,7 @@ public class MSA implements Serializable {
                     new MotifPositionCost(left.leaf, right.leaf, costMatrices)) == res.getScore();
 
         } else {
-
+	    logger.debug("Applying AffineGapAligner on left- and rightProf");
             res = new AffineGapAligner().align(leftProf[0].nrRows, rightProf[0].nrRows,
                     gapCostAg, gapCostBg,
                     new MotifProfilePositionCost(leftProf, rightProf, costMatrices), mode);
@@ -85,12 +106,11 @@ public class MSA implements Serializable {
 //            System.err.printf("%d %d\n", res.getSteps().get(i).getX(), res.getSteps().get(i).getY());
 //        }
 //        System.err.printf("Left %d %d Right %d %d\n", leftSteps.nrRows, leftSteps.nrCols, rightSteps.nrRows, rightSteps.nrCols);
+	logger.debug("Merging the steps and the profiles");
         Matrix2DI steps = mergeSteps(leftSteps,rightSteps,res.getSteps());
         Matrix2DF[] prof = mergeProfile(leftProf,rightProf,res.getSteps());
 //        prof[0].printMatrix();
 //        System.out.println("\n");
-
-
 
         return new MSATree(left,right,prof,res,steps);
 

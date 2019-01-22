@@ -24,7 +24,7 @@ public class Praline {
             throw new Error("Could not obtain hostname! " + e.getMessage());
         }
     }
-    final static int threads = 16;
+    final static int threads = 1;
     final static Logger logger = LoggerFactory.getLogger(Praline.class);
     public static void main(String [] args) throws InterruptedException {
         try {

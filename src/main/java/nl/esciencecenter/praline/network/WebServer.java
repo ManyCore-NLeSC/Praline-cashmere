@@ -1,23 +1,31 @@
 package nl.esciencecenter.praline.network;
 
-import ibis.constellation.Constellation;
-import ibis.constellation.Timer;
-import nl.esciencecenter.praline.data.*;
-import nl.esciencecenter.praline.network.constellation.SimpleConstellationRunner;
-import nl.esciencecenter.praline.network.constellation.SimpleConstellationScheduler;
-import sun.reflect.generics.tree.Tree;
-
 import java.io.Serializable;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import sun.reflect.generics.tree.Tree;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static spark.Spark.*;
+
+import ibis.constellation.Constellation;
+import ibis.constellation.Timer;
+
+import nl.esciencecenter.praline.data.*;
+import nl.esciencecenter.praline.network.constellation.SimpleConstellationRunner;
+import nl.esciencecenter.praline.network.constellation.SimpleConstellationScheduler;
 
 public class WebServer {
 
+    final static Logger logger = LoggerFactory.getLogger(WebServer.class);
+    
     // Global data structures
     private final HashMap<String, Matrix2DF[]> costs;
     private final HashMap<String, Matrix2DF[]> profiles;
@@ -281,9 +289,10 @@ public class WebServer {
             return "Alignment processed.";
         });
         get("/processtrees", ((request, response) -> {
+	    logger.debug("Receiving command /processtrees");
             ArrayList<Map.Entry<String,TreeAligner>> aligns = new ArrayList<>();
+	    logger.debug("Adding tasks from alignmentTreeQueue to aligns");
             synchronized (alignmentTreeQueue) {
-  ;
                 for(Map.Entry<String,AlignmentTreeQueue> q : alignmentTreeQueue.entrySet()){
                     aligns.add(new AbstractMap.SimpleEntry<>(q.getKey(),q.getValue().getAligner()));
                 }
@@ -296,8 +305,7 @@ public class WebServer {
                             (x) -> new AbstractMap.SimpleEntry<>(x.getKey(),x.getValue().run());
             busy.run(constellation,f, aligns);
 
-            System.out.println("Going to process ! " + aligns.size());
-
+	    logger.debug("Started a SimpleConstellationRunner thread that is processing {} alignments", aligns.size());
 
             response.status(200);
             return "Processing on cluster";

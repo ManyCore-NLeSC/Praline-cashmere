@@ -39,11 +39,11 @@ public class DivideMapActivity<A,B> extends Activity{
 
     @Override
     public int initialize(Constellation c) {
-        logger.info("got size {}", inputs.size());
+        logger.debug("Initialize on inputs size: {}", inputs.size());
         if(inputs.size() <= threshold){
             Timer t = c.getTimer("CPU",c.identifier().toString(),"compute");
             int j = t.start();
-            logger.info("Computing {}", inputs.size());
+            logger.debug("Computing on inputs size: {}", inputs.size());
             for(int i = 0 ; i < inputs.size() ; i++){
                 output.set(i,compute.apply(inputs.get(i)));
             }
@@ -51,6 +51,8 @@ public class DivideMapActivity<A,B> extends Activity{
             return FINISH;
         } else {
             try {
+		logger.debug("Splitting the inputs in half");
+
                 int sizeL = inputs.size()/2;
                 ArrayList<A> leftHalf = new ArrayList<>(sizeL);
 
@@ -101,7 +103,7 @@ public class DivideMapActivity<A,B> extends Activity{
 
     @Override
     public void cleanup(Constellation c) {
-        logger.info("Sending up {} {}", inputs.size(), parent);
+        logger.debug("Sending up {} {}", inputs.size(), parent);
         c.send(new Event(identifier(), parent, new ResWithSide( side, output)));
 
     }

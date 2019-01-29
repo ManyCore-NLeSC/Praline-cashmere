@@ -1,6 +1,5 @@
 package nl.esciencecenter.praline.network;
 
-import ibis.constellation.Constellation;
 import nl.esciencecenter.praline.data.*;
 import nl.esciencecenter.praline.gapcost.AffineGapCost;
 
@@ -15,7 +14,7 @@ public class AlignmentTreeQueue {
     private final AlignmentTreeInteger alignmentTreeInteger;
     public long start;
 
-    public AlignmentTreeQueue(Constellation constellation, int nrLeaves, AlignmentMode mode, Matrix2DF[] costMatrices, Float costStartGap,
+    public AlignmentTreeQueue(int nrLeaves, AlignmentMode mode, Matrix2DF[] costMatrices, Float costStartGap,
                               Float costExtendGap, AlignmentTreeInteger alignmentTreeInteger) {
         this.nrLeaves = nrLeaves;
         this.alignmentMode = mode;

@@ -63,11 +63,12 @@ public class AffineGapAligner implements IAlign {
 
         for(int row = 1; row < sizeB + 1; row++){
             for(int col = 1 ; col < sizeA + 1; col++){
-                int traceA = traceback.get(row-1,col);
 
+                int traceA = traceback.get(row-1,col);
                 boolean gapAStarted = (traceA & GAPA_MASK) == GAPA_MASK;
                 float gapA = cost.get(row - 1,col) +
                         (gapAStarted ? gapCostA.extend : gapCostA.start);
+		
                 int traceB = traceback.get(row,col-1);
                 boolean gapBStarted =  (traceB & GAPB_MASK) == GAPB_MASK;
                 float gapB =  cost.get(row ,col - 1) +
@@ -76,6 +77,7 @@ public class AffineGapAligner implements IAlign {
 
                 float match =  cost.get(row-1,col - 1) +
                         posCosts.cost(col - 1, row-1);
+		
                 float score = max3(gapA,gapB,match);
                 int trace = 0 ;
                 if(mode == AlignmentMode.LOCAL && score <= 0){

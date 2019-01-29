@@ -17,7 +17,7 @@ public class TreeAligner implements Serializable{
     private final MSA aligner;
 
     public TreeAligner(AlignmentTreeQueue treeQueue) {
-	logger.debug("Creating a new TreeAligner with MSA as alignmer");
+	logger.debug("Creating a new TreeAligner with MSA as aligner");
         tree = treeQueue.getTree();
         aligner = new MSA(treeQueue.getCostMatrices(), treeQueue.getAffineGapCost(), treeQueue.getAffineGapCost(),
             treeQueue.getAlignmentMode());

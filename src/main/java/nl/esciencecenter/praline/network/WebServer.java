@@ -379,6 +379,9 @@ public class WebServer {
         synchronized ( alignmentTreeQueue ) {
             alignmentTreeQueue.put(name, queue);
         }
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Registering a tree with name: {}, alignmentMode: {}", name, alignmentMode);
+	}
         return 201;
     }
 

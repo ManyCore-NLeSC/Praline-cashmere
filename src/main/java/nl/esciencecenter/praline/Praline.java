@@ -1,12 +1,17 @@
 package nl.esciencecenter.praline;
 
-import com.beust.jcommander.JCommander;
-import ibis.constellation.*;
-import nl.esciencecenter.praline.network.WebServer;
+import java.io.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import com.beust.jcommander.JCommander;
+
+import ibis.constellation.*;
+import ibis.cashmere.constellation.Cashmere;
+
+import nl.esciencecenter.praline.network.WebServer;
+
 
 public class Praline {
 
@@ -38,7 +43,8 @@ public class Praline {
                 cons[i] = new ConstellationConfiguration(ctxt);
             }
 
-            Constellation c = ConstellationFactory.createConstellation(cons);
+	    Cashmere.initialize(cons);
+            Constellation c = Cashmere.getConstellation();
             c.activate();
             if (c.isMaster()) {
 		String dir = System.getenv("PRALINE_CASHMERE_DIR");
@@ -59,7 +65,8 @@ public class Praline {
                     server.wait();
                 }
                 logger.info("DONE!");
-                c.done();
+		// The actual c.done is done in SimpleConstellationRunner
+                // c.done();
                 // Clean up
                 server.close();
             } else {

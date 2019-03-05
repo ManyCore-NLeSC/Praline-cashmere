@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.praline.data.*;
 import nl.esciencecenter.praline.gapcost.IGapCost;
+import nl.esciencecenter.praline.gapcost.AffineGapCost;
+import nl.esciencecenter.praline.gapcost.LinearGapCost;
 import nl.esciencecenter.praline.positioncost.MotifPositionCost;
 import nl.esciencecenter.praline.positioncost.MotifProfilePositionCost;
 
@@ -29,6 +31,19 @@ public class MSA implements Serializable {
         this.mode = mode;
     }
 
+    AffineGapCost getAffineGapCost(IGapCost iGapCost) {
+	AffineGapCost gapCost;
+	if(iGapCost instanceof LinearGapCost) {
+            int cost = ((LinearGapCost)gapCostAg).cost;
+            gapCost = new AffineGapCost(cost,cost);
+        } else {
+            gapCost = ((AffineGapCost)  gapCostAg);
+        }
+
+	return gapCost;
+    }
+
+    
     public MSATree msa(AlignmentTree tree ){
         if(tree.sequence !=null){
 	    logger.debug("The alignment tree has a sequence, returning it");
@@ -75,22 +90,86 @@ public class MSA implements Serializable {
             rightSteps = right.coordinates;
         }
 
+	boolean mc = false;
         if(left.prof == null && right.prof == null){
 	    logger.debug("Both left.prof and right.prof == null, so applying AffineGapAligner on the leafs");
-            res = new AffineGapAligner().align(left.leaf.nrCols, right.leaf.nrCols,
-                    gapCostAg, gapCostBg,
-                    new MotifPositionCost(left.leaf, right.leaf, costMatrices), mode);
-            assert ComputeScore.getAlignScore(res.getAlignSteps(),left.leaf.nrCols, right.leaf.nrCols,gapCostAg, gapCostBg,
-                    new MotifPositionCost(left.leaf, right.leaf, costMatrices)) == res.getScore();
+
+	    int maxA = 0;
+	    int maxB = 0;
+	    for (int i = 0; i < costMatrices.length; i++) {
+		int nrRows = costMatrices[i].nrRows;
+		int nrColumns = costMatrices[i].nrCols;
+		logger.debug("Costmatrix {} has {} rows and {} columns", i, nrRows, nrColumns);
+		maxA += nrColumns;
+		maxB += nrRows;
+	    }
+
+	    logger.debug("maxA: {}, maxB: {}", maxA, maxB);
+
+	    // if (mc) {
+		// Kernel kernel = Cashmere.getKernel("align");
+		// KernelLaunch kl = kernel.createLaunch();
+		// MCL.launchAlignKernel(kl, left.leaf.nrCols, right.leaf.nrCols,
+		// 	sizeAlphabetMax, // ???
+		// 	costMatrices.length, // nrTracks
+		// 	sizesAlphabet
+	    // }
+	    // else {
+		logger.debug("launching AffineGapAligner with MotifPositionCost");
+		logger.debug("  left.leaf.nrCols: {}", left.leaf.nrCols);
+		logger.debug("  right.leaf.nrCols: {}", right.leaf.nrCols);
+		logger.debug("  sizeAlphabetMax: {}", 0);
+		logger.debug("  nrTracks: {}", costMatrices.length);
+		AffineGapCost gapCostA = getAffineGapCost(gapCostAg);
+		logger.debug("  gapCostStartA: {}", gapCostA.start);
+		logger.debug("  gapCostExtendA: {}", gapCostA.extend);
+		AffineGapCost gapCostB = getAffineGapCost(gapCostBg);
+		logger.debug("  gapCostStartB: {}", gapCostB.start);
+		logger.debug("  gapCostExtendB: {}", gapCostB.extend);
+		res = new AffineGapAligner().align(left.leaf.nrCols, right.leaf.nrCols,
+			gapCostAg, gapCostBg,
+			new MotifPositionCost(left.leaf, right.leaf, costMatrices), mode);
+		assert ComputeScore.getAlignScore(res.getAlignSteps(),left.leaf.nrCols, right.leaf.nrCols,gapCostAg, gapCostBg,
+			new MotifPositionCost(left.leaf, right.leaf, costMatrices)) == res.getScore();
+	    // }
 
         } else {
 	    logger.debug("Applying AffineGapAligner on left- and rightProf");
-            res = new AffineGapAligner().align(leftProf[0].nrRows, rightProf[0].nrRows,
-                    gapCostAg, gapCostBg,
-                    new MotifProfilePositionCost(leftProf, rightProf, costMatrices), mode);
-            assert ComputeScore.getAlignScore(res.getAlignSteps(),leftProf[0].nrRows, rightProf[0].nrRows,
-                    gapCostAg, gapCostBg,
-                    new MotifProfilePositionCost(leftProf, rightProf, costMatrices)) == res.getScore();
+
+	    int maxA = 0;
+	    int maxB = 0;
+	    for (int i = 0; i < costMatrices.length; i++) {
+		int nrRows = costMatrices[i].nrRows;
+		int nrColumns = costMatrices[i].nrCols;
+		logger.debug("Costmatrix {} has {} rows and {} columns", i, nrRows, nrColumns);
+		maxA += nrColumns;
+		maxB += nrRows;
+	    }
+
+	    logger.debug("maxA: {}, maxB: {}", maxA, maxB);
+
+	    
+            // if (mc) {
+	    // }
+	    // else {
+		logger.debug("launching AffineGapAligner with MotifProfilePositionCost");
+		logger.debug("  leftProf[0].nrRows: {}", leftProf[0].nrRows);
+		logger.debug("  rightProf[0].nrCols: {}", rightProf[0].nrRows);
+		logger.debug("  sizeAlphabetMax: {}", 0);
+		logger.debug("  nrTracks: {}", costMatrices.length);
+		AffineGapCost gapCostA = getAffineGapCost(gapCostAg);
+		logger.debug("  gapCostStartA: {}", gapCostA.start);
+		logger.debug("  gapCostExtendA: {}", gapCostA.extend);
+		AffineGapCost gapCostB = getAffineGapCost(gapCostBg);
+		logger.debug("  gapCostStartB: {}", gapCostB.start);
+		logger.debug("  gapCostExtendB: {}", gapCostB.extend);
+		res = new AffineGapAligner().align(leftProf[0].nrRows, rightProf[0].nrRows,
+			gapCostAg, gapCostBg,
+			new MotifProfilePositionCost(leftProf, rightProf, costMatrices), mode);
+		assert ComputeScore.getAlignScore(res.getAlignSteps(),leftProf[0].nrRows, rightProf[0].nrRows,
+			gapCostAg, gapCostBg,
+			new MotifProfilePositionCost(leftProf, rightProf, costMatrices)) == res.getScore();
+	    // }
         }
 //        System.out.println("LEFTA");
 //        leftSteps.printMatrix();

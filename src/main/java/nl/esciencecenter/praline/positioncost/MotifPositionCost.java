@@ -26,16 +26,17 @@ public class MotifPositionCost implements IPositionCost {
         for(int track = 0; track < alignCosts.length; track++){
             int ac;
             int bc;
+	    
             if(posA >= a.nrCols || posB >= b.nrCols){
                 System.err.printf("OUTOFBOUNDS\n");
                 System.err.printf("track %d rows %d cols %d\n", track, a.nrRows, b.nrRows);
                 System.err.printf("ding %d %d\n",  posA,posB);
                 throw new Error("cost out of bounds!");
             } else {
-
                 ac = a.get(track,posA);
                 bc = b.get(track,posB);
             }
+	    
             if(ac >= alignCosts[track].nrRows || bc >= alignCosts[track].nrCols){
                 System.err.printf("OUTOFBOUNDS\n");
                 System.err.printf("track %d rows %d cols %d\n", track, alignCosts[track].nrRows, alignCosts[track].nrCols);
@@ -44,8 +45,6 @@ public class MotifPositionCost implements IPositionCost {
             } else {
                 cost+=alignCosts[track].get(ac, bc);
             }
-
-
         }
         return cost;
     }

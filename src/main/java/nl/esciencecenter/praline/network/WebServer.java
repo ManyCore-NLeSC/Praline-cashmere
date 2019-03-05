@@ -380,7 +380,8 @@ public class WebServer {
             alignmentTreeQueue.put(name, queue);
         }
 	if (logger.isDebugEnabled()) {
-	    logger.debug("Registering a tree with name: {}, alignmentMode: {}", name, alignmentMode);
+	    logger.debug(String.format("Registering a tree with name: %s, alignmentMode: %s, costStartGap: %f, costExtendGap: %f", 
+			    name, alignmentMode, costStartGap, costExtendGap));
 	}
         return 201;
     }

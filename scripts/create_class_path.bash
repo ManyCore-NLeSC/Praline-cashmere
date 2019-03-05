@@ -2,8 +2,7 @@
 
 createClassPath() {
     basedir=$1
-    jar=$2
-    classpath="$1/$2"
+    classpath=""
 
     if [ -d $basedir/lib ]
     then

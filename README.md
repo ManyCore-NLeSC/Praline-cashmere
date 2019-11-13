@@ -33,6 +33,7 @@ conda install numpy
 ```bash
 git clone praline.git
 cd praline
+git checkout cashmere
 ```
 
 Then install Praline from the `praline` directory:
@@ -48,10 +49,11 @@ This repository contains the motif-aware part of praline.
 ```bash
 git clone MA-PRALINE.git
 cd MA-PRALINE
+git checkout cashmere
 ```
 
-In `setup.py` we remove the dependency on `praline` by removing package
-`PRALINE>=1.0` from the variable `install_requires`.
+<!-- In `setup.py` we remove the dependency on `praline` by removing package -->
+<!-- `PRALINE>=1.0` from the variable `install_requires`. -->
 
 Then we can run:
 
@@ -134,6 +136,7 @@ We need the following Python (2) packages:
 ```bash
 git clone praline.git
 cd praline
+git checkout cashmere
 ```
 
 Then install Praline from the `praline` directory:
@@ -149,10 +152,11 @@ This repository contains the motif-aware part of praline.
 ```bash
 git clone MA-PRALINE.git
 cd MA-PRALINE
+git checkout cashmere
 ```
 
-In `setup.py` we remove the dependency on `praline` by removing package
-`PRALINE>=1.0` from the variable `install_requires`.
+<!-- In `setup.py` we remove the dependency on `praline` by removing package -->
+<!-- `PRALINE>=1.0` from the variable `install_requires`. -->
 
 Then we can run:
 
